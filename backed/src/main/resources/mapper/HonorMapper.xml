@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.HonorMapper">
+    
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.Honor">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="category" property="category"/>
+        <result column="achieved_time" property="achievedTime"/>
+        <result column="project_id" property="projectId"/>
+        <result column="icon" property="icon"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, title, description, category, achieved_time, project_id, icon,
+        rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+    </sql>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_honor
+        WHERE id = #{id} AND arch_flag = 0 AND rec_creator = #{recCreator}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_honor
+        WHERE arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY achieved_time DESC
+    </select>
+    
+    <select id="selectByCategory" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_honor
+        WHERE category = #{category} AND arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY achieved_time DESC
+    </select>
+    
+    <insert id="insert" parameterType="com.knowledge.entity.Honor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_honor (
+            title, description, category, achieved_time, project_id, icon,
+            rec_creator, rec_create_time, arch_flag
+        ) VALUES (
+            #{title}, #{description}, #{category}, #{achievedTime}, #{projectId}, #{icon},
+            #{recCreator}, NOW(), 0
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.knowledge.entity.Honor">
+        UPDATE km_honor
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="achievedTime != null">achieved_time = #{achievedTime},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="recRevisor != null">rec_revisor = #{recRevisor},</if>
+            rec_revise_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        UPDATE km_honor
+        SET arch_flag = 1, rec_revise_time = NOW()
+        WHERE id = #{id}
+    </delete>
+    
+</mapper>
+

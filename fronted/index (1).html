@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人知识管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#7B61FF',
+                        accent: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        dark: '#1D2129',
+                        'dark-800': '#2B2F36',
+                        'dark-600': '#4E5969',
+                        'dark-400': '#86909C',
+                        'dark-200': '#C9CDD4',
+                        'dark-100': '#F2F3F5',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px rgba(0, 0, 0, 0.1)',
+                        'hover': '0 8px 30px rgba(0, 0, 0, 0.12)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            .animate-slide-in {
+                animation: slideIn 0.4s ease-out;
+            }
+            .animate-pulse-soft {
+                animation: pulseSoft 2s infinite;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulseSoft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="font-inter bg-dark text-dark-100 min-h-screen flex flex-col">
+    <!-- 侧边栏导航 -->
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-dark-800 shadow-lg transform transition-transform duration-300 lg:translate-x-0 -translate-x-full" id="sidebar">
+        <div class="flex items-center justify-between p-4 border-b border-dark-600">
+            <h1 class="text-xl font-bold text-primary flex items-center space-x-2">
+                <i class="fa fa-lightbulb"></i>
+                <span>知识管理系统</span>
+            </h1>
+            <button class="lg:hidden text-dark-400 hover:text-dark-100" id="closeSidebar">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        
+        <nav class="p-4 space-y-1">
+            <a href="#dashboard" class="flex items-center p-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors sidebar-link">
+                <i class="fa fa-tachometer w-6"></i>
+                <span>仪表盘</span>
+            </a>
+            <div class="space-y-1">
+                <button class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors group" id="materialsBtn">
+                    <div class="flex items-center">
+                        <i class="fa fa-book w-6"></i>
+                        <span>素材组</span>
+                    </div>
+                    <i class="fa fa-chevron-down text-xs transition-transform duration-200 group-active:rotate-180"></i>
+                </button>
+                <div class="pl-8 space-y-1 hidden" id="materialsMenu">
+                    <a href="#fragment-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-lightbulb-o mr-2"></i>碎片笔记
+                    </a>
+                    <a href="#basic-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-file-text-o mr-2"></i>基础笔记
+                    </a>
+                    <a href="#study-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-graduation-cap mr-2"></i>求学笔记
+                    </a>
+                    <a href="#book-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-book mr-2"></i>书籍笔记
+                    </a>
+                    <a href="#exercise-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-pencil-square-o mr-2"></i>刷题笔记
+                    </a>
+                    <a href="#practical-notes" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-cogs mr-2"></i>实战笔记
+                    </a>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <button class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors group" id="actionsBtn">
+                    <div class="flex items-center">
+                        <i class="fa fa-briefcase w-6"></i>
+                        <span>行动组</span>
+                    </div>
+                    <i class="fa fa-chevron-down text-xs transition-transform duration-200 group-active:rotate-180"></i>
+                </button>
+                <div class="pl-8 space-y-1 hidden" id="actionsMenu">
+                    <a href="#defense-projects" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-shield mr-2"></i>防守战争
+                    </a>
+                    <a href="#construction-projects" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-building mr-2"></i>工程建设
+                    </a>
+                    <a href="#diplomatic-projects" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-handshake-o mr-2"></i>外交行动
+                    </a>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <button class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors group" id="commandBtn">
+                    <div class="flex items-center">
+                        <i class="fa fa-star w-6"></i>
+                        <span>最高首脑</span>
+                    </div>
+                    <i class="fa fa-chevron-down text-xs transition-transform duration-200 group-active:rotate-180"></i>
+                </button>
+                <div class="pl-8 space-y-1 hidden" id="commandMenu">
+                    <a href="#info-statistics" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-bar-chart mr-2"></i>信息统计
+                    </a>
+                    <a href="#system-decisions" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-gavel mr-2"></i>系统决策
+                    </a>
+                    <a href="#system-summary" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-file-text mr-2"></i>系统总结
+                    </a>
+                    <a href="#theory-system" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-cubes mr-2"></i>理论体系
+                    </a>
+                    <a href="#practical-system" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-cogs mr-2"></i>实战体系
+                    </a>
+                    <a href="#exam-projects" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-certificate mr-2"></i>备考工程
+                    </a>
+                    <a href="#project-production" class="block p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-600/30 transition-colors sidebar-link">
+                        <i class="fa fa-folder-open mr-2"></i>项目制作
+                    </a>
+                </div>
+            </div>
+            <a href="#system-overview" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors sidebar-link">
+                <i class="fa fa-info-circle w-6"></i>
+                <span>系统概述</span>
+            </a>
+            <a href="#settings" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors sidebar-link">
+                <i class="fa fa-cog w-6"></i>
+                <span>设置</span>
+            </a>
+        </nav>
+        
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-dark-600">
+            <div class="flex items-center space-x-3">
+                <img src="https://picsum.photos/id/64/40/40" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                <div>
+                    <p class="text-sm font-medium">知识管理者</p>
+                    <p class="text-xs text-dark-400">成长中...</p>
+                </div>
+                <button class="ml-auto text-dark-400 hover:text-dark-100">
+                    <i class="fa fa-sign-out"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="flex-1 lg:ml-64 transition-all duration-300">
+        <!-- 顶部导航栏 -->
+        <header class="sticky top-0 z-40 bg-dark-800/80 backdrop-blur-md border-b border-dark-600 shadow-sm">
+            <div class="flex items-center justify-between px-4 py-3">
+                <div class="flex items-center">
+                    <button class="lg:hidden text-dark-200 hover:text-dark-100 mr-4" id="openSidebar">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="relative">
+                        <input type="text" placeholder="搜索笔记、项目..." class="pl-10 pr-4 py-2 bg-dark-600/50 border border-dark-600 rounded-lg text-dark-100 focus:outline-none focus:ring-2 focus:ring-primary/50 w-64 lg:w-80">
+                        <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative text-dark-200 hover:text-dark-100" id="notificationBtn">
+                        <i class="fa fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-danger rounded-full"></span>
+                    </button>
+                    <button class="relative text-dark-200 hover:text-dark-100" id="messageBtn">
+                        <i class="fa fa-envelope text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+                    </button>
+                    <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors" id="newItemBtn">
+                        <i class="fa fa-plus"></i>
+                        <span>新建</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 页面内容 -->
+        <main class="p-4 lg:p-6">
+            <!-- 项目背景部分 -->
+            <section id="dashboard" class="mb-8 animate-fade-in">
+                <div class="bg-dark-800 rounded-xl shadow-card p-6 mb-6">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4 text-balance">个人知识管理系统</h2>
+                    <p class="text-dark-200 text-lg mb-6 leading-relaxed">
+                        本系统面向个人工作、学习、项目成长的多场景管理，构建"素材积累-项目实战-系统升级"的知识与能力闭环，实现碎片知识管理、有序项目推进与自我提升。
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-dark-600/30 rounded-lg p-5 border border-dark-600/50 hover:shadow-hover transition-shadow cursor-pointer" id="materialsSectionBtn">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold">素材组</h3>
+                                <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium">知识资源池</span>
+                            </div>
+                            <p class="text-dark-400 mb-4">日常学习、灵感、知识碎片的总汇</p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-dark-400 text-sm">已收集</p>
+                                    <p class="text-2xl font-bold">128 条</p>
+                                </div>
+                                <button class="text-primary hover:text-primary/80">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-dark-600/30 rounded-lg p-5 border border-dark-600/50 hover:shadow-hover transition-shadow cursor-pointer" id="actionsSectionBtn">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold">行动组</h3>
+                                <span class="bg-secondary/20 text-secondary px-3 py-1 rounded-full text-sm font-medium">实践转化区</span>
+                            </div>
+                            <p class="text-dark-400 mb-4">实际项目、工作、工程的开展场域</p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-dark-400 text-sm">进行中</p>
+                                    <p class="text-2xl font-bold">5 个项目</p>
+                                </div>
+                                <button class="text-secondary hover:text-secondary/80">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-dark-600/30 rounded-lg p-5 border border-dark-600/50 hover:shadow-hover transition-shadow cursor-pointer" id="commandSectionBtn">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold">最高首脑</h3>
+                                <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">指挥中枢</span>
+                            </div>
+                            <p class="text-dark-400 mb-4">方向决策、大局规划与战略复盘</p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-dark-400 text-sm">本月计划</p>
+                                    <p class="text-2xl font-bold">3 项</p>
+                                </div>
+                                <button class="text-accent hover:text-accent/80">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 统计图表 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-dark-800 rounded-xl shadow-card p-6 lg:col-span-2">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold">知识成长趋势</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-sm bg-dark-600/50 rounded-md hover:bg-dark-600/80 transition-colors chart-period-btn" data-period="week">本周</button>
+                                <button class="px-3 py-1 text-sm bg-primary/20 text-primary rounded-md hover:bg-primary/30 transition-colors chart-period-btn" data-period="month">本月</button>
+                                <button class="px-3 py-1 text-sm bg-dark-600/50 rounded-md hover:bg-dark-600/80 transition-colors chart-period-btn" data-period="year">全年</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-dark-800 rounded-xl shadow-card p-6">
+                        <h3 class="text-xl font-semibold mb-6">知识分布</h3>
+                        <div class="h-64">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 待办任务和最近更新 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-dark-800 rounded-xl shadow-card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold">待办任务</h3>
+                            <button class="text-primary hover:text-primary/80 text-sm">查看全部</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-dark-600/20 rounded-lg border border-dark-600/40">
+                                <input type="checkbox" class="mr-3 h-5 w-5 text-primary rounded border-dark-600 focus:ring-primary task-checkbox">
+                                <div class="flex-1">
+                                    <p class="font-medium">整理本周碎片笔记</p>
+                                    <p class="text-dark-400 text-sm">截止日期: 今天</p>
+                                </div>
+                                <span class="px-2 py-1 bg-warning/20 text-warning text-xs rounded-full">紧急</span>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-dark-600/20 rounded-lg border border-dark-600/40">
+                                <input type="checkbox" class="mr-3 h-5 w-5 text-primary rounded border-dark-600 focus:ring-primary task-checkbox">
+                                <div class="flex-1">
+                                    <p class="font-medium">完成项目月度复盘</p>
+                                    <p class="text-dark-400 text-sm">截止日期: 明天</p>
+                                </div>
+                                <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">常规</span>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-dark-600/20 rounded-lg border border-dark-600/40">
+                                <input type="checkbox" class="mr-3 h-5 w-5 text-primary rounded border-dark-600 focus:ring-primary task-checkbox">
+                                <div class="flex-1">
+                                    <p class="font-medium">提炼书籍笔记精华</p>
+                                    <p class="text-dark-400 text-sm">截止日期: 周六</p>
+                                </div>
+                                <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">常规</span>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-dark-600/20 rounded-lg border border-dark-600/40">
+                                <input type="checkbox" class="mr-3 h-5 w-5 text-primary rounded border-dark-600 focus:ring-primary task-checkbox">
+                                <div class="flex-1">
+                                    <p class="font-medium">制定下月学习计划</p>
+                                    <p class="text-dark-400 text-sm">截止日期: 下周一</p>
+                                </div>
+                                <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">常规</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-dark-800 rounded-xl shadow-card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold">最近更新</h3>
+                            <button class="text-primary hover:text-primary/80 text-sm">查看全部</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start p-3 bg-dark-600/20 rounded-lg border border-dark-600/40 cursor-pointer" data-note-id="1">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                    <i class="fa fa-file-text-o"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium">Python数据分析笔记</p>
+                                        <span class="text-dark-400 text-xs">2小时前</span>
+                                    </div>
+                                    <p class="text-dark-400 text-sm mt-1">更新了数据可视化部分，添加了Matplotlib和Seaborn的使用示例</p>
+                                    <div class="flex items-center mt-2">
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full mr-2">基础笔记</span>
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">Python</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start p-3 bg-dark-600/20 rounded-lg border border-dark-600/40 cursor-pointer" data-note-id="2">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+                                    <i class="fa fa-cogs"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium">个人网站重构</p>
+                                        <span class="text-dark-400 text-xs">昨天</span>
+                                    </div>
+                                    <p class="text-dark-400 text-sm mt-1">完成了首页设计，优化了响应式布局，添加了新的交互元素</p>
+                                    <div class="flex items-center mt-2">
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full mr-2">工程建设</span>
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">前端</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start p-3 bg-dark-600/20 rounded-lg border border-dark-600/40 cursor-pointer" data-note-id="3">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium">《学习之道》读书笔记</p>
+                                        <span class="text-dark-400 text-xs">3天前</span>
+                                    </div>
+                                    <p class="text-dark-400 text-sm mt-1">完成了第三章"学习的记忆机制"的阅读笔记，整理了关键概念和实践方法</p>
+                                    <div class="flex items-center mt-2">
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full mr-2">书籍笔记</span>
+                                        <span class="px-2 py-1 bg-dark-600/50 text-dark-200 text-xs rounded-full">学习方法</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 系统概述部分 -->
+            <section id="system-overview" class="mb-8 animate-fade-in hidden">
+                <div class="bg-dark-800 rounded-xl shadow-card p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-6">系统概述</h2>
+                    
+                    <!-- 系统定位与核心目标 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">系统定位与核心目标</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary mt-1 mr-3">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">素材组</h4>
+                                    <p class="text-dark-400">为日常学习、灵感、知识碎片的总汇，知识的资源池。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mt-1 mr-3">
+                                    <i class="fa fa-cogs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">行动组</h4>
+                                    <p class="text-dark-400">为所有实际项目、工作、工程、考试、对外交付的开展场域，是知识的实践与转化区。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent mt-1 mr-3">
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">最高首脑</h4>
+                                    <p class="text-dark-400">为方向决策、大局规划、理论总结与战略复盘的"指挥中枢"，优化素材与行动间流转，驱动持续成长。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分区结构及功能定义 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">分区结构及功能定义</h3>
+                        
+                        <!-- 素材组 -->
+                        <div class="bg-dark-600/30 rounded-xl p-5 border border-dark-600/50 mb-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <h4 class="text-lg font-semibold">素材组</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-medium">用途</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>承载日常所有学习、积累、输出、灵感、素材的"第一存放点"</li>
+                                        <li>按素材性质设六大分组，便于归类与后续调取</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">六大分组说明</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>碎片笔记：随时记录的灵感、短内容、网络摘录等</li>
+                                        <li>基础笔记：自主探索、原理归纳，立足于通用技能和系统知识框架</li>
+                                        <li>求学笔记：参与课程、外部班级学习的记录</li>
+                                        <li>书籍笔记：各类书籍阅读摘要与洞见</li>
+                                        <li>刷题笔记：做题过程中的技巧总结、典型题型与答疑札记</li>
+                                        <li>实战笔记：实操尝试或临时项目实践中的心得、踩坑、改进点，不直接挂钩大项目</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">核心需求要点</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>默认一切新知识先归档素材组</li>
+                                        <li>创新、经验、技巧沉淀后，将关键内容提炼/升华，用于项目发起或全局总结</li>
+                                        <li>保持分类完整、命名清晰、标签规范，便于导出、检索和复用</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 行动组 -->
+                        <div class="bg-dark-600/30 rounded-xl p-5 border border-dark-600/50 mb-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mr-3">
+                                    <i class="fa fa-briefcase"></i>
+                                </div>
+                                <h4 class="text-lg font-semibold">行动组</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-medium">用途</h5>
+                                    <p class="text-dark-400">将素材转化为成果，承担项目落地、工作任务、对外交付等"行动主场"</p>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">下设三类</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>防守战争：代表工作、考试、对外需求等外部驱动的项目。重点在甲方/考试/上级要求下的成果输出与能力应对。</li>
+                                        <li>工程建设：自研/主动发起的工程项目。源于长远目标、能力建设的主动实践，为未来战争或外交工程提供底层能力。</li>
+                                        <li>外交行动：对外合作、联动、自主对外输出（如为别人/外部机构服务或协作）。虽可参考既有工程，但独立推进，产出独立。</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">核心需求要点</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>项目需明确目标、时间节点、资源需求，制定可执行计划</li>
+                                        <li>定期跟踪进度，记录问题与解决方案，形成项目经验库</li>
+                                        <li>项目结束后需进行复盘，提炼通用经验，纳入理论体系或补充素材组</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 最高首脑 -->
+                        <div class="bg-dark-600/30 rounded-xl p-5 border border-dark-600/50">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent mr-3">
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <h4 class="text-lg font-semibold">最高首脑</h4>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="font-medium">用途</h5>
+                                    <p class="text-dark-400">统揽全局，从战略高度规划方向，制定决策，总结规律，优化知识管理系统运转</p>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">下设七项</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>信息统计：对素材组、行动组数据进行多维度统计分析，辅助决策</li>
+                                        <li>系统决策：基于数据与趋势分析，制定阶段性目标、资源分配与优先级决策</li>
+                                        <li>系统总结：定期对整体系统运行情况进行全面总结，发现问题与改进点</li>
+                                        <li>理论体系：将零散知识系统化，构建个人知识体系框架</li>
+                                        <li>实战体系：提炼项目实践中的方法论、流程、模式，形成可复用的实战体系</li>
+                                        <li>备考工程：针对重要考试、认证的专门备考计划与执行</li>
+                                        <li>项目制作：将积累的素材和能力整合，制作有价值的输出成果</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h5 class="font-medium">核心需求要点</h5>
+                                    <ul class="list-disc pl-5 text-dark-400 space-y-1">
+                                        <li>定期（至少每月）进行系统性回顾与规划，确保方向不偏离长期目标</li>
+                                        <li>注重知识体系化建设，避免碎片化积累</li>
+                                        <li>通过数据驱动决策，而非仅凭感觉</li>
+                                        <li>保持开放心态，根据反馈和环境变化灵活调整策略</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 系统流程 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">系统流程</h3>
+                        <div class="bg-dark-600/30 rounded-xl p-5 border border-dark-600/50">
+                            <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary mx-auto mb-3">
+                                        <i class="fa fa-arrow-down text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-medium">获取知识</h4>
+                                    <p class="text-dark-400 text-sm mt-1">学习、阅读、实践、交流</p>
+                                </div>
+                                
+                                <div class="w-full md:w-16 flex items-center justify-center">
+                                    <div class="w-full h-1 bg-dark-600 relative">
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse-soft"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary mx-auto mb-3">
+                                        <i class="fa fa-folder text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-medium">素材组</h4>
+                                    <p class="text-dark-400 text-sm mt-1">分类整理、初步加工</p>
+                                </div>
+                                
+                                <div class="w-full md:w-16 flex items-center justify-center">
+                                    <div class="w-full h-1 bg-dark-600 relative">
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse-soft"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center text-secondary mx-auto mb-3">
+                                        <i class="fa fa-cogs text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-medium">行动组</h4>
+                                    <p class="text-dark-400 text-sm mt-1">项目实践、能力转化</p>
+                                </div>
+                                
+                                <div class="w-full md:w-16 flex items-center justify-center">
+                                    <div class="w-full h-1 bg-dark-600 relative">
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse-soft"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center text-accent mx-auto mb-3">
+                                        <i class="fa fa-star text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-medium">最高首脑</h4>
+                                    <p class="text-dark-400 text-sm mt-1">总结规律、优化系统</p>
+                                </div>
+                                
+                                <div class="w-full md:w-16 flex items-center justify-center">
+                                    <div class="w-full h-1 bg-dark-600 relative">
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-3 h-3 bg-primary rounded-full animate-pulse-soft"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full bg-warning/20 flex items-center justify-center text-warning mx-auto mb-3">
+                                        <i class="fa fa-arrow-up text-2xl"></i>
+                                    </div>
+                                    <h4 class="font-medium">能力提升</h4>
+                                    <p class="text-dark-400 text-sm mt-1">持续成长、价值输出</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 素材组部分 -->
+            <section id="materials-section" class="mb-8 animate-fade-in hidden">
+                <div class="bg-dark-800 rounded-xl shadow-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold">素材组</h2>
+                        <div class="flex space-x-2">
+                            <button class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg flex items-center space-x-2 transition-colors" id="newNoteBtn">
+                                <i class="fa fa-plus"></i>
+                                <span>新建笔记</span>
+                            </button>
+                            <button class="px-4 py-2 bg-dark-600/50 hover:bg-dark-600/80 text-dark-100 rounded-lg flex items-center space-x-2 transition-colors">
+                                <i class="fa fa-filter"></i>
+                                <span>筛选</span>
+                            </button>
+                            <button class="px-4 py-2 bg-dark-600/50 hover:bg-dark-600/80 text-dark-100 rounded-lg flex items-center space-x-2 transition-colors">
+                                <i class="fa fa-sort"></i>
+                                <span>排序</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 素材组标签页 -->
+                    <div class="border-b border-dark-600 mb-6">
+                        <div class="flex space-x-1 overflow-x-auto scrollbar-hide">
+                            <button class="px-4 py-2 text-primary border-b-2 border-primary font-medium" data-material-tab="all">全部</button>
+                            <button class="px-4 py-2 text-dark-400 hover:text-dark-100" data-material-tab="basic">基础笔记</button>
+                            <button class="px-4 py-2 text-dark-400 hover:text-dark-100" data-material-tab="study">求学笔记</button>
+                            <button class="px-4 py-2 text-dark-400 hover:text-dark-100" data-material-tab="book">书籍笔记</button>
+                            <button class="px-4 py-2 text-dark-400 hover:text-dark-100" data-material-tab="exercise">刷题笔记</button>
+                            <button class="px-4 py-2 text-dark-400 hover:text-dark-100" data-material-tab="practical">实战笔记</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 素材组内容 -->
+                    <div class="space-y-4">
+                        <!-- 素材组内容模板代码 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
