@@ -50,3 +50,7 @@ public class BaseEntity implements Serializable {
     private Integer archFlag;
 }
 
+
+
+
+

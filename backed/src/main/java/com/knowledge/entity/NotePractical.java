@@ -35,3 +35,7 @@ public class NotePractical extends BaseEntity {
     private String projectName;
 }
 
+
+
+
+

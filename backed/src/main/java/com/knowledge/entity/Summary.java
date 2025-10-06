@@ -50,3 +50,7 @@ public class Summary extends BaseEntity {
     private String tags;
 }
 
+
+
+
+

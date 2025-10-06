@@ -133,21 +133,28 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   
-  // 如果页面需要认证
+  // 如果访问登录页或注册页
+  if (to.path === '/login' || to.path === '/register') {
+    if (token) {
+      // 已登录，跳转到首页
+      next('/')
+    } else {
+      // 未登录，允许访问
+      next()
+    }
+    return
+  }
+  
+  // 访问其他页面，检查是否需要认证
   if (to.meta.requiresAuth !== false) {
     if (!token) {
       // 未登录，跳转到登录页
-      next('/login')
+      next({ path: '/login', query: { redirect: to.fullPath } })
     } else {
       next()
     }
   } else {
-    // 如果已登录访问登录页或注册页，跳转到首页
-    if ((to.path === '/login' || to.path === '/register') && token) {
-      next('/')
-    } else {
-      next()
-    }
+    next()
   }
 })
 

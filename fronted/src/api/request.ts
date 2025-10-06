@@ -1,7 +1,8 @@
 /**
  * 统一请求封装
  */
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import type { ApiResponse } from '@/types/api'
 
 // API基础路径
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'

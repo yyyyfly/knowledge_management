@@ -309,15 +309,15 @@
               <div class="mt-2 space-y-1">
                 <div class="flex justify-between text-xs">
                   <span class="text-blue-600">已完成</span>
-                  <span class="font-medium">1</span>
+                  <span class="font-medium">{{ defenseProjectStats.completed }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-green-600">进行中</span>
-                  <span class="font-medium">2</span>
+                  <span class="font-medium">{{ defenseProjectStats.inProgress }}</span>
             </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-yellow-600">规划中</span>
-                  <span class="font-medium">0</span>
+                  <span class="font-medium">{{ defenseProjectStats.planning }}</span>
               </div>
               </div>
             </div>
@@ -329,25 +329,25 @@
                 <i class="fa-solid fa-tasks text-red-500 text-sm"></i>
               </div>
               <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ allTasks.filter(t => defenseProjects.some(p => p.id === t.projectId)).length }}</span>
+                <span class="text-2xl font-bold text-gray-900">{{ defenseTaskStats.total }}</span>
                 <span class="text-sm text-gray-500">个</span>
               </div>
               <div class="mt-2 space-y-1">
                 <div class="flex justify-between text-xs">
                   <span class="text-green-600">已完成</span>
-                  <span class="font-medium">9</span>
+                  <span class="font-medium">{{ defenseTaskStats.completed }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">2</span>
+                  <span class="font-medium">{{ defenseTaskStats.inProgress }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">8</span>
+                  <span class="font-medium">{{ defenseTaskStats.notStarted }}</span>
             </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-red-600">已停止</span>
-                  <span class="font-medium">0</span>
+                  <span class="font-medium">{{ defenseTaskStats.stopped }}</span>
               </div>
               </div>
             </div>
@@ -357,7 +357,7 @@
           <div class="flex items-center justify-between text-sm text-gray-500">
             <div class="flex items-center space-x-2">
               <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: 2小时前</span>
+              <span>最近更新: {{ getProjectLatestUpdate('defense') }}</span>
             </div>
             <div class="flex items-center space-x-1 text-red-500 group-hover:translate-x-1 transition-transform duration-300">
               <span class="text-sm font-medium">查看详情</span>
@@ -424,25 +424,25 @@
                 <i class="fa-solid fa-tasks text-blue-500 text-sm"></i>
               </div>
               <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ allTasks.filter(t => constructionProjects.some(p => p.id === t.projectId)).length }}</span>
+                <span class="text-2xl font-bold text-gray-900">{{ constructionTaskStats.total }}</span>
                 <span class="text-sm text-gray-500">个</span>
               </div>
               <div class="mt-2 space-y-1">
                 <div class="flex justify-between text-xs">
                   <span class="text-green-600">已完成</span>
-                  <span class="font-medium">5</span>
+                  <span class="font-medium">{{ constructionTaskStats.completed }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">1</span>
+                  <span class="font-medium">{{ constructionTaskStats.inProgress }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">6</span>
+                  <span class="font-medium">{{ constructionTaskStats.notStarted }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-red-600">已停止</span>
-                  <span class="font-medium">0</span>
+                  <span class="font-medium">{{ constructionTaskStats.stopped }}</span>
                 </div>
               </div>
             </div>
@@ -452,7 +452,7 @@
           <div class="flex items-center justify-between text-sm text-gray-500">
             <div class="flex items-center space-x-2">
               <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: 1小时前</span>
+              <span>最近更新: {{ getProjectLatestUpdate('construction') }}</span>
             </div>
             <div class="flex items-center space-x-1 text-blue-500 group-hover:translate-x-1 transition-transform duration-300">
               <span class="text-sm font-medium">查看详情</span>
@@ -519,25 +519,25 @@
                 <i class="fa-solid fa-tasks text-green-500 text-sm"></i>
               </div>
               <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ allTasks.filter(t => diplomaticProjects.some(p => p.id === t.projectId)).length }}</span>
+                <span class="text-2xl font-bold text-gray-900">{{ diplomaticTaskStats.total }}</span>
                 <span class="text-sm text-gray-500">个</span>
               </div>
               <div class="mt-2 space-y-1">
                 <div class="flex justify-between text-xs">
                   <span class="text-green-600">已完成</span>
-                  <span class="font-medium">0</span>
+                  <span class="font-medium">{{ diplomaticTaskStats.completed }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">1</span>
+                  <span class="font-medium">{{ diplomaticTaskStats.inProgress }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">4</span>
+                  <span class="font-medium">{{ diplomaticTaskStats.notStarted }}</span>
                 </div>
                 <div class="flex justify-between text-xs">
                   <span class="text-red-600">已停止</span>
-                  <span class="font-medium">0</span>
+                  <span class="font-medium">{{ diplomaticTaskStats.stopped }}</span>
                 </div>
               </div>
             </div>
@@ -547,7 +547,7 @@
           <div class="flex items-center justify-between text-sm text-gray-500">
             <div class="flex items-center space-x-2">
               <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: 4小时前</span>
+              <span>最近更新: {{ getProjectLatestUpdate('diplomatic') }}</span>
             </div>
             <div class="flex items-center space-x-1 text-green-500 group-hover:translate-x-1 transition-transform duration-300">
               <span class="text-sm font-medium">查看详情</span>
@@ -596,191 +596,31 @@
         </h3>
         <p class="text-gray-600 text-sm mt-1">系统操作记录与动态追踪</p>
       </div>
-      <div class="space-y-4">
-        <!-- 碎片笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-lg border border-indigo-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-puzzle-piece text-indigo-600 text-lg"></i>
+      <div v-if="recentActivities.length === 0" class="text-center py-12 text-gray-500">
+        <i class="fas fa-inbox text-4xl mb-3"></i>
+        <p>暂无最近活动</p>
+      </div>
+      <div v-else class="space-y-4">
+        <div 
+          v-for="note in recentActivities" 
+          :key="note.id" 
+          class="flex items-center space-x-4 p-4 bg-gradient-to-r rounded-lg border hover:shadow-md transition-shadow"
+          :class="`${getNoteTypeConfig(note.type).bgClass} ${getNoteTypeConfig(note.type).borderClass}`"
+        >
+          <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-sm" :class="getNoteTypeConfig(note.type).iconBgClass">
+            <i class="fas text-lg" :class="`${getNoteTypeConfig(note.type).icon} ${getNoteTypeConfig(note.type).iconColorClass}`"></i>
           </div>
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">前端性能优化灵感集</p>
-              <span class="bg-indigo-200 text-indigo-700 px-2 py-1 rounded-full text-xs font-medium">碎片笔记</span>
+              <p class="text-sm font-medium text-gray-900 truncate">{{ note.title || '无标题' }}</p>
+              <span class="px-2 py-1 rounded-full text-xs font-medium flex-shrink-0" :class="`${getNoteTypeConfig(note.type).badgeBgClass} ${getNoteTypeConfig(note.type).badgeTextClass}`">
+                {{ getNoteTypeConfig(note.type).label }}
+              </span>
             </div>
-            <p class="text-xs text-gray-600">记录了代码分割、懒加载等优化技巧的灵感片段</p>
+            <p class="text-xs text-gray-600 line-clamp-1">{{ note.content || '暂无内容' }}</p>
           </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">3天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-lg border border-indigo-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-puzzle-piece text-indigo-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">移动端交互细节随记</p>
-              <span class="bg-indigo-200 text-indigo-700 px-2 py-1 rounded-full text-xs font-medium">碎片笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">收集移动端常见交互设计灵感与问题</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">5天前</span>
-          </div>
-        </div>
-        <!-- 框架笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-sitemap text-purple-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">Vue 3 框架知识导图</p>
-              <span class="bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">框架笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">整理Vue 3核心知识点的结构化导图</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">2天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-sitemap text-purple-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">前后端分层架构梳理</p>
-              <span class="bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">框架笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">总结常见分层架构及其优缺点</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">4天前</span>
-          </div>
-        </div>
-        <!-- 求学笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-graduation-cap text-blue-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">算法课程学习笔记</p>
-              <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">求学笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">记录算法课程中的重点难点与解题思路</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">1天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-graduation-cap text-blue-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">《深入理解计算机系统》学习</p>
-              <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">求学笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">系统性梳理CSAPP书籍内容与思考</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">2天前</span>
-          </div>
-        </div>
-        <!-- 背诵笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-lightbulb text-green-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">高频考点公式背诵</p>
-              <span class="bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-medium">背诵笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">整理常考公式与记忆技巧</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">1天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-lightbulb text-green-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">英语单词记忆卡片</p>
-              <span class="bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-medium">背诵笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">制作高频词汇记忆卡片，便于随时复习</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">2天前</span>
-          </div>
-        </div>
-        <!-- 刷题笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-pen-to-square text-orange-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">动态规划刷题总结</p>
-              <span class="bg-orange-200 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">刷题笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">总结DP题型的常用套路与易错点</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">3天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-pen-to-square text-orange-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">二分查找刷题记录</p>
-              <span class="bg-orange-200 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">刷题笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">记录二分查找相关题目的解题思路</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">4天前</span>
-          </div>
-        </div>
-        <!-- 实战笔记活动 -->
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-flask text-red-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">微前端架构实践总结</p>
-              <span class="bg-red-200 text-red-700 px-2 py-1 rounded-full text-xs font-medium">实战笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">基于qiankun的微前端架构设计与实战经验</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">2天前</span>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center shadow-sm">
-            <i class="fas fa-flask text-red-600 text-lg"></i>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900">CI/CD自动化部署实战</p>
-              <span class="bg-red-200 text-red-700 px-2 py-1 rounded-full text-xs font-medium">实战笔记</span>
-            </div>
-            <p class="text-xs text-gray-600">记录CI/CD自动化部署流程与踩坑经验</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-500 font-medium">3天前</span>
+          <div class="text-right flex-shrink-0">
+            <span class="text-xs text-gray-500 font-medium">{{ dayjs(note.createTime || note.recCreateTime).fromNow() }}</span>
           </div>
         </div>
       </div>
@@ -826,6 +666,86 @@ const constructionHonors = computed(() =>
 const diplomaticHonors = computed(() => 
   allHonors.value.filter(h => h.category === 'diplomatic')
 )
+
+// 战争行动项目状态统计
+const defenseProjectStats = computed(() => {
+  const completed = defenseProjects.value.filter(p => p.status === 'completed').length
+  const inProgress = defenseProjects.value.filter(p => p.status === 'inProgress').length
+  const planning = defenseProjects.value.filter(p => p.status === 'planning').length
+  return { completed, inProgress, planning }
+})
+
+// 战争行动任务统计
+const defenseTaskStats = computed(() => {
+  const defenseTasks = allTasks.value.filter(t => defenseProjects.value.some(p => p.id === t.projectId))
+  const completed = defenseTasks.filter(t => t.status === 'completed').length
+  const inProgress = defenseTasks.filter(t => t.status === 'inProgress').length
+  const notStarted = defenseTasks.filter(t => t.status === 'notStarted').length
+  const stopped = defenseTasks.filter(t => t.status === 'stopped').length
+  return { total: defenseTasks.length, completed, inProgress, notStarted, stopped }
+})
+
+// 工程建设任务统计
+const constructionTaskStats = computed(() => {
+  const constructionTasks = allTasks.value.filter(t => constructionProjects.value.some(p => p.id === t.projectId))
+  const completed = constructionTasks.filter(t => t.status === 'completed').length
+  const inProgress = constructionTasks.filter(t => t.status === 'inProgress').length
+  const notStarted = constructionTasks.filter(t => t.status === 'notStarted').length
+  const stopped = constructionTasks.filter(t => t.status === 'stopped').length
+  return { total: constructionTasks.length, completed, inProgress, notStarted, stopped }
+})
+
+// 外交行动任务统计
+const diplomaticTaskStats = computed(() => {
+  const diplomaticTasks = allTasks.value.filter(t => diplomaticProjects.value.some(p => p.id === t.projectId))
+  const completed = diplomaticTasks.filter(t => t.status === 'completed').length
+  const inProgress = diplomaticTasks.filter(t => t.status === 'inProgress').length
+  const notStarted = diplomaticTasks.filter(t => t.status === 'notStarted').length
+  const stopped = diplomaticTasks.filter(t => t.status === 'stopped').length
+  return { total: diplomaticTasks.length, completed, inProgress, notStarted, stopped }
+})
+
+// 获取最近活动（最新的笔记）
+const recentActivities = computed(() => {
+  // 取最新的12条笔记
+  return [...allNotes.value]
+    .sort((a, b) => {
+      const timeA = new Date(a.createTime || a.recCreateTime || 0).getTime()
+      const timeB = new Date(b.createTime || b.recCreateTime || 0).getTime()
+      return timeB - timeA
+    })
+    .slice(0, 12)
+})
+
+// 获取笔记类型的配置
+const getNoteTypeConfig = (type: string) => {
+  const configs: Record<string, any> = {
+    fragment: { label: '碎片笔记', icon: 'fa-puzzle-piece', bgClass: 'from-indigo-50 to-indigo-100', borderClass: 'border-indigo-200', iconBgClass: 'bg-indigo-200', iconColorClass: 'text-indigo-600', badgeBgClass: 'bg-indigo-200', badgeTextClass: 'text-indigo-700' },
+    framework: { label: '框架笔记', icon: 'fa-sitemap', bgClass: 'from-purple-50 to-purple-100', borderClass: 'border-purple-200', iconBgClass: 'bg-purple-200', iconColorClass: 'text-purple-600', badgeBgClass: 'bg-purple-200', badgeTextClass: 'text-purple-700' },
+    study: { label: '求学笔记', icon: 'fa-graduation-cap', bgClass: 'from-blue-50 to-blue-100', borderClass: 'border-blue-200', iconBgClass: 'bg-blue-200', iconColorClass: 'text-blue-600', badgeBgClass: 'bg-blue-200', badgeTextClass: 'text-blue-700' },
+    memorization: { label: '背诵笔记', icon: 'fa-lightbulb', bgClass: 'from-green-50 to-green-100', borderClass: 'border-green-200', iconBgClass: 'bg-green-200', iconColorClass: 'text-green-600', badgeBgClass: 'bg-green-200', badgeTextClass: 'text-green-700' },
+    exercise: { label: '刷题笔记', icon: 'fa-pen-to-square', bgClass: 'from-orange-50 to-orange-100', borderClass: 'border-orange-200', iconBgClass: 'bg-orange-200', iconColorClass: 'text-orange-600', badgeBgClass: 'bg-orange-200', badgeTextClass: 'text-orange-700' },
+    practical: { label: '实战笔记', icon: 'fa-flask', bgClass: 'from-red-50 to-red-100', borderClass: 'border-red-200', iconBgClass: 'bg-red-200', iconColorClass: 'text-red-600', badgeBgClass: 'bg-red-200', badgeTextClass: 'text-red-700' }
+  }
+  return configs[type] || configs.fragment
+}
+
+// 获取各项目类型最近更新时间
+const getProjectLatestUpdate = (category: string) => {
+  const projects = allProjects.value.filter(p => p.category === category)
+  if (!projects.length) return '暂无数据'
+  
+  const tasks = allTasks.value.filter(t => projects.some(p => p.id === t.projectId))
+  const allTimes = [
+    ...projects.map(p => p.recReviseTime || p.recCreateTime || ''),
+    ...tasks.map(t => t.recReviseTime || t.recCreateTime || '')
+  ].filter(t => t)
+  
+  if (!allTimes.length) return '暂无数据'
+  
+  const latest = allTimes.reduce((max, time) => time > max ? time : max, allTimes[0])
+  return dayjs(latest).fromNow()
+}
 
 // 加载所有数据
 const loadData = async () => {

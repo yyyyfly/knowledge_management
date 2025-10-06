@@ -1,0 +1,34 @@
+# 后端
+backed/target/
+backed/.idea/
+backed/*.iml
+backed/.classpath
+backed/.project
+backed/.settings/
+backed/logs/
+
+# 前端
+fronted/node_modules/
+fronted/dist/
+fronted/.env.local
+fronted/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+

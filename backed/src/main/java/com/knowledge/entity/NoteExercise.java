@@ -47,3 +47,7 @@ public class NoteExercise extends BaseEntity {
     private BigDecimal accuracy;
 }
 
+
+
+
+

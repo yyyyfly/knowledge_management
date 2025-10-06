@@ -59,3 +59,7 @@ public class NoteMemorization extends BaseEntity {
     private String cue;
 }
 
+
+
+
+

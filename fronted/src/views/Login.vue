@@ -117,8 +117,11 @@ const handleLogin = async () => {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
       
-      // 跳转到首页
-      router.push('/')
+      // 获取重定向路径（如果有的话）
+      const redirect = (router.currentRoute.value.query.redirect as string) || '/'
+      
+      // 跳转到指定页面或首页
+      router.push(redirect)
     } else {
       errorMessage.value = response.message || '登录失败，请重试'
     }
