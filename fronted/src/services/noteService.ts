@@ -15,11 +15,88 @@ export interface Note {
   title: string
   content?: string
   type: string
+  summary?: string
   tags?: string[]
   materialIds?: string
   recCreator?: string
   recCreateTime?: string
   createTime?: string
+  // 背诵笔记字段
+  project?: string
+  knowledgePoint?: string[]
+  reviewCount?: number
+  originalText?: string
+  explanation?: string
+  cue?: string
+  // 框架笔记字段
+  subject?: string[]
+  subjectType?: string[]
+  // 求学笔记字段
+  course?: string[]
+  studySubject?: string[]
+  bookName?: string
+  bookSubject?: string[]
+  // 刷题笔记字段
+  exerciseSource?: string
+  exerciseSubject?: string[]
+  exerciseKnowledge?: string[]
+  exerciseDifficulty?: number
+  // 实战笔记字段
+  techTags?: string[]
+  techStack?: string[]
+  projectType?: string[]
+  projectName?: string
+  // 碎片笔记字段
+  fragmentCategory?: string[]
+  fragmentTheme?: string[]
+  importance?: string
+}
+
+/**
+ * 将后端返回的逗号分隔字符串字段转换为数组
+ */
+const normalizeNoteArrayFields = (notes: any[]): any[] => {
+  return notes.map(note => {
+    const normalized = { ...note }
+    
+    // 将逗号分隔的字符串、JSON字符串或单个值转换为数组
+    const toArray = (value: any) => {
+      if (!value) return []
+      if (Array.isArray(value)) return value
+      if (typeof value === 'string') {
+        // 尝试解析 JSON 字符串
+        if (value.trim().startsWith('[') && value.trim().endsWith(']')) {
+          try {
+            const parsed = JSON.parse(value)
+            if (Array.isArray(parsed)) return parsed
+          } catch (e) {
+            // JSON 解析失败，继续使用逗号分割
+          }
+        }
+        // 如果是逗号分隔的字符串，拆分成数组
+        return value.split(',').map((item: string) => item.trim()).filter((item: string) => item !== '')
+      }
+      return [value]
+    }
+    
+    // 处理所有可能的数组字段
+    if (normalized.subject) normalized.subject = toArray(normalized.subject)
+    if (normalized.course) normalized.course = toArray(normalized.course)
+    if (normalized.studySubject) normalized.studySubject = toArray(normalized.studySubject)
+    if (normalized.bookSubject) normalized.bookSubject = toArray(normalized.bookSubject)
+    if (normalized.subjectType) normalized.subjectType = toArray(normalized.subjectType)
+    if (normalized.knowledgePoint) normalized.knowledgePoint = toArray(normalized.knowledgePoint)
+    if (normalized.techTags) normalized.techTags = toArray(normalized.techTags)
+    if (normalized.techStack) normalized.techStack = toArray(normalized.techStack)
+    if (normalized.fragmentCategory) normalized.fragmentCategory = toArray(normalized.fragmentCategory)
+    if (normalized.fragmentTheme) normalized.fragmentTheme = toArray(normalized.fragmentTheme)
+    if (normalized.projectType) normalized.projectType = toArray(normalized.projectType)
+    if (normalized.exerciseKnowledge) normalized.exerciseKnowledge = toArray(normalized.exerciseKnowledge)
+    if (normalized.exerciseSubject) normalized.exerciseSubject = toArray(normalized.exerciseSubject)
+    if (normalized.tags) normalized.tags = toArray(normalized.tags)
+    
+    return normalized
+  })
 }
 
 /**
@@ -30,7 +107,8 @@ export const getAllNotes = async (): Promise<Note[]> => {
     return Promise.resolve(mockNotes.getAllNotes())
   } else {
     const response = await apiNote.getAllNotes()
-    return response.data || []
+    const notes = response.data || []
+    return normalizeNoteArrayFields(notes)
   }
 }
 
@@ -42,7 +120,8 @@ export const getNotesByType = async (type: string): Promise<Note[]> => {
     return Promise.resolve(mockNotes.getNotesByType(type as any))
   } else {
     const response = await apiNote.getNotesByType(type)
-    return response.data || []
+    const notes = response.data || []
+    return normalizeNoteArrayFields(notes)
   }
 }
 

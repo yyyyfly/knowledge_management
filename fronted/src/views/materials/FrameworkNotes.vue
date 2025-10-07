@@ -438,7 +438,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onActivated, nextTick, watch, onUnmounted } from 'vue'
 import dayjs from 'dayjs'
 import { getAllNotes } from '@/services/noteService'
 
@@ -675,6 +675,13 @@ onMounted(async () => {
   await loadNotes()
   nextTick(() => {
     initCharts()
+  })
+})
+
+onActivated(async () => {
+  await loadNotes()
+  nextTick(() => {
+    updateCharts()
   })
 })
 

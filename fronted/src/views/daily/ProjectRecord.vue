@@ -769,9 +769,17 @@
                     <h5 class="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-purple-600 transition-colors">{{ material.title }}</h5>
                   </div>
                   <p class="text-xs text-gray-600 mb-3 line-clamp-2">{{ material.summary }}</p>
+                  
+                  <!-- 背诵笔记显示知识点 -->
+                  <div v-if="material.type === 'memorization' && Array.isArray(material.knowledgePoint)" class="flex flex-wrap gap-1 mb-2">
+                    <span v-for="kp in material.knowledgePoint.slice(0, 3)" :key="kp" class="bg-green-100 text-green-600 px-1 py-0.5 rounded text-xs">
+                      {{ kp }}
+                    </span>
+                  </div>
+                  
                   <div class="flex items-center justify-between text-xs text-gray-500">
-                    <span>{{ material.createTime }}</span>
-                    <div class="flex space-x-1">
+                    <span>{{ material.createTime || material.recCreateTime }}</span>
+                    <div class="flex space-x-1" v-if="Array.isArray(material.tags) && material.tags.length > 0">
                       <span v-for="tag in material.tags.slice(0, 2)" :key="tag" class="bg-gray-100 text-gray-600 px-1 py-0.5 rounded text-xs">
                         {{ tag }}
                       </span>
@@ -815,19 +823,45 @@
                 </span>
               </div>
               
-              <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm font-medium text-gray-700 mb-2">摘要：</p>
-                <p class="text-sm text-gray-600">{{ selectedMaterial.summary }}</p>
-              </div>
+              <!-- 背诵笔记特殊显示 -->
+              <template v-if="selectedMaterial.type === 'memorization'">
+                <div class="bg-gray-50 p-4 rounded-lg" v-if="selectedMaterial.summary">
+                  <p class="text-sm font-medium text-gray-700 mb-2">摘要：</p>
+                  <p class="text-sm text-gray-600">{{ selectedMaterial.summary }}</p>
+                </div>
+                
+                <div v-if="selectedMaterial.knowledgePoint && Array.isArray(selectedMaterial.knowledgePoint) && selectedMaterial.knowledgePoint.length > 0">
+                  <p class="text-sm font-medium text-gray-700 mb-2">知识点：</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="kp in selectedMaterial.knowledgePoint" :key="kp" class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
+                      {{ kp }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div v-if="selectedMaterial.project">
+                  <p class="text-sm font-medium text-gray-700 mb-2">所属项目：</p>
+                  <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm">{{ selectedMaterial.project }}</span>
+                </div>
+              </template>
+              
+              <!-- 其他类型笔记显示 -->
+              <template v-else>
+                <div class="bg-gray-50 p-4 rounded-lg" v-if="selectedMaterial.summary">
+                  <p class="text-sm font-medium text-gray-700 mb-2">摘要：</p>
+                  <p class="text-sm text-gray-600">{{ selectedMaterial.summary }}</p>
+                </div>
+              </template>
               
               <div>
                 <p class="text-sm font-medium text-gray-700 mb-2">详细内容：</p>
                 <div class="text-sm text-gray-600 prose prose-sm max-w-none" v-html="selectedMaterial.content"></div>
               </div>
               
-              <div class="flex items-center space-x-4 text-sm text-gray-500">
-                <span>创建时间：{{ selectedMaterial.createTime }}</span>
-                <div class="flex space-x-1">
+              <div class="flex flex-col space-y-2 text-sm text-gray-500">
+                <span>创建时间：{{ selectedMaterial.createTime || selectedMaterial.recCreateTime }}</span>
+                <div class="flex flex-wrap gap-2" v-if="Array.isArray(selectedMaterial.tags) && selectedMaterial.tags.length > 0">
+                  <span class="text-gray-700 mr-2">标签：</span>
                   <span v-for="tag in selectedMaterial.tags" :key="tag" class="bg-gray-100 text-gray-600 px-2 py-1 rounded">
                     {{ tag }}
                   </span>
@@ -1758,7 +1792,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
@@ -1772,6 +1806,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import CodeBlock from '@tiptap/extension-code-block'
 import Placeholder from '@tiptap/extension-placeholder'
 import request from '@/api/request'
+import { getAllNotes, type Note } from '@/services/noteService'
 
 // 响应式数据
 const projects = ref<any[]>([])
@@ -1784,10 +1819,9 @@ const defaultProjectTags = ['技术', '学习', '工作']
 // 加载数据
 const loadData = async () => {
   try {
-    const [projectRes, taskRes, noteRes] = await Promise.all([
+    const [projectRes, taskRes] = await Promise.all([
       request.get('/project/list'),
-      request.get('/task/list'),
-      request.get('/note/list')
+      request.get('/task/list')
     ])
     
     if (projectRes.code === 200) {
@@ -1798,11 +1832,12 @@ const loadData = async () => {
       tasks.value = taskRes.data || []
       console.log('【项目执行】加载任务数据:', tasks.value.length, '个')
     }
-    if (noteRes.code === 200) {
-      notes.value = noteRes.data || []
-      materials.value = noteRes.data || []
-      console.log('【项目执行】加载笔记数据:', notes.value.length, '个')
-    }
+    
+    // 使用 noteService 获取笔记数据，自动处理数组字段
+    const notesData = await getAllNotes()
+    notes.value = notesData
+    materials.value = notesData
+    console.log('【项目执行】加载笔记数据:', notes.value.length, '个')
   } catch (error) {
     console.error('【项目执行】加载数据失败:', error)
   }
@@ -2669,7 +2704,34 @@ const getMaterialTypeText = (type: Note['type']) => {
 
 // 查看素材详情
 const viewMaterialDetail = (material: Note) => {
-  selectedMaterial.value = material
+  // 确保数组字段被正确解析
+  const normalizedMaterial = { ...material }
+  
+  // 处理可能是 JSON 字符串的字段
+  const ensureArray = (value: any) => {
+    if (!value) return []
+    if (Array.isArray(value)) return value
+    if (typeof value === 'string') {
+      // 尝试解析 JSON 字符串
+      if (value.trim().startsWith('[')) {
+        try {
+          const parsed = JSON.parse(value)
+          if (Array.isArray(parsed)) return parsed
+        } catch (e) {
+          // 忽略解析错误
+        }
+      }
+      // 如果是逗号分隔的字符串
+      return value.split(',').map((item: string) => item.trim()).filter((item: string) => item !== '')
+    }
+    return [value]
+  }
+  
+  // 确保所有可能的数组字段都是数组
+  if (normalizedMaterial.tags) normalizedMaterial.tags = ensureArray(normalizedMaterial.tags) as string[]
+  if (normalizedMaterial.knowledgePoint) normalizedMaterial.knowledgePoint = ensureArray(normalizedMaterial.knowledgePoint) as string[]
+  
+  selectedMaterial.value = normalizedMaterial
   showMaterialDetail.value = true
 }
 
@@ -2773,6 +2835,11 @@ onMounted(() => {
       showTableMenu.value = false
     }
   })
+})
+
+onActivated(() => {
+  // 页面激活时重新加载数据
+  loadData()
 })
 </script>
 

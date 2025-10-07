@@ -261,303 +261,521 @@
       </div>
     </div>
 
-    <!-- 行动组管理 -->
-    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-          <i class="fa-solid fa-briefcase text-secondary mr-3"></i>
+    <!-- 行动组 -->
+    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
+      <div class="mb-8">
+        <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+          <i class="fa-solid fa-bolt text-gray-900 text-2xl mr-3"></i>
           行动组
         </h3>
-        <p class="text-gray-600 text-sm mt-1">项目执行与任务管理</p>
-          </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- 战争行动工程 -->
-        <div class="group relative bg-gradient-to-br from-red-50 via-red-100 to-red-50 rounded-xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border border-red-200 hover:border-red-300 overflow-hidden" @click="$router.push('/actions/defense-projects')">
-          <!-- 背景装饰 -->
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-red-200/30 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-red-200/20 to-transparent rounded-full translate-y-8 -translate-x-8"></div>
-          
-          <!-- 头部区域 -->
-          <div class="relative flex items-center justify-between mb-6">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <i class="fa-solid fa-crosshairs text-white text-lg"></i>
+        <p class="text-gray-500 text-sm mt-2">项目执行与任务管理</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 战争行动 -->
+        <div class="bg-white rounded-2xl p-6 border-2 border-red-200 hover:border-red-300 hover:shadow-2xl transition-all duration-300 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-crosshairs text-white text-xl"></i>
               </div>
               <div>
                 <h4 class="text-xl font-bold text-gray-900">战争行动</h4>
-                <p class="text-sm text-gray-600">实战任务管理</p>
+                <p class="text-xs text-red-600 font-medium">实战任务管理</p>
               </div>
             </div>
-            <span class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">实战任务</span>
+            <router-link to="/actions/defense-projects" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-md hover:shadow-lg">
+              实战任务
+            </router-link>
           </div>
-          
-          <!-- 描述 -->
-          <p class="text-gray-700 mb-6 text-sm leading-relaxed">日常工作执行、考试备战、副业发展等核心任务的管理与追踪</p>
-          
-          <!-- 统计卡片 -->
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- 项目统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">项目总数</span>
-                <i class="fa-solid fa-folder text-red-500 text-sm"></i>
-              </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ defenseProjects.length }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">已完成</span>
-                  <span class="font-medium">{{ defenseProjectStats.completed }}</span>
+          <p class="text-sm text-gray-500 mb-5 leading-relaxed">日常工作执行、考试备战、副业发展等核心任务</p>
+
+          <!-- 项目和任务统计 -->
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-folder text-white text-sm"></i>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">进行中</span>
-                  <span class="font-medium">{{ defenseProjectStats.inProgress }}</span>
-            </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">规划中</span>
-                  <span class="font-medium">{{ defenseProjectStats.planning }}</span>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
               </div>
+              <div class="text-4xl font-black text-red-600 mb-3">{{ statsByCategory.defense.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.defense.projects.completed }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.defense.projects.active }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">规划中</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.defense.projects.planning }}</span>
+                </div>
               </div>
             </div>
-            
-            <!-- 任务统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-red-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">任务总数</span>
-                <i class="fa-solid fa-tasks text-red-500 text-sm"></i>
-              </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ defenseTaskStats.total }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">已完成</span>
-                  <span class="font-medium">{{ defenseTaskStats.completed }}</span>
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-list-check text-white text-sm"></i>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">{{ defenseTaskStats.inProgress }}</span>
-                </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">{{ defenseTaskStats.notStarted }}</span>
-            </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-red-600">已停止</span>
-                  <span class="font-medium">{{ defenseTaskStats.stopped }}</span>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
               </div>
+              <div class="text-4xl font-black text-red-600 mb-3">{{ statsByCategory.defense.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.defense.tasks.completed }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.defense.tasks.inProgress }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">待开始</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.defense.tasks.pending }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已停止</span>
+                  <span class="font-bold text-gray-500">{{ statsByCategory.defense.tasks.stopped }}</span>
+                </div>
               </div>
             </div>
           </div>
-          
-          <!-- 底部信息 -->
-          <div class="flex items-center justify-between text-sm text-gray-500">
+
+          <!-- 紧急任务提醒 -->
+          <div class="mb-5">
+            <div 
+              @click="toggleCategory('defense')" 
+              class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="text-sm font-bold text-gray-900">紧急任务</span>
+                  <p class="text-xs text-gray-500">点击查看详情</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span :class="urgentTasksByCategory.defense.count > 0 ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                  {{ urgentTasksByCategory.defense.count > 0 ? `${urgentTasksByCategory.defense.count} 个` : '无' }}
+                </span>
+                <i :class="`fas fa-chevron-${expandedCategories.defense ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
+              </div>
+            </div>
+            <transition name="slide-fade">
+              <div v-show="expandedCategories.defense" class="mt-3 space-y-2">
+                <div v-if="urgentTasksByCategory.defense.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                <div class="flex items-center justify-center space-x-2">
+                  <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                  <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
+                </div>
+              </div>
+              <div 
+                v-else
+                v-for="task in urgentTasksByCategory.defense.tasks" 
+                :key="task.id"
+                class="bg-white rounded-xl p-4 border-l-4 shadow-sm hover:shadow-md transition-shadow"
+                :class="{
+                  'border-red-600 bg-gradient-to-r from-red-50 to-red-100': task.isOverdue,
+                  'border-red-400 bg-red-50': !task.isOverdue && task.daysLeft <= 2,
+                  'border-orange-400 bg-orange-50': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                      <h5 class="text-xs font-semibold text-gray-900">{{ task.name }}</h5>
+                      <span 
+                        class="px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1"
+                        :class="{
+                          'bg-red-600 text-white': task.isOverdue,
+                          'bg-red-100 text-red-700': !task.isOverdue && task.daysLeft <= 2,
+                          'bg-orange-100 text-orange-700': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                        }"
+                      >
+                        <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
+                        <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                      <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
+                    </div>
+                  </div>
+                  <button 
+                    @click="goToProjectRecord(task)"
+                    :class="{
+                      'bg-red-600 hover:bg-red-700': task.isOverdue,
+                      'bg-blue-600 hover:bg-blue-700': !task.isOverdue
+                    }"
+                    class="ml-2 px-2 py-1 text-white text-xs rounded transition-colors whitespace-nowrap"
+                  >
+                    处理
+                  </button>
+                </div>
+              </div>
+              </div>
+            </transition>
+          </div>
+
+          <!-- 最近更新 -->
+          <div class="flex items-center justify-between pt-4 mt-5 border-t-2 border-dashed border-red-200">
             <div class="flex items-center space-x-2">
-              <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: {{ getProjectLatestUpdate('defense') }}</span>
+              <div class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+                <i class="far fa-clock text-red-600 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">最近更新</p>
+                <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('defense') }}</p>
+              </div>
             </div>
-            <div class="flex items-center space-x-1 text-red-500 group-hover:translate-x-1 transition-transform duration-300">
-              <span class="text-sm font-medium">查看详情</span>
+            <router-link to="/actions/defense-projects" class="text-xs font-semibold text-red-600 hover:text-red-700 flex items-center space-x-1 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
+              <span>查看详情</span>
               <i class="fas fa-arrow-right text-xs"></i>
-        </div>
+            </router-link>
           </div>
         </div>
 
-        <!-- 工程建设管理 -->
-        <div class="group relative bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 rounded-xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border border-blue-200 hover:border-blue-300 overflow-hidden" @click="$router.push('/actions/construction-projects')">
-          <!-- 背景装饰 -->
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-200/30 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-200/20 to-transparent rounded-full translate-y-8 -translate-x-8"></div>
-          
-          <!-- 头部区域 -->
-          <div class="relative flex items-center justify-between mb-6">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <i class="fa-solid fa-building text-white text-lg"></i>
+        <!-- 工程建设 -->
+        <div class="bg-white rounded-2xl p-6 border-2 border-blue-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-hammer text-white text-xl"></i>
               </div>
               <div>
                 <h4 class="text-xl font-bold text-gray-900">工程建设</h4>
-                <p class="text-sm text-gray-600">模拟实战管理</p>
+                <p class="text-xs text-blue-600 font-medium">模拟实战管理</p>
               </div>
             </div>
-            <span class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">模拟实战</span>
+            <router-link to="/actions/construction-projects" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg">
+              模拟训练
+            </router-link>
           </div>
-          
-          <!-- 描述 -->
-          <p class="text-gray-700 mb-6 text-sm leading-relaxed">技术项目实践、模拟业务场景、技能训练等开发项目的管理与执行</p>
-          
-          <!-- 统计卡片 -->
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- 项目统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-blue-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">项目总数</span>
-                <i class="fa-solid fa-folder text-blue-500 text-sm"></i>
-              </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ constructionProjects.length }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">进行中</span>
-                  <span class="font-medium">{{ constructionProjects.filter(p => p.status === 'inProgress').length }}</span>
+          <p class="text-sm text-gray-500 mb-5 leading-relaxed">技术项目实践、模拟业务场景、技能训练项目</p>
+
+          <!-- 项目和任务统计 -->
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-folder text-white text-sm"></i>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">规划中</span>
-                  <span class="font-medium">{{ constructionProjects.filter(p => p.status === 'planning').length }}</span>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
+              </div>
+              <div class="text-4xl font-black text-blue-600 mb-3">{{ statsByCategory.construction.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.construction.projects.completed }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">已完成</span>
-                  <span class="font-medium">{{ constructionProjects.filter(p => p.status === 'completed').length }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.construction.projects.active }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">规划中</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.construction.projects.planning }}</span>
                 </div>
               </div>
             </div>
-            
-            <!-- 任务统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-blue-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">任务总数</span>
-                <i class="fa-solid fa-tasks text-blue-500 text-sm"></i>
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-list-check text-white text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
               </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ constructionTaskStats.total }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">已完成</span>
-                  <span class="font-medium">{{ constructionTaskStats.completed }}</span>
+              <div class="text-4xl font-black text-blue-600 mb-3">{{ statsByCategory.construction.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.construction.tasks.completed }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">{{ constructionTaskStats.inProgress }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.construction.tasks.inProgress }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">{{ constructionTaskStats.notStarted }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">待开始</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.construction.tasks.pending }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-red-600">已停止</span>
-                  <span class="font-medium">{{ constructionTaskStats.stopped }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已停止</span>
+                  <span class="font-bold text-gray-500">{{ statsByCategory.construction.tasks.stopped }}</span>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- 底部信息 -->
-          <div class="flex items-center justify-between text-sm text-gray-500">
+
+          <!-- 紧急任务提醒 -->
+          <div class="mb-5">
+            <div 
+              @click="toggleCategory('construction')" 
+              class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="text-sm font-bold text-gray-900">紧急任务</span>
+                  <p class="text-xs text-gray-500">点击查看详情</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span :class="urgentTasksByCategory.construction.count > 0 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                  {{ urgentTasksByCategory.construction.count > 0 ? `${urgentTasksByCategory.construction.count} 个` : '无' }}
+                </span>
+                <i :class="`fas fa-chevron-${expandedCategories.construction ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
+              </div>
+            </div>
+            <transition name="slide-fade">
+              <div v-show="expandedCategories.construction" class="mt-3 space-y-2">
+                <div v-if="urgentTasksByCategory.construction.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                <div class="flex items-center justify-center space-x-2">
+                  <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                  <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
+                </div>
+              </div>
+              <div 
+                v-else
+                v-for="task in urgentTasksByCategory.construction.tasks" 
+                :key="task.id"
+                class="bg-white rounded-xl p-4 border-l-4 shadow-sm hover:shadow-md transition-shadow"
+                :class="{
+                  'border-red-600 bg-gradient-to-r from-red-50 to-red-100': task.isOverdue,
+                  'border-red-400 bg-red-50': !task.isOverdue && task.daysLeft <= 2,
+                  'border-orange-400 bg-orange-50': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                      <h5 class="text-xs font-semibold text-gray-900">{{ task.name }}</h5>
+                      <span 
+                        class="px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1"
+                        :class="{
+                          'bg-red-600 text-white': task.isOverdue,
+                          'bg-red-100 text-red-700': !task.isOverdue && task.daysLeft <= 2,
+                          'bg-orange-100 text-orange-700': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                        }"
+                      >
+                        <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
+                        <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                      <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
+                    </div>
+                  </div>
+                  <button 
+                    @click="goToProjectRecord(task)"
+                    :class="{
+                      'bg-red-600 hover:bg-red-700': task.isOverdue,
+                      'bg-blue-600 hover:bg-blue-700': !task.isOverdue
+                    }"
+                    class="ml-2 px-2 py-1 text-white text-xs rounded transition-colors whitespace-nowrap"
+                  >
+                    处理
+                  </button>
+                </div>
+              </div>
+              </div>
+            </transition>
+          </div>
+
+          <!-- 最近更新 -->
+          <div class="flex items-center justify-between pt-4 mt-5 border-t-2 border-dashed border-blue-200">
             <div class="flex items-center space-x-2">
-              <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: {{ getProjectLatestUpdate('construction') }}</span>
+              <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="far fa-clock text-blue-600 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">最近更新</p>
+                <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('construction') }}</p>
+              </div>
             </div>
-            <div class="flex items-center space-x-1 text-blue-500 group-hover:translate-x-1 transition-transform duration-300">
-              <span class="text-sm font-medium">查看详情</span>
+            <router-link to="/actions/construction-projects" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center space-x-1 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+              <span>查看详情</span>
               <i class="fas fa-arrow-right text-xs"></i>
-        </div>
+            </router-link>
           </div>
         </div>
 
-        <!-- 外交行动协作 -->
-        <div class="group relative bg-gradient-to-br from-green-50 via-green-100 to-green-50 rounded-xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border border-green-200 hover:border-green-300 overflow-hidden" @click="$router.push('/actions/diplomatic-projects')">
-          <!-- 背景装饰 -->
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-green-200/30 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-green-200/20 to-transparent rounded-full translate-y-8 -translate-x-8"></div>
-          
-          <!-- 头部区域 -->
-          <div class="relative flex items-center justify-between mb-6">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <i class="fa-solid fa-handshake text-white text-lg"></i>
+        <!-- 外交行动 -->
+        <div class="bg-white rounded-2xl p-6 border-2 border-green-200 hover:border-green-300 hover:shadow-2xl transition-all duration-300 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-handshake text-white text-xl"></i>
               </div>
               <div>
                 <h4 class="text-xl font-bold text-gray-900">外交行动</h4>
-                <p class="text-sm text-gray-600">对外推广管理</p>
+                <p class="text-xs text-green-600 font-medium">对外推广管理</p>
               </div>
             </div>
-            <span class="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">对外推广</span>
+            <router-link to="/actions/diplomatic-projects" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg">
+              对外推广
+            </router-link>
           </div>
-          
-          <!-- 描述 -->
-          <p class="text-gray-700 mb-6 text-sm leading-relaxed">已有成果对外分享、技术交流、利益互动等协作项目的管理与执行</p>
-          
-          <!-- 统计卡片 -->
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- 项目统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-green-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">项目总数</span>
-                <i class="fa-solid fa-folder text-green-500 text-sm"></i>
-              </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ diplomaticProjects.length }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">进行中</span>
-                  <span class="font-medium">{{ diplomaticProjects.filter(p => p.status === 'inProgress').length }}</span>
+          <p class="text-sm text-gray-500 mb-5 leading-relaxed">已有成果对外分享、技术交流、利益互动</p>
+
+          <!-- 项目和任务统计 -->
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-folder text-white text-sm"></i>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">规划中</span>
-                  <span class="font-medium">{{ diplomaticProjects.filter(p => p.status === 'planning').length }}</span>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
+              </div>
+              <div class="text-4xl font-black text-green-600 mb-3">{{ statsByCategory.diplomatic.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.diplomatic.projects.completed }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">已完成</span>
-                  <span class="font-medium">{{ diplomaticProjects.filter(p => p.status === 'completed').length }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.diplomatic.projects.active }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">规划中</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.diplomatic.projects.planning }}</span>
                 </div>
               </div>
             </div>
-            
-            <!-- 任务统计卡片 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-green-200/50">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-600">任务总数</span>
-                <i class="fa-solid fa-tasks text-green-500 text-sm"></i>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
+                  <i class="fa-solid fa-list-check text-white text-sm"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
               </div>
-              <div class="flex items-baseline space-x-1">
-                <span class="text-2xl font-bold text-gray-900">{{ diplomaticTaskStats.total }}</span>
-                <span class="text-sm text-gray-500">个</span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-green-600">已完成</span>
-                  <span class="font-medium">{{ diplomaticTaskStats.completed }}</span>
+              <div class="text-4xl font-black text-green-600 mb-3">{{ statsByCategory.diplomatic.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已完成</span>
+                  <span class="font-bold text-green-600">{{ statsByCategory.diplomatic.tasks.completed }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-blue-600">进行中</span>
-                  <span class="font-medium">{{ diplomaticTaskStats.inProgress }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">进行中</span>
+                  <span class="font-bold text-blue-600">{{ statsByCategory.diplomatic.tasks.inProgress }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-yellow-600">待开始</span>
-                  <span class="font-medium">{{ diplomaticTaskStats.notStarted }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">待开始</span>
+                  <span class="font-bold text-yellow-600">{{ statsByCategory.diplomatic.tasks.pending }}</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-red-600">已停止</span>
-                  <span class="font-medium">{{ diplomaticTaskStats.stopped }}</span>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-600">已停止</span>
+                  <span class="font-bold text-gray-500">{{ statsByCategory.diplomatic.tasks.stopped }}</span>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- 底部信息 -->
-          <div class="flex items-center justify-between text-sm text-gray-500">
+
+          <!-- 紧急任务提醒 -->
+          <div class="mb-5">
+            <div 
+              @click="toggleCategory('diplomatic')" 
+              class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                </div>
+                <div>
+                  <span class="text-sm font-bold text-gray-900">紧急任务</span>
+                  <p class="text-xs text-gray-500">点击查看详情</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span :class="urgentTasksByCategory.diplomatic.count > 0 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                  {{ urgentTasksByCategory.diplomatic.count > 0 ? `${urgentTasksByCategory.diplomatic.count} 个` : '无' }}
+                </span>
+                <i :class="`fas fa-chevron-${expandedCategories.diplomatic ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
+              </div>
+            </div>
+            <transition name="slide-fade">
+              <div v-show="expandedCategories.diplomatic" class="mt-3 space-y-2">
+                <div v-if="urgentTasksByCategory.diplomatic.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                <div class="flex items-center justify-center space-x-2">
+                  <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                  <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
+                </div>
+              </div>
+              <div 
+                v-else
+                v-for="task in urgentTasksByCategory.diplomatic.tasks" 
+                :key="task.id"
+                class="bg-white rounded-xl p-4 border-l-4 shadow-sm hover:shadow-md transition-shadow"
+                :class="{
+                  'border-red-600 bg-gradient-to-r from-red-50 to-red-100': task.isOverdue,
+                  'border-red-400 bg-red-50': !task.isOverdue && task.daysLeft <= 2,
+                  'border-orange-400 bg-orange-50': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                }"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                      <h5 class="text-xs font-semibold text-gray-900">{{ task.name }}</h5>
+                      <span 
+                        class="px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1"
+                        :class="{
+                          'bg-red-600 text-white': task.isOverdue,
+                          'bg-red-100 text-red-700': !task.isOverdue && task.daysLeft <= 2,
+                          'bg-orange-100 text-orange-700': !task.isOverdue && task.daysLeft > 2 && task.daysLeft <= 5
+                        }"
+                      >
+                        <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
+                        <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                      <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
+                    </div>
+                  </div>
+                  <button 
+                    @click="goToProjectRecord(task)"
+                    :class="{
+                      'bg-red-600 hover:bg-red-700': task.isOverdue,
+                      'bg-blue-600 hover:bg-blue-700': !task.isOverdue
+                    }"
+                    class="ml-2 px-2 py-1 text-white text-xs rounded transition-colors whitespace-nowrap"
+                  >
+                    处理
+                  </button>
+                </div>
+              </div>
+              </div>
+            </transition>
+          </div>
+
+          <!-- 最近更新 -->
+          <div class="flex items-center justify-between pt-4 mt-5 border-t-2 border-dashed border-green-200">
             <div class="flex items-center space-x-2">
-              <i class="fas fa-clock text-gray-400"></i>
-              <span>最近更新: {{ getProjectLatestUpdate('diplomatic') }}</span>
+              <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="far fa-clock text-green-600 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">最近更新</p>
+                <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('diplomatic') }}</p>
+              </div>
             </div>
-            <div class="flex items-center space-x-1 text-green-500 group-hover:translate-x-1 transition-transform duration-300">
-              <span class="text-sm font-medium">查看详情</span>
+            <router-link to="/actions/diplomatic-projects" class="text-xs font-semibold text-green-600 hover:text-green-700 flex items-center space-x-1 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors">
+              <span>查看详情</span>
               <i class="fas fa-arrow-right text-xs"></i>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
     </div>
-
     <!-- 统计图表 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- 素材增长趋势 -->
@@ -620,7 +838,7 @@
             <p class="text-xs text-gray-600 line-clamp-1">{{ note.content || '暂无内容' }}</p>
           </div>
           <div class="text-right flex-shrink-0">
-            <span class="text-xs text-gray-500 font-medium">{{ dayjs(note.createTime || note.recCreateTime).fromNow() }}</span>
+            <span class="text-xs text-gray-500 font-medium">{{ formatNoteTime(note) }}</span>
           </div>
         </div>
       </div>
@@ -629,13 +847,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onActivated } from 'vue'
+import { ref, onMounted, computed, onActivated, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Chart from 'chart.js/auto'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
 // 使用API请求
 import request from '@/api/request'
+
+const router = useRouter()
 
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
@@ -650,6 +871,10 @@ const allNotes = ref<any[]>([])
 const allTasks = ref<any[]>([])
 const allProjects = ref<any[]>([])
 const loading = ref(true)
+
+// 当前时间戳（用于自动更新相对时间）
+const currentTime = ref(Date.now())
+let timeUpdateTimer: number | null = null
 
 // 计算各类项目数量
 const defenseProjects = computed(() => allProjects.value.filter(p => p.category === 'defense'))
@@ -732,6 +957,9 @@ const getNoteTypeConfig = (type: string) => {
 
 // 获取各项目类型最近更新时间
 const getProjectLatestUpdate = (category: string) => {
+  // 依赖currentTime.value以实现自动更新
+  currentTime.value // 触发响应式更新
+  
   const projects = allProjects.value.filter(p => p.category === category)
   if (!projects.length) return '暂无数据'
   
@@ -745,6 +973,15 @@ const getProjectLatestUpdate = (category: string) => {
   
   const latest = allTimes.reduce((max, time) => time > max ? time : max, allTimes[0])
   return dayjs(latest).fromNow()
+}
+
+// 格式化笔记创建时间为相对时间
+const formatNoteTime = (note: any) => {
+  // 依赖currentTime.value以实现自动更新
+  currentTime.value // 触发响应式更新
+  
+  const time = note.createTime || note.recCreateTime
+  return time ? dayjs(time).fromNow() : '-'
 }
 
 // 加载所有数据
@@ -801,6 +1038,192 @@ const refreshHonors = async () => {
   }
 }
 
+// 折叠状态控制
+const expandedCategories = ref<{ [key: string]: boolean }>({
+  defense: false,
+  construction: false,
+  diplomatic: false
+})
+
+// 切换分类折叠状态
+const toggleCategory = (category: string) => {
+  expandedCategories.value[category] = !expandedCategories.value[category]
+}
+
+// 计算紧急任务（已过期或5天内到期且未完成）
+const urgentTasks = computed(() => {
+  const now = new Date()
+  const fiveDaysLater = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000)
+  
+  return allTasks.value
+    .filter(task => {
+      // 排除已完成和已停止的任务
+      if (task.status === 'completed' || task.status === 'stopped') return false
+      
+      // 检查截止时间
+      if (!task.deadline) return false
+      
+      const deadline = new Date(task.deadline)
+      // 已过期或在5天内到期
+      return deadline <= fiveDaysLater
+    })
+    .map(task => {
+      const deadline = new Date(task.deadline)
+      const timeDiff = deadline.getTime() - now.getTime()
+      const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+      
+      // 获取项目信息来确定分类
+      const project = allProjects.value.find(p => p.id === task.projectId)
+      
+      return {
+        ...task,
+        daysLeft,
+        isOverdue: deadline < now, // 标记是否已过期
+        category: project?.category || 'unknown'
+      }
+    })
+    .sort((a, b) => a.daysLeft - b.daysLeft) // 按剩余天数排序（过期的会排在最前面，因为是负数）
+})
+
+// 按分类分组紧急任务
+const urgentTasksByCategory = computed(() => {
+  const defense = urgentTasks.value.filter(t => t.category === 'defense')
+  const construction = urgentTasks.value.filter(t => t.category === 'construction')
+  const diplomatic = urgentTasks.value.filter(t => t.category === 'diplomatic')
+  
+  return {
+    defense: {
+      name: '战争行动',
+      icon: 'fa-crosshairs',
+      color: 'red',
+      tasks: defense,
+      count: defense.length
+    },
+    construction: {
+      name: '工程建设',
+      icon: 'fa-hammer',
+      color: 'blue',
+      tasks: construction,
+      count: construction.length
+    },
+    diplomatic: {
+      name: '外交行动',
+      icon: 'fa-handshake',
+      color: 'green',
+      tasks: diplomatic,
+      count: diplomatic.length
+    }
+  }
+})
+
+// 总紧急任务数
+const totalUrgentTasks = computed(() => urgentTasks.value.length)
+
+// 按分类统计项目和任务
+const statsByCategory = computed(() => {
+  // 战争行动统计
+  const defenseProjects = allProjects.value.filter(p => p.category === 'defense')
+  const defenseTasks = allTasks.value.filter(t => {
+    const project = allProjects.value.find(p => p.id === t.projectId)
+    return project?.category === 'defense'
+  })
+  
+  // 工程建设统计
+  const constructionProjects = allProjects.value.filter(p => p.category === 'construction')
+  const constructionTasks = allTasks.value.filter(t => {
+    const project = allProjects.value.find(p => p.id === t.projectId)
+    return project?.category === 'construction'
+  })
+  
+  // 外交行动统计
+  const diplomaticProjects = allProjects.value.filter(p => p.category === 'diplomatic')
+  const diplomaticTasks = allTasks.value.filter(t => {
+    const project = allProjects.value.find(p => p.id === t.projectId)
+    return project?.category === 'diplomatic'
+  })
+  
+  return {
+    defense: {
+      projects: {
+        total: defenseProjects.length,
+        completed: defenseProjects.filter(p => p.status === 'completed').length,
+        active: defenseProjects.filter(p => p.status === 'active').length,
+        planning: defenseProjects.filter(p => p.status === 'planning').length
+      },
+      tasks: {
+        total: defenseTasks.length,
+        completed: defenseTasks.filter(t => t.status === 'completed').length,
+        inProgress: defenseTasks.filter(t => t.status === 'in-progress').length,
+        pending: defenseTasks.filter(t => t.status === 'pending').length,
+        stopped: defenseTasks.filter(t => t.status === 'stopped').length
+      }
+    },
+    construction: {
+      projects: {
+        total: constructionProjects.length,
+        completed: constructionProjects.filter(p => p.status === 'completed').length,
+        active: constructionProjects.filter(p => p.status === 'active').length,
+        planning: constructionProjects.filter(p => p.status === 'planning').length
+      },
+      tasks: {
+        total: constructionTasks.length,
+        completed: constructionTasks.filter(t => t.status === 'completed').length,
+        inProgress: constructionTasks.filter(t => t.status === 'in-progress').length,
+        pending: constructionTasks.filter(t => t.status === 'pending').length,
+        stopped: constructionTasks.filter(t => t.status === 'stopped').length
+      }
+    },
+    diplomatic: {
+      projects: {
+        total: diplomaticProjects.length,
+        completed: diplomaticProjects.filter(p => p.status === 'completed').length,
+        active: diplomaticProjects.filter(p => p.status === 'active').length,
+        planning: diplomaticProjects.filter(p => p.status === 'planning').length
+      },
+      tasks: {
+        total: diplomaticTasks.length,
+        completed: diplomaticTasks.filter(t => t.status === 'completed').length,
+        inProgress: diplomaticTasks.filter(t => t.status === 'in-progress').length,
+        pending: diplomaticTasks.filter(t => t.status === 'pending').length,
+        stopped: diplomaticTasks.filter(t => t.status === 'stopped').length
+      }
+    }
+  }
+})
+
+// 获取最近更新时间（通过项目和任务的最后更新时间）
+const getLastUpdateTime = (category: string) => {
+  // 依赖currentTime.value以实现自动更新
+  currentTime.value // 触发响应式更新
+  
+  const projects = allProjects.value.filter(p => p.category === category)
+  const tasks = allTasks.value.filter(t => {
+    const project = allProjects.value.find(p => p.id === t.projectId)
+    return project?.category === category
+  })
+  
+  const allItems = [...projects, ...tasks]
+  if (allItems.length === 0) return '暂无数据'
+  
+  const latest = allItems.reduce((max, item) => {
+    const time = item.recReviseTime || item.recCreateTime || ''
+    return time > max ? time : max
+  }, allItems[0].recReviseTime || allItems[0].recCreateTime || '')
+  
+  return latest ? dayjs(latest).fromNow() : '暂无数据'
+}
+
+// 获取项目名称
+const getProjectName = (projectId: number) => {
+  const project = allProjects.value.find(p => p.id === projectId)
+  return project ? project.name : '未知项目'
+}
+
+// 跳转到项目执行页面
+const goToProjectRecord = (task: any) => {
+  router.push('/daily/project-record')
+}
+
 // 格式化日期显示
 const formatAchievedTime = (dateTimeStr: string) => {
   if (!dateTimeStr) return '-'
@@ -829,6 +1252,9 @@ const removeHonor = async (honorId: number) => {
 
 // 动态获取各类笔记最近更新时间（改为异步）
 const getLatestUpdate = (type: 'framework' | 'study' | 'memorization' | 'exercise' | 'practical' | 'fragment') => {
+  // 依赖currentTime.value以实现自动更新
+  currentTime.value // 触发响应式更新
+  
   const notes = allNotes.value.filter(n => n.type === type)
   if (!notes.length) return '暂无数据'
   // 取最大 createTime 或 recCreateTime
@@ -884,14 +1310,21 @@ const tasksByMonth = computed(() => {
 
 // loadData 函数已在上面定义
 
-// 组件激活时刷新荣誉战绩数据
+// 组件激活时刷新数据（当从其他页面切换回来时）
 onActivated(() => {
-  refreshHonors()
+  console.log('【总览面板】页面被激活，刷新数据...')
+  // 刷新所有数据，确保任务状态等信息是最新的
+  loadData()
 })
 
 onMounted(async () => {
   // 先加载数据
   await loadData()
+  
+  // 启动定时器，每分钟更新一次当前时间，让相对时间自动刷新
+  timeUpdateTimer = window.setInterval(() => {
+    currentTime.value = Date.now()
+  }, 60000) // 60秒更新一次
   
   // 然后初始化图表
   // 素材增长趋势图表（改为折线图）
@@ -968,6 +1401,14 @@ onMounted(async () => {
     }
   }
 })
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (timeUpdateTimer !== null) {
+    clearInterval(timeUpdateTimer)
+    timeUpdateTimer = null
+  }
+})
 </script>
 
 <style scoped>
@@ -978,5 +1419,24 @@ onMounted(async () => {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* 折叠展开过渡动画 */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
 }
 </style> 

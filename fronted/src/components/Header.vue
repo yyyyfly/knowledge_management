@@ -39,14 +39,6 @@
             <span class="text-base font-medium font-mono">{{ currentTime }}</span>
           </div>
         </div>
-        
-        <button 
-          class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-          @click="showNewItemModal = true"
-        >
-          <i class="fa-solid fa-plus"></i>
-          <span>新建</span>
-        </button>
 
         <!-- 用户信息和退出登录 -->
         <div class="relative" ref="userMenuRef">
@@ -91,7 +83,6 @@ import { logout } from '@/api/auth'
 
 const router = useRouter()
 
-const showNewItemModal = ref(false)
 const isDarkMode = ref(false)
 const showUserMenu = ref(false)
 const userMenuRef = ref<HTMLElement>()

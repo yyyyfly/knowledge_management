@@ -481,9 +481,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import dayjs from 'dayjs'
-import request from '@/api/request'
+import { getNotesByType } from '@/services/noteService'
 
 // 定义背诵笔记类型
 type MemorizationNote = {
@@ -491,12 +491,18 @@ type MemorizationNote = {
   title: string
   content: string
   type: string
+  summary?: string
+  project: string
   knowledgePoint: string[]
+  reviewCount: number
   createTime?: string
   recCreateTime?: string
   completedCount?: number
   lastReviewTime?: string
   nextReviewTime?: string
+  originalText?: string
+  explanation?: string
+  cue?: string
 }
 
 // 响应式数据
@@ -505,13 +511,14 @@ const memorizationNotesData = ref<MemorizationNote[]>([])
 // 加载背诵笔记
 const loadNotes = async () => {
   try {
-    const res = await request.get('/note/type/memorization')
-    if (res.code === 200) {
-      memorizationNotesData.value = (res.data || []).map((note: any) => ({
-        ...note,
-        knowledgePoint: note.tags ? (Array.isArray(note.tags) ? note.tags : note.tags.split(',')) : []
-      }))
-    }
+    const notes = await getNotesByType('memorization')
+    // noteService 已经将所有字符串字段转换为数组，但需要确保字段完整性
+    memorizationNotesData.value = notes.map((note: any) => ({
+      ...note,
+      knowledgePoint: Array.isArray(note.knowledgePoint) ? note.knowledgePoint : [],
+      reviewCount: note.reviewCount || 0,
+      project: note.project || '未分类'
+    })) as MemorizationNote[]
   } catch (error) {
     console.error('加载背诵笔记失败:', error)
   }
@@ -519,6 +526,11 @@ const loadNotes = async () => {
 
 // 组件挂载时加载
 onMounted(() => {
+  loadNotes()
+})
+
+// 组件激活时刷新数据（从其他页面返回时）
+onActivated(() => {
   loadNotes()
 })
 
@@ -533,9 +545,12 @@ const recentNotes = computed(() => {
 const topKnowledgePoints = computed(() => {
   const countMap: Record<string, number> = {}
   memorizationNotes.value.forEach(note => {
-    note.knowledgePoint.forEach(kp => {
-      countMap[kp] = (countMap[kp] || 0) + 1
-    })
+    // 确保 knowledgePoint 是数组
+    if (Array.isArray(note.knowledgePoint)) {
+      note.knowledgePoint.forEach(kp => {
+        countMap[kp] = (countMap[kp] || 0) + 1
+      })
+    }
   })
   return Object.entries(countMap)
     .map(([knowledgePoint, count]) => ({ knowledgePoint, count }))
@@ -560,7 +575,10 @@ const uniqueProjects = computed(() => {
 const uniqueKnowledgePoints = computed(() => {
   const knowledgePoints = new Set<string>()
   memorizationNotes.value.forEach(note => {
-    note.knowledgePoint.forEach(kp => knowledgePoints.add(kp))
+    // 确保 knowledgePoint 是数组
+    if (Array.isArray(note.knowledgePoint)) {
+      note.knowledgePoint.forEach(kp => knowledgePoints.add(kp))
+    }
   })
   return Array.from(knowledgePoints)
 })
@@ -573,8 +591,12 @@ const projectStats = computed(() => {
       stats[note.project] = { count: 0, knowledgePoints: [], totalReviewCount: 0 }
     }
     stats[note.project].count++
-    stats[note.project].knowledgePoints.push(...note.knowledgePoint)
-    stats[note.project].totalReviewCount += note.reviewCount
+    // 确保 knowledgePoint 是数组
+    if (Array.isArray(note.knowledgePoint)) {
+      stats[note.project].knowledgePoints.push(...note.knowledgePoint)
+    }
+    // 确保 reviewCount 不为空
+    stats[note.project].totalReviewCount += (note.reviewCount || 0)
   })
   
   return Object.entries(stats).map(([project, data]) => ({
@@ -610,23 +632,21 @@ const filteredNotes = computed(() => {
 
 const handleCompleteMemorization = () => {
   if (selectedNote.value) {
-    const updatedNote = completeMemorization(selectedNote.value.id)
-    if (updatedNote) {
-      // 更新响应式数据
-      const noteIndex = memorizationNotesData.value.findIndex(note => note.id === selectedNote.value!.id)
-      if (noteIndex !== -1) {
-        memorizationNotesData.value[noteIndex] = { ...updatedNote }
-      }
+    // 更新背诵次数（本地更新）
+    const noteIndex = memorizationNotesData.value.findIndex(note => note.id === selectedNote.value!.id)
+    if (noteIndex !== -1) {
+      memorizationNotesData.value[noteIndex].reviewCount = (memorizationNotesData.value[noteIndex].reviewCount || 0) + 1
+      memorizationNotesData.value[noteIndex].lastReviewTime = new Date().toISOString()
       
-      // 强制触发响应式更新
-      selectedNote.value = { ...updatedNote }
-      
-      // 延迟关闭弹窗，让用户看到更新效果
-      setTimeout(() => {
-        showNoteDetail.value = false
-        selectedNote.value = null
-      }, 500)
+      // 更新选中的笔记
+      selectedNote.value = { ...memorizationNotesData.value[noteIndex] }
     }
+    
+    // 延迟关闭弹窗，让用户看到更新效果
+    setTimeout(() => {
+      showNoteDetail.value = false
+      selectedNote.value = null
+    }, 500)
   }
 }
 

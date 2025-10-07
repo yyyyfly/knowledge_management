@@ -225,127 +225,6 @@
       </div>
     </div>
 
-    <!-- 时间节点管理界面 -->
-    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">时间节点管理</h3>
-        <div class="flex space-x-2">
-          <button 
-            @click="showCreateTimeNode = true"
-            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2"
-          >
-            <i class="fas fa-plus"></i>
-            <span>新建时间节点</span>
-          </button>
-        </div>
-      </div>
-      
-      <!-- 时间节点搜索和筛选 -->
-      <div class="mb-6">
-        <div class="flex flex-col md:flex-row gap-4">
-          <div class="flex-1">
-            <input 
-              v-model="timeNodeSearchQuery"
-              type="text" 
-              placeholder="搜索时间节点标题或描述..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-          </div>
-          <div>
-            <select v-model="timeNodeFilterType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-              <option value="">全部类型</option>
-              <option value="war">战争行动</option>
-              <option value="diplomatic">外交活动</option>
-            </select>
-          </div>
-          <div>
-            <select v-model="timeNodeFilterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-              <option value="">全部状态</option>
-              <option value="not-started">未开始</option>
-              <option value="upcoming">即将开始</option>
-              <option value="ongoing">进行中</option>
-              <option value="completed">已完成</option>
-              <option value="overdue">已逾期</option>
-              <option value="closed">已关闭</option>
-            </select>
-          </div>
-          <div>
-            <select v-model="timeNodeSortBy" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-              <option value="time">按时间排序</option>
-              <option value="status">按状态排序</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 时间节点列表 -->
-      <div class="space-y-4">
-        <div v-for="timeNode in paginatedTimeNodes" :key="timeNode.id" 
-          :class="getTimeNodeCardClass(timeNode.status)" class="rounded-lg shadow-sm p-4 border-l-4 hover:shadow-md transition-shadow"
-        >
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900 mb-1">{{ timeNode.title }}</h4>
-              <p class="text-sm text-gray-600 mb-2">{{ timeNode.description }}</p>
-              <div class="flex items-center space-x-4 text-sm text-gray-500">
-                <span><i class="fas fa-calendar mr-1"></i>{{ timeNode.time }}</span>
-                <span :class="getTimeNodeTypeClass(timeNode.type)" class="px-2 py-1 rounded-full text-xs">
-                  {{ getTimeNodeTypeText(timeNode.type) }}
-                </span>
-              </div>
-            </div>
-            <div class="flex space-x-2">
-              <button 
-                @click="toggleTimeNodeStatus(timeNode)"
-                :class="getTimeNodeStatusClass(timeNode.status)"
-                class="px-2 py-1 rounded-full text-xs font-medium hover:opacity-80"
-              >
-                {{ getTimeNodeStatusText(timeNode.status) }}
-              </button>
-              <button @click="editTimeNode(timeNode)" class="text-blue-600 hover:text-blue-800">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button @click="deleteTimeNode(timeNode.id)" class="text-red-600 hover:text-red-800">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 翻页控制 -->
-        <div v-if="totalPages > 1" class="flex items-center justify-center space-x-4 mt-6">
-          <button 
-            @click="prevPage" 
-            :disabled="currentPage === 1"
-            class="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="fas fa-chevron-left mr-1"></i>上一页
-          </button>
-          <span class="text-sm text-gray-600">{{ currentPage }} / {{ totalPages }}</span>
-          <button 
-            @click="nextPage" 
-            :disabled="currentPage === totalPages"
-            class="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            下一页<i class="fas fa-chevron-right ml-1"></i>
-          </button>
-        </div>
-
-        <!-- 时间节点搜索空状态 -->
-        <div v-if="paginatedTimeNodes.length === 0" class="text-center py-12 text-gray-500">
-          <i class="fas fa-clock text-4xl mb-4"></i>
-          <p class="text-lg font-medium mb-2">未找到匹配的时间节点</p>
-          <p class="text-sm">请尝试调整搜索条件或创建新的时间节点</p>
-          <button 
-            @click="showCreateTimeNode = true"
-            class="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            创建新时间节点
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- 项目弹窗 -->
     <Transition name="modal-fade">
       <div v-if="showCreateProject" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -503,84 +382,6 @@
         </Transition>
       </div>
     </Transition>
-
-    <!-- 时间节点弹窗 -->
-    <Transition name="modal-fade">
-      <div v-if="showCreateTimeNode" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <Transition name="modal-slide">
-          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-semibold text-gray-900">{{ editingTimeNode ? '编辑时间节点' : '新建时间节点' }}</h3>
-              <button 
-                @click="closeTimeNodeForm"
-                class="text-gray-500 hover:text-gray-700"
-              >
-                <i class="fas fa-times text-xl"></i>
-              </button>
-            </div>
-            
-            <form @submit.prevent="submitTimeNode" class="space-y-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">标题</label>
-                <input 
-                  v-model="timeNodeForm.title" 
-                  type="text" 
-                  placeholder="请输入时间节点标题"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
-                >
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
-                <textarea 
-                  v-model="timeNodeForm.description" 
-                  rows="3" 
-                  placeholder="请输入时间节点描述..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
-                ></textarea>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">时间</label>
-                <input 
-                  v-model="timeNodeForm.time" 
-                  type="datetime-local" 
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
-                >
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">类型</label>
-                <select v-model="timeNodeForm.type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required>
-                  <option value="">请选择类型</option>
-                  <option value="war">战争行动</option>
-                  <option value="diplomatic">外交活动</option>
-                </select>
-              </div>
-
-              <div class="flex justify-end space-x-4">
-                <button 
-                  type="button" 
-                  @click="closeTimeNodeForm"
-                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                >
-                  取消
-                </button>
-                <button 
-                  type="submit" 
-                  class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  {{ editingTimeNode ? '更新时间节点' : '创建时间节点' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </Transition>
-  </div>
-    </Transition>
   </section>
 </template>
 
@@ -593,7 +394,6 @@ import request from '@/api/request'
 // 响应式数据
 const projects = ref<any[]>([])
 const tasks = ref<any[]>([])
-const timeNodes = ref<any[]>([])
 
 // 加载数据
 const loadData = async () => {
@@ -608,12 +408,6 @@ const loadData = async () => {
     const taskRes = await request.get('/task/list')
     if (taskRes.code === 200) {
       tasks.value = taskRes.data || []
-    }
-    
-    // 加载时间节点
-    const timeNodeRes = await request.get('/timenode/list')
-    if (timeNodeRes.code === 200) {
-      timeNodes.value = timeNodeRes.data || []
     }
   } catch (error) {
     console.error('加载数据失败:', error)
@@ -630,12 +424,10 @@ const pageSize = 4
 // 响应式数据
 const showCreateProject = ref(false)
 const showCreateTask = ref(false)
-const showCreateTimeNode = ref(false)
 
 // 编辑状态
 const editingProject = ref<any>(null)
 const editingTask = ref<any>(null)
-const editingTimeNode = ref<any>(null)
 
 // 搜索和筛选
 const taskSearchQuery = ref('')
@@ -643,10 +435,6 @@ const taskFilterStatus = ref('')
 const projectSearchQuery = ref('')
 const projectFilterStatus = ref('')
 const projectFilterCategory = ref('')
-const timeNodeSearchQuery = ref('')
-const timeNodeFilterType = ref('')
-const timeNodeFilterStatus = ref('')
-const timeNodeSortBy = ref('')
 
 // 项目展开状态
 const projectExpanded = ref<number[]>([])
@@ -674,50 +462,6 @@ const taskForm = reactive({
   status: 'pending'
 })
 
-// 时间节点表单
-const timeNodeForm = reactive({
-  title: '',
-  description: '',
-  time: '',
-  type: ''
-})
-
-// 时间节点计算属性
-const filteredTimeNodes = computed(() => {
-  let filtered = timeNodes.value
-  
-  // 按搜索关键词筛选
-  if (timeNodeSearchQuery.value) {
-    const query = timeNodeSearchQuery.value.toLowerCase()
-    filtered = filtered.filter(node => 
-      node.title.toLowerCase().includes(query) ||
-      node.description.toLowerCase().includes(query)
-    )
-  }
-  
-  // 按类型筛选
-  if (timeNodeFilterType.value) {
-    filtered = filtered.filter(node => node.type === timeNodeFilterType.value)
-  }
-  
-  // 按状态筛选
-  if (timeNodeFilterStatus.value) {
-    filtered = filtered.filter(node => node.status === timeNodeFilterStatus.value)
-  }
-  
-  // 排序逻辑
-  if (timeNodeSortBy.value === 'time') {
-    // 按时间排序，靠后的排在前面
-    filtered.sort((a, b) => new Date(b.time.replace(' ', 'T')).getTime() - new Date(a.time.replace(' ', 'T')).getTime())
-  } else if (timeNodeSortBy.value === 'status') {
-    // 按状态排序
-    const statusOrder = { 'overdue': 0, 'upcoming': 1, 'ongoing': 2, 'completed': 3, 'not-started': 4, 'closed': 5 }
-    filtered.sort((a, b) => (statusOrder[a.status as keyof typeof statusOrder] || 6) - (statusOrder[b.status as keyof typeof statusOrder] || 6))
-  }
-  
-  return filtered
-})
-
 // 项目分页相关
 const projectPageSize = 5
 const projectCurrentPage = ref(1)
@@ -743,33 +487,6 @@ const nextProjectPage = () => {
     projectCurrentPage.value++
   }
 }
-
-// 时间节点分页计算属性
-const totalPages = computed(() => Math.ceil(filteredTimeNodes.value.length / pageSize))
-
-const paginatedTimeNodes = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return Array.isArray(filteredTimeNodes.value) ? filteredTimeNodes.value.slice(start, end) : []
-})
-
-// 翻页方法
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-// 监听筛选和排序变化，重置到第一页
-watch([timeNodeSearchQuery, timeNodeFilterType, timeNodeFilterStatus, timeNodeSortBy], () => {
-  currentPage.value = 1
-})
 
 // 监听项目筛选变化，重置到第一页
 watch([projectSearchQuery, projectFilterCategory, projectFilterStatus], () => {
@@ -954,7 +671,13 @@ const editTask = (task: any) => {
   taskForm.projectId = task.projectId.toString()
   taskForm.name = task.name
   taskForm.description = task.description
-  taskForm.deadline = task.deadline
+  // 转换日期格式：从后端格式 (yyyy-MM-dd HH:mm:ss) 到 datetime-local (yyyy-MM-ddTHH:mm)
+  if (task.deadline) {
+    // 将 "2025-10-07 14:30:00" 转换为 "2025-10-07T14:30"
+    taskForm.deadline = task.deadline.substring(0, 16).replace(' ', 'T')
+  } else {
+    taskForm.deadline = ''
+  }
   // 不设置状态，状态由执行页面管理
   showCreateTask.value = true
 }
@@ -978,11 +701,18 @@ const deleteTask = async (id: number) => {
 // 提交任务
 const submitTask = async () => {
   try {
+    // 转换日期格式：从 datetime-local (yyyy-MM-ddTHH:mm) 到后端格式 (yyyy-MM-dd HH:mm:ss)
+    let formattedDeadline = taskForm.deadline
+    if (formattedDeadline) {
+      // 将 "2025-10-07T14:30" 转换为 "2025-10-07 14:30:00"
+      formattedDeadline = formattedDeadline.replace('T', ' ') + ':00'
+    }
+    
     const taskData = {
       projectId: parseInt(taskForm.projectId),
       name: taskForm.name,
       description: taskForm.description,
-      deadline: taskForm.deadline,
+      deadline: formattedDeadline,
       status: taskForm.status || 'pending'
     }
     
@@ -1059,190 +789,6 @@ const filteredProjects = computed(() => {
   
   return filtered
 })
-
-// 时间节点相关方法
-// 获取时间节点类型样式
-const getTimeNodeTypeClass = (type: string) => {
-  const classes = {
-    war: 'bg-red-100 text-red-600',
-    diplomatic: 'bg-blue-100 text-blue-600'
-  }
-  return classes[type as keyof typeof classes] || 'bg-gray-100 text-gray-600'
-}
-
-// 获取时间节点类型文本
-const getTimeNodeTypeText = (type: string) => {
-  const texts = {
-    war: '战争行动',
-    diplomatic: '外交活动'
-  }
-  return texts[type as keyof typeof texts] || '未知'
-}
-
-// 获取时间节点状态样式
-const getTimeNodeStatusClass = (status: string) => {
-  const classes = {
-    'not-started': 'bg-purple-100 text-purple-600',
-    upcoming: 'bg-orange-100 text-orange-600',
-    ongoing: 'bg-blue-100 text-blue-600',
-    completed: 'bg-green-100 text-green-600',
-    overdue: 'bg-red-100 text-red-600',
-    closed: 'bg-gray-100 text-gray-600'
-  }
-  return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-600'
-}
-
-// 获取时间节点状态文本
-const getTimeNodeStatusText = (status: string) => {
-  const texts = {
-    'not-started': '未开始',
-    upcoming: '即将开始',
-    ongoing: '进行中',
-    completed: '已完成',
-    overdue: '已逾期',
-    closed: '已关闭'
-  }
-  return texts[status as keyof typeof texts] || '未知'
-}
-
-// 编辑时间节点
-const editTimeNode = (timeNode: any) => {
-  editingTimeNode.value = timeNode
-  timeNodeForm.title = timeNode.title
-  timeNodeForm.description = timeNode.description
-  // 转换时间格式为datetime-local格式
-  const date = new Date(timeNode.time.replace(' ', 'T'))
-  timeNodeForm.time = date.toISOString().slice(0, 16)
-  timeNodeForm.type = timeNode.type
-  showCreateTimeNode.value = true
-}
-
-// 删除时间节点
-const deleteTimeNode = async (id: number) => {
-  if (confirm('确定要删除这个时间节点吗？')) {
-    try {
-      const res = await request.delete(`/timenode/${id}`)
-      if (res.code === 200) {
-        alert('时间节点已删除！')
-        loadData()
-      }
-    } catch (error) {
-      console.error('删除时间节点失败:', error)
-      alert('删除失败，请重试')
-    }
-  }
-}
-
-// 提交时间节点
-const submitTimeNode = async () => {
-  try {
-    // 转换时间格式
-    const formattedTime = timeNodeForm.time.replace('T', ' ')
-    
-    const timeNodeData = {
-      title: timeNodeForm.title,
-      description: timeNodeForm.description,
-      time: formattedTime,
-      type: timeNodeForm.type,
-      status: 'not-started'
-    }
-    
-    if (editingTimeNode.value) {
-      // 更新时间节点
-      const res = await request.put('/timenode', { ...timeNodeData, id: editingTimeNode.value.id })
-      if (res.code === 200) {
-        alert('时间节点已更新！')
-        loadData()
-      }
-    } else {
-      // 创建新时间节点
-      const res = await request.post('/timenode', timeNodeData)
-      if (res.code === 200) {
-        alert('时间节点已创建！')
-        loadData()
-      }
-    }
-    closeTimeNodeForm()
-  } catch (error) {
-    console.error('保存时间节点失败:', error)
-    alert('操作失败，请重试')
-  }
-}
-
-// 关闭时间节点表单
-const closeTimeNodeForm = () => {
-  showCreateTimeNode.value = false
-  editingTimeNode.value = null
-  timeNodeForm.title = ''
-  timeNodeForm.description = ''
-  timeNodeForm.time = ''
-  timeNodeForm.type = ''
-}
-
-// 切换时间节点状态
-const toggleTimeNodeStatus = async (timeNode: any) => {
-  let newStatus: 'not-started' | 'upcoming' | 'ongoing' | 'completed' | 'overdue' | 'closed'
-  
-  switch (timeNode.status) {
-    case 'not-started':
-      newStatus = 'upcoming'
-      break
-    case 'upcoming':
-      newStatus = 'ongoing'
-      break
-    case 'ongoing':
-      newStatus = 'completed'
-      break
-    case 'completed':
-      newStatus = 'closed'
-      break
-    case 'overdue':
-      newStatus = 'ongoing'
-      break
-    case 'closed':
-      newStatus = 'not-started'
-      break
-    default:
-      newStatus = 'not-started'
-  }
-  
-  try {
-    const res = await request.put('/timenode', { 
-      id: timeNode.id,
-      title: timeNode.title,
-      description: timeNode.description,
-      time: timeNode.time,
-      type: timeNode.type,
-      status: newStatus
-    })
-    if (res.code === 200) {
-      loadData()
-    }
-  } catch (error) {
-    console.error('更新时间节点状态失败:', error)
-  }
-}
-
-// 获取时间节点卡片类
-const getTimeNodeCardClass = (status: string) => {
-  const classes = {
-    'not-started': 'bg-purple-50 border-purple-500',
-    upcoming: 'bg-orange-50 border-orange-500',
-    ongoing: 'bg-blue-50 border-blue-500',
-    completed: 'bg-green-50 border-green-500',
-    overdue: 'bg-red-50 border-red-500',
-    closed: 'bg-gray-50 border-gray-500'
-  }
-  return classes[status as keyof typeof classes] || 'bg-gray-50 border-gray-500'
-}
-
-// 组件挂载时启动定时器
-// 注释掉定时器，因为状态更新由后端管理
-// onMounted(() => {
-//   statusUpdateTimer = window.setInterval(() => {
-//     // 状态检查由后端处理
-//   }, 60000)
-// })
 
 // 将项目加入荣誉战绩
 const addProjectToHonors = (project: any) => {

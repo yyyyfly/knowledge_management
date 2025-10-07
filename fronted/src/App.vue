@@ -11,7 +11,11 @@
       <div class="flex-1 lg:ml-72 transition-all duration-300">
         <Header />
         <main class="p-4 lg:p-6">
-          <router-view></router-view>
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+          </router-view>
         </main>
       </div>
     </template>

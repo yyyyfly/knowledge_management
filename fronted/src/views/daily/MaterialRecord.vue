@@ -2363,7 +2363,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { ref, reactive, onMounted, onActivated, onBeforeUnmount, computed, watch } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
@@ -2395,6 +2395,8 @@ const loadNotes = async () => {
     if (res.code === 200) {
       allNotes.value = res.data || []
       todayRecords.value = res.data || []
+      // 数据加载后立即规范化数组字段
+      normalizeRecordArrays()
     }
   } catch (error) {
     console.error('加载笔记失败:', error)
@@ -2415,7 +2417,8 @@ import {
   defaultExerciseSubjects,
   defaultExerciseKnowledge
 } from '@/mock/defaultOptions'
-import { projectTemplates } from '@/mock/projectTemplates'
+import { getAllProjectTemplates } from '@/api/projectTemplate'
+import type { ProjectTemplate as ApiProjectTemplate } from '@/api/projectTemplate'
 
 // 表单数据
 const recordForm = reactive({
@@ -2492,6 +2495,9 @@ const newSubjectType = ref('')
 const newKnowledgePoint = ref('')
 const newProjectType = ref('')
 const newFragmentTheme = ref('')
+
+// 项目模板数据
+const projectTemplates = ref<{id: number; domain: string; name: string; description: string; requirements: any[]; commonFeatures: any[]}[]>([])
 
 // 自定义输入变量
 const customProject = ref('')
@@ -2705,27 +2711,55 @@ const filterType = ref('')
 // 今日记录数据
 const todayRecords = ref<Note[]>([])
 
-// 兜底：所有类型字段都转为数组（mock数据已经是正确格式，这里保留以防万一）
+// 兜底：所有类型字段都转为数组（从后端返回的逗号分隔字符串需要拆分）
 function normalizeRecordArrays() {
   todayRecords.value.forEach((record: any) => {
+    // 将逗号分隔的字符串或单个值转换为数组
+    const toArray = (value: any) => {
+      if (!value) return []
+      if (Array.isArray(value)) return value
+      if (typeof value === 'string') {
+        // 如果是逗号分隔的字符串，拆分成数组
+        return value.split(',').map(item => item.trim()).filter(item => item !== '')
+      }
+      return [value]
+    }
+    
     // 确保所有数组字段都是数组类型
-    if (record.subject && !Array.isArray(record.subject)) record.subject = [record.subject]
-    if (record.course && !Array.isArray(record.course)) record.course = [record.course]
-    if (record.studySubject && !Array.isArray(record.studySubject)) record.studySubject = [record.studySubject]
-    if (record.bookSubject && !Array.isArray(record.bookSubject)) record.bookSubject = [record.bookSubject]
-    if (record.subjectType && !Array.isArray(record.subjectType)) record.subjectType = [record.subjectType]
-    if (record.knowledgePoint && !Array.isArray(record.knowledgePoint)) record.knowledgePoint = [record.knowledgePoint]
-    if (record.techTags && !Array.isArray(record.techTags)) record.techTags = [record.techTags]
-    if (record.fragmentCategory && !Array.isArray(record.fragmentCategory)) record.fragmentCategory = [record.fragmentCategory]
-    if (record.fragmentTheme && !Array.isArray(record.fragmentTheme)) record.fragmentTheme = [record.fragmentTheme]
-    if (record.projectType && !Array.isArray(record.projectType)) record.projectType = [record.projectType]
+    if (record.subject) record.subject = toArray(record.subject)
+    if (record.course) record.course = toArray(record.course)
+    if (record.studySubject) record.studySubject = toArray(record.studySubject)
+    if (record.bookSubject) record.bookSubject = toArray(record.bookSubject)
+    if (record.subjectType) record.subjectType = toArray(record.subjectType)
+    if (record.knowledgePoint) record.knowledgePoint = toArray(record.knowledgePoint)
+    if (record.techTags) record.techTags = toArray(record.techTags)
+    if (record.fragmentCategory) record.fragmentCategory = toArray(record.fragmentCategory)
+    if (record.fragmentTheme) record.fragmentTheme = toArray(record.fragmentTheme)
+    if (record.projectType) record.projectType = toArray(record.projectType)
+    if (record.exerciseKnowledge) record.exerciseKnowledge = toArray(record.exerciseKnowledge)
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadNotes()
   loadStoredTypes()
-  normalizeRecordArrays()
+  
+  // 加载项目模板
+  try {
+    const response = await getAllProjectTemplates()
+    if (response.code === 200 && response.data) {
+      projectTemplates.value = response.data.map((item: ApiProjectTemplate) => ({
+        id: item.id || 0,
+        domain: item.domain,
+        name: item.name,
+        description: item.description,
+        requirements: JSON.parse(item.requirements || '[]'),
+        commonFeatures: JSON.parse(item.commonFeatures || '[]')
+      }))
+    }
+  } catch (error) {
+    console.error('加载项目模板失败:', error)
+  }
   
   // 初始化练习笔记选项
   const initExerciseOptions = () => {
@@ -2751,6 +2785,11 @@ onMounted(() => {
       showTableMenu.value = false
     }
   })
+})
+
+// 组件激活时刷新数据（从其他页面返回时）
+onActivated(() => {
+  loadNotes()
 })
 
 // 计算已有学科列表
@@ -4393,7 +4432,7 @@ const allSubjectTypeOptions = computed(() => {
 
 const allProjectTypeOptions = computed(() => {
   // 获取项目模板的名称作为实战笔记的项目类型选项
-  const templateNames = projectTemplates.map(template => template.name)
+  const templateNames = projectTemplates.value.map(template => template.name)
   return templateNames.sort()
 })
 

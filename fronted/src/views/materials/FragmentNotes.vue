@@ -472,19 +472,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onActivated } from 'vue'
 import { getNotesByType } from '@/services/noteService'
 
 // 响应式笔记数据
 const notesData = ref<any[]>([])
 
 // 加载数据
-onMounted(async () => {
+const loadNotes = async () => {
   try {
     notesData.value = await getNotesByType('fragment')
   } catch (error) {
     console.error('加载碎片笔记失败:', error)
   }
+}
+
+onMounted(() => {
+  loadNotes()
+})
+
+onActivated(() => {
+  loadNotes()
 })
 import { Bar, Line } from 'vue-chartjs'
 import {

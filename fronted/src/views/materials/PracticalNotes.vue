@@ -47,14 +47,14 @@
         </div>
       </div>
 
-      <!-- 技术实现数 -->
+      <!-- 技术栈数量 -->
       <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">技术实现</p>
-            <p class="text-3xl font-bold text-gray-900">{{ projectImplementations.length }}</p>
+            <p class="text-sm font-medium text-gray-600 mb-1">使用技术</p>
+            <p class="text-3xl font-bold text-gray-900">{{ techStackStats.length }}</p>
             <p class="text-xs text-blue-600 font-medium mt-1">
-              <i class="fas fa-tools text-xs mr-1"></i>{{ uniqueTechStacks.length }} 种技术栈
+              <i class="fas fa-tools text-xs mr-1"></i>{{ projectTemplates.length }} 个项目模板
             </p>
           </div>
           <div class="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
@@ -95,74 +95,60 @@
 
     <!-- 实战概览仪表盘 -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- 项目定制进度 -->
+      <!-- 项目领域分布 -->
       <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-          <i class="fas fa-chart-line text-blue-600 mr-2"></i>
-          项目定制进度
-        </h3>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600">模板设计</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
-              </div>
-              <span class="text-xs font-medium text-blue-600">85%</span>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600">需求分析</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-200 rounded-full h-2">
-                <div class="bg-green-600 h-2 rounded-full" style="width: 92%"></div>
-              </div>
-              <span class="text-xs font-medium text-green-600">92%</span>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600">技术实现</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-200 rounded-full h-2">
-                <div class="bg-purple-600 h-2 rounded-full" style="width: 78%"></div>
-              </div>
-              <span class="text-xs font-medium text-purple-600">78%</span>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600">项目交付</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-200 rounded-full h-2">
-                <div class="bg-orange-600 h-2 rounded-full" style="width: 65%"></div>
-              </div>
-              <span class="text-xs font-medium text-orange-600">65%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 热门技术栈 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-          <i class="fas fa-fire text-red-600 mr-2"></i>
-          热门技术栈
+          <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
+          项目领域分布
         </h3>
         <div class="space-y-3">
-          <div v-for="(tech, index) in uniqueTechStacks.slice(0, 5)" :key="tech" 
+          <div v-for="(domain, index) in domainStats.slice(0, 5)" :key="domain.name" 
                class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
                 {{ index + 1 }}
               </div>
-              <span class="text-sm font-medium text-gray-900">{{ tech }}</span>
+              <span class="text-sm font-medium text-gray-900">{{ domain.name }}</span>
             </div>
             <div class="flex items-center space-x-2">
-              <div class="w-12 bg-gray-200 rounded-full h-2">
+              <div class="w-16 bg-gray-200 rounded-full h-2">
                 <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" 
-                     :style="{ width: Math.max(30, 100 - index * 15) + '%' }"></div>
+                     :style="{ width: (domain.count / Math.max(...domainStats.map(d => d.count)) * 100) + '%' }"></div>
               </div>
-              <span class="text-xs text-gray-500">{{ Math.max(2, 10 - index * 2) }}</span>
+              <span class="text-xs text-gray-600 font-medium w-8 text-right">{{ domain.count }}</span>
             </div>
+          </div>
+          <div v-if="domainStats.length === 0" class="text-center py-4 text-gray-500 text-sm">
+            暂无领域数据
+          </div>
+        </div>
+      </div>
+
+      <!-- 笔记技术栈统计 -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <i class="fas fa-code text-purple-600 mr-2"></i>
+          技术栈统计
+        </h3>
+        <div class="space-y-3">
+          <div v-for="(tech, index) in techStackStats.slice(0, 5)" :key="tech.name" 
+               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                {{ index + 1 }}
+              </div>
+              <span class="text-sm font-medium text-gray-900">{{ tech.name }}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <div class="w-16 bg-gray-200 rounded-full h-2">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full" 
+                     :style="{ width: (tech.count / Math.max(...techStackStats.map(t => t.count)) * 100) + '%' }"></div>
+              </div>
+              <span class="text-xs text-gray-600 font-medium w-8 text-right">{{ tech.count }}</span>
+            </div>
+          </div>
+          <div v-if="techStackStats.length === 0" class="text-center py-4 text-gray-500 text-sm">
+            暂无技术栈数据
           </div>
         </div>
       </div>
@@ -224,11 +210,11 @@
           </div>
           <div class="text-center">
             <div class="text-2xl font-bold text-purple-600">{{ totalNonFunctionalRequirements }}</div>
-            <div class="text-sm text-gray-600">质量需求</div>
+            <div class="text-sm text-gray-600">非功能性需求</div>
           </div>
           <div class="text-center">
-            <div class="text-2xl font-bold text-orange-600">{{ projectImplementations.length }}</div>
-            <div class="text-sm text-gray-600">技术实现</div>
+            <div class="text-2xl font-bold text-orange-600">{{ practicalNotes.length }}</div>
+            <div class="text-sm text-gray-600">实战笔记</div>
           </div>
         </div>
       </div>
@@ -240,8 +226,8 @@
                class="group relative bg-white border-2 border-gray-100 rounded-xl p-6 hover:border-blue-300 hover:shadow-lg transition-all duration-300">
             
             <!-- 操作按钮 -->
-            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div class="flex space-x-2">
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <div class="flex space-x-2 bg-white rounded-lg shadow-lg p-1">
                 <button @click.stop="openEditModal(template)" 
                         class="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
                   <i class="fas fa-edit text-sm"></i>
@@ -254,13 +240,17 @@
             </div>
 
             <div class="mb-4">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ template.name }}</h3>
-                <span class="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                  {{ template.domain }}
-                </span>
+              <div class="mb-3">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors pr-2 flex-1">{{ template.name }}</h3>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white whitespace-nowrap">
+                    {{ template.domain }}
+                  </span>
+                  <p class="text-gray-600 text-sm line-clamp-2 flex-1">{{ template.description }}</p>
+                </div>
               </div>
-              <p class="text-gray-600 text-sm line-clamp-2">{{ template.description }}</p>
             </div>
 
             <!-- 模板统计 -->
@@ -271,7 +261,7 @@
               </div>
               <div class="text-center p-3 bg-green-50 rounded-lg">
                 <div class="text-lg font-bold text-green-600">{{ getImplementationCount(template.id) }}</div>
-                <div class="text-xs text-gray-600">技术实现</div>
+                <div class="text-xs text-gray-600">实战笔记</div>
               </div>
             </div>
 
@@ -463,14 +453,14 @@
               </div>
               <div class="text-center p-4 bg-green-50 rounded-xl">
                 <div class="text-2xl font-bold text-green-600">{{ selectedTemplateDetail?.commonFeatures?.length || 0 }}</div>
-                <div class="text-sm text-gray-600">质量需求</div>
+                <div class="text-sm text-gray-600">非功能性需求</div>
               </div>
               <div class="text-center p-4 bg-purple-50 rounded-xl">
-                <div class="text-2xl font-bold text-purple-600">{{ implementations.length }}</div>
-                <div class="text-sm text-gray-600">技术实现</div>
+                <div class="text-2xl font-bold text-purple-600">{{ selectedTemplateDetail ? getTemplateNotes(selectedTemplateDetail.id).length : 0 }}</div>
+                <div class="text-sm text-gray-600">实战笔记</div>
               </div>
               <div class="text-center p-4 bg-orange-50 rounded-xl">
-                <div class="text-2xl font-bold text-orange-600">{{ uniqueTechStacks.length }}</div>
+                <div class="text-2xl font-bold text-orange-600">{{ selectedTemplateDetail ? getTemplateTechStacks(selectedTemplateDetail.id).length : 0 }}</div>
                 <div class="text-sm text-gray-600">技术栈</div>
               </div>
             </div>
@@ -670,11 +660,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import { getAllNotes } from '@/services/noteService'
 import { getAllProjectTemplates, createProjectTemplate, updateProjectTemplate, deleteProjectTemplate } from '@/api/projectTemplate'
 import type { ProjectTemplate as ApiProjectTemplate } from '@/api/projectTemplate'
-import { projectImplementations } from '@/mock/projectImplementations'
 
 type Note = {
   id: number
@@ -716,7 +705,7 @@ const allNotesData = ref<Note[]>([])
 const projectTemplates = ref<ProjectTemplate[]>([])
 
 // 加载笔记数据和项目模板
-onMounted(async () => {
+const loadData = async () => {
   try {
     // 加载笔记
     allNotesData.value = await getAllNotes()
@@ -737,13 +726,20 @@ onMounted(async () => {
   } catch (error) {
     console.error('加载数据失败:', error)
   }
+}
+
+onMounted(() => {
+  loadData()
+})
+
+onActivated(() => {
+  loadData()
 })
 
 const showDetail = ref(false)
 const showFormModal = ref(false)
 const isEditing = ref(false)
 const selectedTemplateDetail = ref<ProjectTemplate | null>(null)
-const implementations = ref<typeof projectImplementations>([])
 const showNotesList = ref(false)
 const showNoteDetail = ref(false)
 const selectedNote = ref<Note | null>(null)
@@ -760,9 +756,57 @@ const formData = ref({
   commonFeatures: [] as ProjectRequirement[]
 })
 
-// 获取唯一技术栈列表
-const uniqueTechStacks = computed(() => {
-  return [...new Set(projectImplementations.map(i => i.techStack))]
+// 获取模板相关的实战笔记
+const getTemplateNotes = (templateId: number) => {
+  const template = projectTemplates.value.find(t => t.id === templateId)
+  if (!template) return []
+  
+  return allNotesData.value.filter(note => 
+    note.type === 'practical' && 
+    (note.projectName === template.name || 
+     (note.title && note.title.includes(template.name)))
+  )
+}
+
+// 获取模板相关的所有技术栈
+const getTemplateTechStacks = (templateId: number) => {
+  const notes = getTemplateNotes(templateId)
+  const techStacks = new Set<string>()
+  notes.forEach(note => {
+    if (note.techStack && Array.isArray(note.techStack)) {
+      note.techStack.forEach(tech => techStacks.add(tech))
+    }
+  })
+  return Array.from(techStacks)
+}
+
+// 项目领域分布统计
+const domainStats = computed(() => {
+  const domainCount: { [key: string]: number } = {}
+  projectTemplates.value.forEach(template => {
+    const domain = template.domain || '未分类'
+    domainCount[domain] = (domainCount[domain] || 0) + 1
+  })
+  return Object.entries(domainCount)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+})
+
+// 笔记技术栈统计
+const techStackStats = computed(() => {
+  const techCount: { [key: string]: number } = {}
+  allNotesData.value
+    .filter(n => n.type === 'practical')
+    .forEach(note => {
+      if (note.techStack && Array.isArray(note.techStack)) {
+        note.techStack.forEach(tech => {
+          techCount[tech] = (techCount[tech] || 0) + 1
+        })
+      }
+    })
+  return Object.entries(techCount)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
 })
 
 // 获取最近笔记
@@ -781,9 +825,9 @@ const getRecentNotes = () => {
     }))
 }
 
-// 获取模板的实现数量
+// 获取模板的实战笔记数量
 const getImplementationCount = (templateId: number) => {
-  return projectImplementations.filter(i => i.templateId === templateId).length
+  return getTemplateNotes(templateId).length
 }
 
 // 打开新增模态框
@@ -917,14 +961,12 @@ const deleteTemplate = async (id: number) => {
 
 function openTemplate(template: ProjectTemplate) {
   selectedTemplateDetail.value = template
-  implementations.value = projectImplementations.filter(i => i.templateId === template.id)
   showDetail.value = true
 }
 
 function closeDetail() {
   showDetail.value = false
   selectedTemplateDetail.value = null
-  implementations.value = []
 }
 
 const totalFunctionalRequirements = computed(() => {

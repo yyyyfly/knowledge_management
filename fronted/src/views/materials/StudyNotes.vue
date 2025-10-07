@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 bg-gray-50 min-h-screen">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">学习笔记</h1>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">求学笔记</h1>
       <p class="text-gray-600">课程学习和知识掌握的统计概览</p>
     </div>
 
@@ -113,7 +113,7 @@
           </div>
           <div class="mb-3">
             <p class="text-sm font-semibold text-blue-900">总笔记数</p>
-            <p class="text-xs text-blue-700">累计学习笔记</p>
+            <p class="text-xs text-blue-700">累计求学笔记</p>
           </div>
           <!-- 本月新增 -->
           <div class="text-xs text-blue-600 mb-2">
@@ -478,19 +478,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onActivated } from 'vue'
 import { getNotesByType } from '@/services/noteService'
 
 // 响应式笔记数据
 const notesData = ref<any[]>([])
 
 // 加载数据
-onMounted(async () => {
+const loadNotes = async () => {
   try {
     notesData.value = await getNotesByType('study')
   } catch (error) {
     console.error('加载求学笔记失败:', error)
   }
+}
+
+onMounted(() => {
+  loadNotes()
+})
+
+onActivated(() => {
+  loadNotes()
 })
 import { Bar, Line } from 'vue-chartjs'
 import {

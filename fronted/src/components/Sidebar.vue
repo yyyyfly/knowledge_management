@@ -229,7 +229,7 @@ const materialsConfig = [
   { name: '碎片笔记', path: '/fragment-notes', icon: 'fa-solid fa-puzzle-piece' },
   { name: '框架笔记', path: '/framework-notes', icon: 'fa-solid fa-sitemap' },
   { name: '求学笔记', path: '/study-notes', icon: 'fa-solid fa-graduation-cap' },
-  { name: '记忆笔记', path: '/memorization-notes', icon: 'fa-regular fa-lightbulb' },
+  { name: '背诵笔记', path: '/memorization-notes', icon: 'fa-regular fa-lightbulb' },
   { name: '刷题笔记', path: '/exercise-notes', icon: 'fa-regular fa-pen-to-square' },
   { name: '实战笔记', path: '/practical-notes', icon: 'fa-solid fa-flask' }
 ]

@@ -129,11 +129,19 @@ const handleLogin = async () => {
       // 跳转到指定页面或首页
       router.push(redirect)
     } else {
+      // 显示后端返回的具体错误信息
       errorMessage.value = response.message || '登录失败，请重试'
     }
   } catch (error: any) {
     console.error('登录失败:', error)
-    errorMessage.value = error.response?.data?.message || '登录失败，请检查网络连接'
+    // 优先显示后端返回的错误信息
+    if (error.response?.data?.message) {
+      errorMessage.value = error.response.data.message
+    } else if (error.message) {
+      errorMessage.value = error.message
+    } else {
+      errorMessage.value = '登录失败，请检查网络连接或后端服务是否正常'
+    }
   } finally {
     loading.value = false
   }
