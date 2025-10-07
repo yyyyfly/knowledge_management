@@ -33,12 +33,31 @@
         <form @submit.prevent="submitDaily" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">日报标题</label>
-              <input v-model="dailyForm.title" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="输入日报标题">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-heading text-blue-500 mr-2"></i>日报标题
+              </label>
+              <input 
+                v-model="dailyForm.title" 
+                type="text" 
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
+                placeholder="输入日报标题"
+              >
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-              <input v-model="dailyForm.period" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="如 2024-01-15">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>日期
+              </label>
+              <div class="relative">
+                <input 
+                  v-model="dailyForm.period" 
+                  type="date" 
+                  class="date-input w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer hover:border-blue-400" 
+                  :max="today"
+                >
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                  <i class="fas fa-calendar text-sm"></i>
+                </div>
+              </div>
             </div>
           </div>
           <h4 class="text-lg mt-4 mb-2 tracking-wide text-shadow font-normal"><i class="fas fa-tasks text-blue-500 mr-2"></i>今日任务完成情况（含耗时）</h4>
@@ -59,7 +78,7 @@
             </div>
           </div>
           <button type="button" @click="dailyForm.content.dailyProblems.push({problem:'',solution:''})" class="text-blue-600 text-sm mb-2"><i class="fas fa-plus mr-1"></i>添加问题</button>
-          <h4 class="text-lg mt-4 mb-2 tracking-wide text-shadow font-normal"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>有效动作 / 有感收获</h4>
+          <h4 class="text-lg mt-4 mb-2 tracking-wide text-shadow font-normal"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>今日收获</h4>
           <div class="mb-6">
             <div v-for="(item, idx) in dailyForm.content.dailyHighlights" :key="idx" class="flex items-center space-x-2 mb-2">
               <input v-model="dailyForm.content.dailyHighlights[idx]" class="flex-1 px-3 py-2 border rounded" placeholder="收获/亮点">
@@ -82,14 +101,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import request from '@/api/request'
 
 const isCollapsed = ref(false)
 
+// 获取今天的日期（格式：YYYY-MM-DD）
+const today = computed(() => {
+  const date = new Date()
+  return date.toISOString().split('T')[0]
+})
+
+// 初始化表单，默认日期为今天
 const dailyForm = ref({
   title: '',
-  period: '',
+  period: new Date().toISOString().split('T')[0], // 默认为今天
   content: {
     dailyTasks: [{ content: '', duration: '' }],
     dailyProblems: [{ problem: '', solution: '' }],
@@ -101,7 +127,7 @@ const dailyForm = ref({
 const resetDailyForm = () => {
   dailyForm.value = {
     title: '',
-    period: '',
+    period: new Date().toISOString().split('T')[0], // 重置为今天
     content: {
       dailyTasks: [{ content: '', duration: '' }],
       dailyProblems: [{ problem: '', solution: '' }],
@@ -118,16 +144,46 @@ const submitDaily = async () => {
       return
     }
 
+    // 检查是否存在相同日期的总结
+    try {
+      const existingRes = await request.get('/summary/list')
+      if (existingRes.code === 200) {
+        const existingSummaries = existingRes.data || []
+        const duplicate = existingSummaries.find((s: any) => 
+          s.type === 'daily' && s.period === dailyForm.value.period
+        )
+        
+        if (duplicate) {
+          const confirmOverwrite = confirm(
+            `已有日期「${dailyForm.value.period}」的日报笔记！\n\n` +
+            `现有笔记：${duplicate.title}\n\n` +
+            `是否覆盖原有笔记？`
+          )
+          
+          if (!confirmOverwrite) {
+            return
+          }
+          
+          // 用户确认覆盖，删除旧的记录
+          await request.delete(`/summary/${duplicate.id}`)
+        }
+      }
+    } catch (error) {
+      console.error('检查重复日报失败:', error)
+      // 继续执行保存
+    }
+
     // 保存到后端（使用系统总结接口）
     const summaryData = {
       title: dailyForm.value.title,
       period: dailyForm.value.period,
+      description: dailyForm.value.content.dailySummary || '每日工作总结',
       content: JSON.stringify(dailyForm.value.content),
       type: 'daily',
-      tags: ['日报']
+      tags: '日报'
     }
 
-    const response = await request.post('/summary/create', summaryData)
+    const response = await request.post('/summary', summaryData)
     
     if (response.code === 200) {
       alert('日报已保存')
@@ -156,5 +212,48 @@ const submitDaily = async () => {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+/* 日期输入框样式优化 */
+.date-input {
+  color-scheme: light;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* 隐藏默认的日历图标，使用我们自定义的 */
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Firefox 兼容 */
+.date-input::-moz-calendar-picker-indicator {
+  opacity: 0;
+}
+
+/* 改善日期显示的字体 */
+.date-input::-webkit-datetime-edit {
+  padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-text {
+  color: #6b7280;
+  padding: 0 2px;
+}
+
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field {
+  color: #1f2937;
 }
 </style> 

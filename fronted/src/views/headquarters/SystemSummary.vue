@@ -76,7 +76,7 @@
               </div>
             </div>
             <button type="button" @click="summaryForm.content.dailyProblems.push({problem:'',solution:''})" class="text-blue-600 text-sm mb-2"><i class="fas fa-plus mr-1"></i>添加问题</button>
-            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>有效动作 / 有感收获</h4>
+            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>今日收获</h4>
             <div class="mb-6">
               <div v-for="(item, idx) in summaryForm.content.dailyHighlights" :key="idx" class="flex items-center space-x-2 mb-2">
                 <input v-model="summaryForm.content.dailyHighlights[idx]" class="flex-1 px-3 py-2 border rounded" placeholder="收获/亮点">
@@ -227,48 +227,43 @@
             <span :class="getTypeClass(selectedSummary?.type || '')" class="px-2 py-1 rounded-full text-xs font-medium">{{ getTypeText(selectedSummary?.type || '') }}</span>
             <span class="text-xs text-gray-500">{{ selectedSummary?.period }}</span>
           </div>
-          <div class="flex items-center gap-4 text-sm text-gray-500">
-            <span>满意度：{{ selectedSummary?.satisfaction }}</span>
-            <span>标签：<span v-for="tag in selectedSummary?.tags" :key="tag" class="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs mr-1">{{ tag }}</span></span>
-          </div>
         </div>
         <div v-if="selectedSummary">
+          <!-- 动态渲染每日总结模板 -->
           <template v-if="selectedSummary.type === 'daily'">
-            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-tasks text-blue-500 mr-2"></i>今日任务完成情况（含耗时）</h4>
-            <div class="mb-6">
-              <div class="border-l-4 border-blue-400 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-200 shadow-lg rounded-xl p-4 mb-8">
+            <div v-for="field in getDailyTemplateFields()" :key="field.key" class="mb-6">
+              <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow">
+                <i :class="[field.icon, field.iconColor, 'mr-2']"></i>{{ field.label }}
+              </h4>
+              
+              <!-- 对象列表类型（任务、问题等） -->
+              <div v-if="field.type === 'objectList' && selectedSummary.content[field.key]" 
+                   :class="['border-l-4', field.borderColor, 'bg-gradient-to-r', field.bgGradient, 'shadow-lg rounded-xl p-4 mb-8']">
                 <ul class="mb-2">
-                  <li v-for="(task, idx) in selectedSummary.content.dailyTasks" :key="idx" class="py-2 font-medium text-gray-800 leading-relaxed">
+                  <li v-for="(item, idx) in selectedSummary.content[field.key]" :key="idx" class="py-2 font-medium text-gray-800 leading-relaxed">
                     <div class='relative inline-block w-7 h-7 mr-3 align-middle'>
-                      <div class="w-6 h-6 rounded-full bg-blue-400 text-white text-center">
+                      <div :class="['w-6 h-6 rounded-full text-white text-center', field.key === 'dailyTasks' ? 'bg-blue-400' : 'bg-orange-400']">
                         {{ idx+1 }}
                       </div>
                     </div>
-                    {{ task.content }} <span class="text-xs text-gray-400">({{ task.duration }})</span>
+                    <!-- 任务类型显示 -->
+                    <template v-if="field.key === 'dailyTasks'">
+                      {{ item.content }} <span class="text-xs text-gray-400">({{ item.duration }})</span>
+                    </template>
+                    <!-- 问题类型显示 -->
+                    <template v-else-if="field.key === 'dailyProblems'">
+                      {{ item.problem }}
+                      <p class="text-sm text-gray-600 ml-11 mt-1">→ {{ item.solution }}</p>
+                    </template>
                   </li>
                 </ul>
               </div>
-            </div>
-            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-bolt text-orange-500 mr-2"></i>过程中的问题与应对方式</h4>
-            <div class="mb-6">
-              <div class="border-l-4 border-orange-400 bg-gradient-to-r from-orange-50 via-orange-100 to-orange-200 shadow-lg rounded-xl p-4 mb-8">
+              
+              <!-- 简单列表类型（收获等） -->
+              <div v-else-if="field.type === 'list' && selectedSummary.content[field.key]"
+                   :class="['border-l-4', field.borderColor, 'bg-gradient-to-r', field.bgGradient, 'shadow-lg rounded-xl p-4 mb-8']">
                 <ul class="mb-2">
-                  <li v-for="(prob, idx) in selectedSummary.content.dailyProblems" :key="idx" class="py-2 font-medium text-gray-800 leading-relaxed">
-                    <div class='relative inline-block w-7 h-7 mr-3 align-middle'>
-                      <div class="w-6 h-6 rounded-full bg-orange-400 text-white text-center">
-                        {{ idx+1 }}
-                      </div>
-                    </div>
-                    {{ prob.problem }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>有效动作 / 有感收获</h4>
-            <div class="mb-6">
-              <div class="border-l-4 border-yellow-400 bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 shadow-lg rounded-xl p-4 mb-8">
-                <ul class="mb-2">
-                  <li v-for="(item, idx) in selectedSummary.content.dailyHighlights" :key="idx" class="py-2 font-medium text-gray-800 leading-relaxed">
+                  <li v-for="(item, idx) in selectedSummary.content[field.key]" :key="idx" class="py-2 font-medium text-gray-800 leading-relaxed">
                     <div class='relative inline-block w-7 h-7 mr-3 align-middle'>
                       <div class="w-6 h-6 rounded-full bg-yellow-400 text-white text-center">
                         {{ idx+1 }}
@@ -278,11 +273,11 @@
                   </li>
                 </ul>
               </div>
-            </div>
-            <h4 class="font-bold text-lg mt-4 mb-2 tracking-wide font-extrabold text-xl text-shadow"><i class="fas fa-quote-right text-purple-500 mr-2"></i>简要总结段</h4>
-            <div class="mb-6">
-              <div class="border-l-4 border-purple-400 bg-gradient-to-r from-purple-50 via-purple-100 to-purple-200 shadow-lg rounded-xl p-4 mb-8">
-                {{ selectedSummary.content.dailySummary }}
+              
+              <!-- 文本框类型（总结段等） -->
+              <div v-else-if="field.type === 'textarea' && selectedSummary.content[field.key]"
+                   :class="['border-l-4', field.borderColor, 'bg-gradient-to-r', field.bgGradient, 'shadow-lg rounded-xl p-4 mb-8']">
+                {{ selectedSummary.content[field.key] }}
               </div>
             </div>
           </template>
@@ -509,7 +504,7 @@
         <!-- 弹窗内容 -->
         <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-y-auto p-8">
           <div class="mb-4">
-            <h2 class="text-2xl font-bold mb-2">{{ getCurrentTypeLabel() }}总结</h2>
+            <h2 class="text-2xl font-bold mb-2">{{ getCurrentTypeLabel() }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
               <span :class="getTypeClass(selectedType)" class="px-2 py-1 rounded-full text-xs font-medium">{{ getTypeText(selectedType) }}</span>
             </div>
@@ -520,42 +515,39 @@
               <div 
                 v-for="summary in summaries.filter((summary: SystemSummary) => summary.type === selectedType)" 
                 :key="summary.id" 
-                @click="viewSummary(summary)"
-                class="bg-white rounded-xl shadow-soft p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 group"
+                class="bg-white rounded-xl shadow-soft p-6 hover:shadow-lg transition-all duration-300 group relative"
               >
-                <!-- 卡片头部 -->
-                <div class="flex items-start justify-between mb-4">
-                  <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {{ summary.title }}
-                    </h3>
-                    <p class="text-sm text-gray-500">{{ summary.period }}</p>
-                  </div>
-                  <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <i class="fas fa-arrow-right text-blue-500"></i>
-                  </div>
-                </div>
-
-                <!-- 卡片内容预览 -->
-                <div class="mb-4">
-                  <p class="text-sm text-gray-600 line-clamp-3">{{ summary.description }}</p>
-                </div>
-
-                <!-- 卡片底部 -->
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4 text-xs text-gray-500">
-                    <div class="flex items-center space-x-1">
-                      <i class="fas fa-tasks"></i>
-                      <span>{{ summary.satisfaction }}</span>
+                <!-- 删除按钮 -->
+                <button
+                  @click.stop="confirmDeleteSummary(summary)"
+                  class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-100 transition-all z-10"
+                  title="删除总结"
+                >
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+                
+                <!-- 卡片内容 - 点击查看详情 -->
+                <div @click="viewSummary(summary)" class="cursor-pointer">
+                  <!-- 卡片头部 -->
+                  <div class="flex items-start justify-between mb-4 pr-8">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        {{ summary.title }}
+                      </h3>
+                      <p class="text-sm text-gray-500">{{ summary.period }}</p>
                     </div>
                   </div>
-                  <div class="flex space-x-1">
-                    <span v-for="tag in summary.tags.slice(0, 2)" :key="tag" class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-                      {{ tag }}
-                    </span>
-                    <span v-if="summary.tags.length > 2" class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-                      +{{ summary.tags.length - 2 }}
-                    </span>
+
+                  <!-- 卡片内容预览 -->
+                  <div class="mb-4">
+                    <p class="text-sm text-gray-600 line-clamp-3">{{ summary.description }}</p>
+                  </div>
+
+                  <!-- 卡片底部 -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                      <span>{{ summary.period }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -586,8 +578,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onActivated } from 'vue'
 import request from '@/api/request'
+import { getTemplate, type TemplateField } from '@/config/summaryTemplates'
 
 // 定义 SystemSummary 类型
 type SystemSummary = {
@@ -597,7 +590,6 @@ type SystemSummary = {
   period: string
   description: string
   content: any
-  satisfaction: number
   tags: string[]
   recCreateTime?: string
   createTime?: string
@@ -630,6 +622,12 @@ const summaryTypes = [
     icon: 'fas fa-calendar-check'
   }
 ]
+
+// 获取每日总结模板字段
+const getDailyTemplateFields = () => {
+  const template = getTemplate('daily')
+  return template ? template.fields : []
+}
 
 // 状态管理
 const summaries = ref<SystemSummary[]>([])
@@ -673,7 +671,6 @@ const summaryForm = reactive({
     yearlyAssets: [''],
     yearlySummary: ''
   },
-  satisfaction: 5,
   tags: ''
 })
 
@@ -688,11 +685,35 @@ const loadSummaries = async () => {
   try {
     const res = await request.get('/summary/list')
     if (res.code === 200) {
-      summaries.value = (res.data || []).map((s: any) => ({
-        ...s,
-        tags: Array.isArray(s.tags) ? s.tags : (s.tags ? s.tags.split(',') : []),
-        content: typeof s.content === 'string' ? JSON.parse(s.content) : s.content
-      }))
+      summaries.value = (res.data || []).map((s: any) => {
+        // 处理 tags 字段 - 可能是数组、JSON字符串或逗号分隔字符串
+        let tags: string[] = []
+        if (Array.isArray(s.tags)) {
+          tags = s.tags
+        } else if (s.tags && typeof s.tags === 'string') {
+          // 尝试解析 JSON 字符串
+          if (s.tags.trim().startsWith('[')) {
+            try {
+              const parsed = JSON.parse(s.tags)
+              if (Array.isArray(parsed)) {
+                tags = parsed
+              }
+            } catch (e) {
+              // JSON 解析失败，使用逗号分割
+              tags = s.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t !== '')
+            }
+          } else {
+            // 逗号分隔字符串
+            tags = s.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t !== '')
+          }
+        }
+        
+        return {
+          ...s,
+          tags,
+          content: typeof s.content === 'string' ? JSON.parse(s.content) : s.content
+        }
+      })
     }
   } catch (error) {
     console.error('加载总结失败:', error)
@@ -738,7 +759,6 @@ const resetForm = () => {
   summaryForm.content.yearlyCriticalReviews = ['']
   summaryForm.content.yearlyCognitiveLeaps = ['']
   summaryForm.content.yearlyAssets = ['']
-  summaryForm.satisfaction = 5
   summaryForm.tags = ''
   summaryForm.content.dailySummary = ''
   summaryForm.content.monthlySummary = ''
@@ -804,7 +824,6 @@ const submitSummary = async () => {
     period: summaryForm.period,
     description: summaryForm.description,
     content: JSON.stringify(contentData),
-    satisfaction: summaryForm.satisfaction,
     tags: summaryForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag).join(',')
   }
 
@@ -855,14 +874,30 @@ const editSummary = (summary: SystemSummary) => {
   summaryForm.content.yearlyCriticalReviews = summary.content.yearlyCriticalReviews ? [...summary.content.yearlyCriticalReviews, ''] : ['']
   summaryForm.content.yearlyCognitiveLeaps = summary.content.yearlyCognitiveLeaps ? [...summary.content.yearlyCognitiveLeaps, ''] : ['']
   summaryForm.content.yearlyAssets = summary.content.yearlyAssets ? [...summary.content.yearlyAssets, ''] : ['']
-  summaryForm.satisfaction = summary.satisfaction
   summaryForm.tags = summary.tags.join(', ')
   showCreateForm.value = true
   closeDetailModal()
 }
 
+// 确认删除总结（从列表中）
+const confirmDeleteSummary = async (summary: SystemSummary) => {
+  if (confirm(`确定要删除总结「${summary.title}」吗？此操作不可恢复。`)) {
+    try {
+      const res = await request.delete(`/summary/${summary.id}`)
+      if (res.code === 200) {
+        alert('总结删除成功！')
+        loadSummaries()
+      }
+    } catch (error) {
+      console.error('删除总结失败:', error)
+      alert('删除失败，请重试')
+    }
+  }
+}
+
+// 删除总结（从详情页）
 const deleteSummary = async (id: number) => {
-  if (confirm('确定要删除这个总结吗？')) {
+  if (confirm('确定要删除这个总结吗？此操作不可恢复。')) {
     try {
       const res = await request.delete(`/summary/${id}`)
       if (res.code === 200) {
@@ -891,7 +926,7 @@ const getTypeClass = (type: string) => {
 const getTypeText = (type: string) => {
   const texts = {
     daily: '每日',
-    monthly: '月度总结',
+    monthly: '月度',
     quarterly: '季度',
     yearly: '年度'
   }
@@ -918,6 +953,10 @@ const closeTypeModal = () => {
 }
 
 onMounted(() => {
+  loadSummaries()
+})
+
+onActivated(() => {
   loadSummaries()
 })
 </script> 
