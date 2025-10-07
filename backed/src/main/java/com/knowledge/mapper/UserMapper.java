@@ -23,5 +23,20 @@ public interface UserMapper {
      * 更新最后登录时间
      */
     int updateLastLoginTime(@Param("id") Long id);
+
+    /**
+     * 根据用户名和邮箱查询用户（用于密码重置验证）
+     */
+    User findByUsernameAndEmail(@Param("username") String username, @Param("email") String email);
+
+    /**
+     * 更新用户密码
+     */
+    int updatePassword(@Param("id") Long id, @Param("password") String password);
+
+    /**
+     * 更新用户信息
+     */
+    int updateUserInfo(User user);
 }
 

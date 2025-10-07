@@ -26,6 +26,6 @@ import Header from '@/components/Header.vue'
 
 const route = useRoute()
 
-// 判断是否是登录或注册页面（不显示导航栏）
-const isLoginPage = computed(() => route.path === '/login' || route.path === '/register')
+// 判断是否是登录、注册或忘记密码页面（不显示导航栏）
+const isLoginPage = computed(() => route.path === '/login' || route.path === '/register' || route.path === '/forgot-password')
 </script> 

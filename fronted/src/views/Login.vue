@@ -69,8 +69,14 @@
           </button>
         </form>
 
-        <!-- 注册链接 -->
-        <div class="pt-4 border-t border-gray-200">
+        <!-- 忘记密码和注册链接 -->
+        <div class="pt-4 border-t border-gray-200 space-y-3">
+          <p class="text-center text-sm text-gray-600">
+            <router-link to="/forgot-password" class="text-orange-600 hover:text-orange-700 font-medium">
+              <i class="fas fa-key mr-1"></i>
+              忘记密码？
+            </router-link>
+          </p>
           <p class="text-center text-sm text-gray-600">
             还没有账号？
             <router-link to="/register" class="text-blue-600 hover:text-blue-700 font-medium">

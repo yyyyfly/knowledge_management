@@ -47,6 +47,40 @@
             />
           </div>
 
+          <!-- 邮箱输入 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-envelope text-gray-400 mr-2"></i>
+              邮箱 <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="registerForm.email"
+              type="email"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              placeholder="用于密码找回"
+            />
+            <p class="mt-1 text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              邮箱用于密码找回，请确保填写正确
+            </p>
+          </div>
+
+          <!-- 手机号输入（可选） -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-phone text-gray-400 mr-2"></i>
+              手机号（可选）
+            </label>
+            <input
+              v-model="registerForm.phone"
+              type="tel"
+              maxlength="11"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              placeholder="11位手机号码"
+            />
+          </div>
+
           <!-- 密码输入 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -142,6 +176,8 @@ const router = useRouter()
 const registerForm = ref({
   username: '',
   nickname: '',
+  email: '',
+  phone: '',
   password: '',
   confirmPassword: ''
 })
@@ -168,11 +204,20 @@ const handleRegister = async () => {
 
   loading.value = true
 
+  // 验证邮箱格式
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(registerForm.value.email)) {
+    errorMessage.value = '请输入有效的邮箱地址'
+    return
+  }
+
   try {
     const response = await register(
       registerForm.value.username,
       registerForm.value.password,
-      registerForm.value.nickname
+      registerForm.value.nickname,
+      registerForm.value.email,
+      registerForm.value.phone
     )
 
     if (response.code === 200) {

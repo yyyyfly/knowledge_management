@@ -54,5 +54,40 @@
         SET last_login_time = NOW()
         WHERE id = #{id}
     </update>
+
+    <select id="findByUsernameAndEmail" resultMap="BaseResultMap">
+        SELECT * FROM sys_user
+        WHERE username = #{username}
+        AND email = #{email}
+        AND arch_flag = 0
+        AND status = 1
+    </select>
+
+    <update id="updatePassword">
+        UPDATE sys_user
+        SET password = #{password},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserInfo" parameterType="com.knowledge.entity.User">
+        UPDATE sys_user
+        <set>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            rec_revise_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>
 

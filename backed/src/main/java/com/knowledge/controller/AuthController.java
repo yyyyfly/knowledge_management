@@ -51,9 +51,11 @@ public class AuthController {
         String username = registerRequest.get("username");
         String password = registerRequest.get("password");
         String nickname = registerRequest.get("nickname");
+        String email = registerRequest.get("email");
+        String phone = registerRequest.get("phone");
 
         try {
-            User user = authService.register(username, password, nickname);
+            User user = authService.register(username, password, nickname, email, phone);
             return Result.success(user);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -86,6 +88,83 @@ public class AuthController {
     @PostMapping("/logout")
     public Result<String> logout() {
         return Result.success("退出成功");
+    }
+
+    /**
+     * 重置密码
+     */
+    @PostMapping("/reset-password")
+    public Result<String> resetPassword(@RequestBody Map<String, String> resetRequest) {
+        String username = resetRequest.get("username");
+        String email = resetRequest.get("email");
+        String newPassword = resetRequest.get("newPassword");
+
+        try {
+            boolean success = authService.resetPassword(username, email, newPassword);
+            if (success) {
+                return Result.success("密码重置成功，请使用新密码登录");
+            } else {
+                return Result.error("密码重置失败，请重试");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新用户信息
+     */
+    @PostMapping("/update-info")
+    public Result<User> updateUserInfo(@RequestBody User user, @RequestHeader("Authorization") String token) {
+        try {
+            // 去掉 "Bearer " 前缀
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            
+            String username = JwtUtil.getUsernameFromToken(token);
+            User currentUser = authService.getCurrentUser(username);
+            
+            // 设置用户ID（防止前端传入错误ID）
+            user.setId(currentUser.getId());
+            
+            boolean success = authService.updateUserInfo(user);
+            if (success) {
+                // 返回更新后的用户信息
+                User updatedUser = authService.getCurrentUser(username);
+                return Result.success(updatedUser);
+            } else {
+                return Result.error("更新失败");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 修改密码（已登录用户）
+     */
+    @PostMapping("/change-password")
+    public Result<String> changePassword(@RequestBody Map<String, String> passwordRequest, @RequestHeader("Authorization") String token) {
+        try {
+            // 去掉 "Bearer " 前缀
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            
+            String username = JwtUtil.getUsernameFromToken(token);
+            String oldPassword = passwordRequest.get("oldPassword");
+            String newPassword = passwordRequest.get("newPassword");
+
+            boolean success = authService.changePassword(username, oldPassword, newPassword);
+            if (success) {
+                return Result.success("密码修改成功");
+            } else {
+                return Result.error("密码修改失败");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 }
 

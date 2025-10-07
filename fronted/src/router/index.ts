@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '@/views/Dashboard.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
+import ForgotPassword from '@/views/ForgotPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,12 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: Register,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
       meta: { requiresAuth: false }
     },
     {
@@ -125,6 +132,18 @@ const router = createRouter({
       name: 'system-overview',
       component: () => import('@/views/system/SystemOverview.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/version-history',
+      name: 'version-history',
+      component: () => import('@/views/system/VersionHistory.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/account-settings',
+      name: 'account-settings',
+      component: () => import('@/views/AccountSettings.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 })
@@ -133,8 +152,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   
-  // 如果访问登录页或注册页
-  if (to.path === '/login' || to.path === '/register') {
+  // 如果访问登录页、注册页或忘记密码页
+  if (to.path === '/login' || to.path === '/register' || to.path === '/forgot-password') {
     if (token) {
       // 已登录，跳转到首页
       next('/')

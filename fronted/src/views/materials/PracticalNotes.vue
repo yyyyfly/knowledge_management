@@ -672,35 +672,72 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getAllNotes } from '@/services/noteService'
+import { getAllProjectTemplates, createProjectTemplate, updateProjectTemplate, deleteProjectTemplate } from '@/api/projectTemplate'
+import type { ProjectTemplate as ApiProjectTemplate } from '@/api/projectTemplate'
+import { projectImplementations } from '@/mock/projectImplementations'
 
 type Note = {
   id: number
   title: string
+  summary?: string
   content?: string
   type: string
   tags?: string[]
+  // 实战笔记特定字段
+  techStack?: string[]
+  projectName?: string
+  projectType?: string
+  // 标准字段
   materialIds?: string
   recCreator?: string
   recCreateTime?: string
   createTime?: string
 }
 
+export interface ProjectRequirement {
+  name: string
+  desc: string
+  children?: ProjectRequirement[]
+}
+
+export interface ProjectTemplate {
+  id: number
+  domain: string
+  name: string
+  description: string
+  requirements: ProjectRequirement[]
+  commonFeatures: ProjectRequirement[]
+}
+
 // 响应式笔记数据
 const allNotesData = ref<Note[]>([])
 
-// 加载笔记数据
+// 响应式的项目模板数据
+const projectTemplates = ref<ProjectTemplate[]>([])
+
+// 加载笔记数据和项目模板
 onMounted(async () => {
   try {
+    // 加载笔记
     allNotesData.value = await getAllNotes()
+    
+    // 加载项目模板
+    const response = await getAllProjectTemplates()
+    if (response.code === 200 && response.data) {
+      // 将后端的 JSON 字符串转换为前端对象
+      projectTemplates.value = response.data.map((item: ApiProjectTemplate) => ({
+        id: item.id || 0,
+        domain: item.domain,
+        name: item.name,
+        description: item.description,
+        requirements: JSON.parse(item.requirements || '[]'),
+        commonFeatures: JSON.parse(item.commonFeatures || '[]')
+      }))
+    }
   } catch (error) {
-    console.error('加载实战笔记失败:', error)
+    console.error('加载数据失败:', error)
   }
 })
-
-// 保留mock数据作为公共配置（项目模板和实现方式属于公共配置数据，不需要用户隔离）
-import { projectTemplates as initialProjectTemplates } from '@/mock/projectTemplates'
-import { projectImplementations } from '@/mock/projectImplementations'
-import type { ProjectTemplate, ProjectRequirement } from '@/mock/projectTemplates'
 
 const showDetail = ref(false)
 const showFormModal = ref(false)
@@ -712,9 +749,6 @@ const showNoteDetail = ref(false)
 const selectedNote = ref<Note | null>(null)
 const searchQuery = ref('')
 const selectedTemplate = ref<ProjectTemplate | null>(null)
-
-// 响应式的项目模板数据
-const projectTemplates = ref<ProjectTemplate[]>([...initialProjectTemplates])
 
 // 表单数据
 const formData = ref({
@@ -735,13 +769,13 @@ const uniqueTechStacks = computed(() => {
 const getRecentNotes = () => {
   const practicalNotes = allNotesData.value.filter(n => n.type === 'practical')
   return practicalNotes
-    .sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime())
+    .sort((a, b) => new Date(b.createTime || b.recCreateTime || '').getTime() - new Date(a.createTime || a.recCreateTime || '').getTime())
     .slice(0, 6)
     .map(note => ({
       id: note.id,
       title: note.title,
-      content: note.summary,
-      time: formatDate(note.createTime),
+      content: note.summary || '',
+      time: formatDate(note.createTime || note.recCreateTime || ''),
       techStack: note.techStack || [],
       template: note.projectName || ''
     }))
@@ -815,30 +849,68 @@ const removeFeature = (index: number) => {
 }
 
 // 保存模板
-const saveTemplate = () => {
-  // 这里应该调用API保存数据
-  if (isEditing.value) {
-    const index = projectTemplates.value.findIndex(t => t.id === formData.value.id)
-    if (index !== -1) {
-      projectTemplates.value[index] = { ...formData.value }
+const saveTemplate = async () => {
+  try {
+    // 将前端对象转换为后端格式
+    const templateData: ApiProjectTemplate = {
+      id: isEditing.value ? formData.value.id : undefined,
+      domain: formData.value.domain,
+      name: formData.value.name,
+      description: formData.value.description,
+      requirements: JSON.stringify(formData.value.requirements),
+      commonFeatures: JSON.stringify(formData.value.commonFeatures)
     }
-  } else {
-    const newId = Math.max(...projectTemplates.value.map(t => t.id)) + 1
-    projectTemplates.value.push({
-      ...formData.value,
-      id: newId
-    })
+    
+    let response
+    if (isEditing.value) {
+      response = await updateProjectTemplate(templateData)
+    } else {
+      response = await createProjectTemplate(templateData)
+    }
+    
+    if (response.code === 200) {
+      // 重新加载项目模板列表
+      const listResponse = await getAllProjectTemplates()
+      if (listResponse.code === 200 && listResponse.data) {
+        projectTemplates.value = listResponse.data.map((item: ApiProjectTemplate) => ({
+          id: item.id || 0,
+          domain: item.domain,
+          name: item.name,
+          description: item.description,
+          requirements: JSON.parse(item.requirements || '[]'),
+          commonFeatures: JSON.parse(item.commonFeatures || '[]')
+        }))
+      }
+      closeFormModal()
+    }
+  } catch (error) {
+    console.error('保存模板失败:', error)
+    alert('保存失败，请重试')
   }
-  
-  closeFormModal()
 }
 
 // 删除模板
-const deleteTemplate = (id: number) => {
+const deleteTemplate = async (id: number) => {
   if (confirm('确定要删除这个模板吗？')) {
-    const index = projectTemplates.value.findIndex(t => t.id === id)
-    if (index !== -1) {
-      projectTemplates.value.splice(index, 1)
+    try {
+      const response = await deleteProjectTemplate(id)
+      if (response.code === 200) {
+        // 重新加载项目模板列表
+        const listResponse = await getAllProjectTemplates()
+        if (listResponse.code === 200 && listResponse.data) {
+          projectTemplates.value = listResponse.data.map((item: ApiProjectTemplate) => ({
+            id: item.id || 0,
+            domain: item.domain,
+            name: item.name,
+            description: item.description,
+            requirements: JSON.parse(item.requirements || '[]'),
+            commonFeatures: JSON.parse(item.commonFeatures || '[]')
+          }))
+        }
+      }
+    } catch (error) {
+      console.error('删除模板失败:', error)
+      alert('删除失败，请重试')
     }
   }
 }
@@ -880,14 +952,17 @@ const filteredNotes = computed(() => {
 
   if (selectedTemplate.value) {
     const selectedTemplateName = selectedTemplate.value.name
-    notes = notes.filter(n => n.title.includes(selectedTemplateName) || n.summary.includes(selectedTemplateName))
+    notes = notes.filter(n => 
+      n.title.includes(selectedTemplateName) || 
+      (n.summary && n.summary.includes(selectedTemplateName))
+    )
   }
 
   if (searchQuery.value) {
     notes = notes.filter(n => 
       n.title.includes(searchQuery.value) || 
-      n.summary.includes(searchQuery.value) ||
-      n.content.includes(searchQuery.value) ||
+      (n.summary && n.summary.includes(searchQuery.value)) ||
+      (n.content && n.content.includes(searchQuery.value)) ||
       (n.techStack && n.techStack.some(tech => tech.includes(searchQuery.value)))
     )
   }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectTemplateMapper">
+    
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectTemplate">
+        <id column="id" property="id"/>
+        <result column="domain" property="domain"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="requirements" property="requirements"/>
+        <result column="common_features" property="commonFeatures"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, domain, name, description, requirements, common_features,
+        rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+    </sql>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_project_template
+        WHERE id = #{id} AND arch_flag = 0 AND rec_creator = #{recCreator}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_project_template
+        WHERE arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY rec_create_time DESC
+    </select>
+    
+    <select id="selectByDomain" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_project_template
+        WHERE domain = #{domain} AND arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY rec_create_time DESC
+    </select>
+    
+    <insert id="insert" parameterType="com.knowledge.entity.ProjectTemplate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_project_template (
+            domain, name, description, requirements, common_features,
+            rec_creator, rec_create_time, arch_flag
+        ) VALUES (
+            #{domain}, #{name}, #{description}, #{requirements}, #{commonFeatures},
+            #{recCreator}, NOW(), 0
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.knowledge.entity.ProjectTemplate">
+        UPDATE km_project_template
+        <set>
+            <if test="domain != null">domain = #{domain},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="requirements != null">requirements = #{requirements},</if>
+            <if test="commonFeatures != null">common_features = #{commonFeatures},</if>
+            <if test="recRevisor != null">rec_revisor = #{recRevisor},</if>
+            rec_revise_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        UPDATE km_project_template
+        SET arch_flag = 1, rec_revise_time = NOW()
+        WHERE id = #{id}
+    </delete>
+    
+</mapper>
+

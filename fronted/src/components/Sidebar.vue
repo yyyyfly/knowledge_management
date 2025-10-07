@@ -179,15 +179,43 @@
           </div>
         </div>
         
-        <!-- 系统管理 -->
+        <!-- 系统配置 -->
         <div class="space-y-1">
-        <router-link to="/system-overview" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
-          <div class="w-6 flex justify-center">
-            <i class="fa-solid fa-circle-info"></i>
+          <button 
+            @click="toggleGroup('system')" 
+            class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
+          >
+            <div class="flex items-center">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-cog"></i>
+              </div>
+              <span class="ml-3">系统配置</span>
+            </div>
+            <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.system }"></i>
+          </button>
+          
+          <!-- 系统配置子菜单 -->
+          <div v-show="expandedGroups.system" class="pl-8 space-y-1">
+            <router-link to="/system-overview" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-circle-info"></i>
+              </div>
+              <span class="ml-3">系统概述</span>
+            </router-link>
+            <router-link to="/version-history" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-code-branch"></i>
+              </div>
+              <span class="ml-3">版本更新</span>
+            </router-link>
+            <router-link to="/account-settings" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-user-cog"></i>
+              </div>
+              <span class="ml-3">账号设置</span>
+            </router-link>
           </div>
-          <span class="ml-3">系统概述</span>
-        </router-link>
-          </div>
+        </div>
       </nav>
     </div>
   </div>
@@ -213,7 +241,8 @@ const expandedGroups = ref({
   materials: false,
   actions: false,
   headquarters: false,
-  daily: false
+  daily: false,
+  system: false
 })
 
 const toggleSidebar = () => {

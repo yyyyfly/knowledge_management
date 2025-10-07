@@ -40,7 +40,7 @@
         <p class="text-2xl font-bold text-purple-600">{{ defenseProjects.filter(p => p.status === 'planning').length }} 个</p>
         <p class="text-sm text-gray-500 mt-2">准备启动的项目</p>
       </div>
-
+      
       <!-- 总子任务 -->
       <div class="bg-white rounded-xl shadow-soft p-6">
         <div class="flex items-center justify-between mb-4">
@@ -62,7 +62,7 @@
         <p class="text-gray-500 text-lg">暂无战争行动项目</p>
         <p class="text-gray-400 text-sm mt-2">开始创建你的第一个实战项目吧！</p>
       </div>
-      
+
       <!-- 项目列表 -->
       <div v-for="project in defenseProjects" :key="project.id" class="bg-white rounded-xl shadow-soft p-6">
         <div class="flex items-center justify-between mb-4">
@@ -87,8 +87,8 @@
                  'bg-gray-50': task.status === 'pending'
                }" 
                class="rounded-lg p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
                 <span class="text-sm font-medium text-gray-900">{{ task.name }}</span>
               </div>
               <span :class="{
@@ -188,4 +188,4 @@ const getStatusText = (status: string) => {
   }
   return texts[status as keyof typeof texts] || '未知'
 }
-</script>
+</script> 

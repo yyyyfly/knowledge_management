@@ -3201,12 +3201,21 @@ const editRecord = (record: Note) => {
 }
 
 // 删除记录
-const deleteRecord = (id: number) => {
+const deleteRecord = async (id: number) => {
   if (confirm('确定要删除这条记录吗？')) {
-    const index = todayRecords.value.findIndex(record => record.id === id)
-    if (index > -1) {
-      todayRecords.value.splice(index, 1)
-      alert('记录已删除！')
+    try {
+      const response = await request.delete(`/note/${id}`)
+      
+      if (response.code === 200) {
+        alert('记录已删除！')
+        // 重新加载数据
+        await loadNotes()
+      } else {
+        alert('删除失败：' + (response.message || '未知错误'))
+      }
+    } catch (error) {
+      console.error('删除笔记失败:', error)
+      alert('删除失败，请检查网络连接')
     }
   }
 }
@@ -3534,7 +3543,7 @@ const redoMemorization = (editorInstance: any) => {
 
 
 // 提交记录
-const submitRecord = () => {
+const submitRecord = async () => {
   console.log('submitRecord 函数被调用')
   console.log('表单数据:', recordForm)
   
@@ -3579,99 +3588,74 @@ const submitRecord = () => {
     return
   }
 
-  if (isEditing.value && editingRecordId.value) {
-    // 编辑现有记录
-    const index = todayRecords.value.findIndex(record => record.id === editingRecordId.value)
-    if (index > -1) {
-      // 对于背诵笔记，使用originalText作为content；对于其他类型，使用editorContent
-      const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
-      
-      const updatedRecord: Note = {
-        ...todayRecords.value[index],
-        type: recordForm.type,
-        title: recordForm.title,
-        summary: recordForm.summary,
-        content: finalContent,
-        tags: [] // 保留空标签数组以兼容现有数据结构
-      }
-      
-      // 添加类型特定字段 (使用any类型来避免TypeScript错误)
-      const updatedRecordAny = updatedRecord as any
-      if (recordForm.type === 'framework') {
-        updatedRecordAny.subject = [...recordForm.subject]
-        updatedRecordAny.frameworkType = recordForm.frameworkType
-      } else if (recordForm.type === 'study') {
-        updatedRecordAny.course = [...recordForm.course]
-        updatedRecordAny.subjectType = [...recordForm.subjectType]
-             } else if (recordForm.type === 'memorization') {
-         updatedRecordAny.project = recordForm.project
-         updatedRecordAny.knowledgePoint = [...recordForm.knowledgePoint]
-         updatedRecordAny.originalText = recordForm.originalText
-         updatedRecordAny.explanation = recordForm.explanation
-         updatedRecordAny.cue = recordForm.cue
-      } else if (recordForm.type === 'exercise') {
-        updatedRecordAny.exerciseSource = recordForm.exerciseSource
-        updatedRecordAny.exerciseDifficulty = recordForm.exerciseDifficulty
-        updatedRecordAny.knowledgePoint = [...recordForm.knowledgePoint]
-      } else if (recordForm.type === 'practical') {
-        updatedRecordAny.techTags = [...recordForm.techTags]
-        updatedRecordAny.projectType = [...recordForm.projectType]
-      } else if (recordForm.type === 'fragment') {
-        updatedRecordAny.fragmentCategory = [...recordForm.fragmentCategory]
-        updatedRecordAny.fragmentTheme = [...recordForm.fragmentTheme]
-        updatedRecordAny.importance = recordForm.importance
-      }
-      
-      todayRecords.value[index] = updatedRecord
-      alert('记录修改成功！')
-    }
-  } else {
-    // 创建新记录
-    // 对于背诵笔记，使用originalText作为content；对于其他类型，使用editorContent
-    const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
-    
-    const newRecord: Note = {
-      id: Date.now(),
-      type: recordForm.type,
-      title: recordForm.title,
-      summary: recordForm.summary,
-      content: finalContent,
-      tags: [], // 保留空标签数组以兼容现有数据结构
-      createTime: new Date().toLocaleString()
-    }
-    
-    // 添加类型特定字段 (使用any类型来避免TypeScript错误)
-    const newRecordAny = newRecord as any
-    if (recordForm.type === 'framework') {
-      newRecordAny.subject = [...recordForm.subject]
-      newRecordAny.frameworkType = recordForm.frameworkType
-    } else if (recordForm.type === 'study') {
-      newRecordAny.course = [...recordForm.course]
-      newRecordAny.subjectType = [...recordForm.subjectType]
-         } else if (recordForm.type === 'memorization') {
-       newRecordAny.project = recordForm.project
-       newRecordAny.knowledgePoint = [...recordForm.knowledgePoint]
-       newRecordAny.originalText = recordForm.originalText
-       newRecordAny.explanation = recordForm.explanation
-       newRecordAny.cue = recordForm.cue
-    } else if (recordForm.type === 'exercise') {
-      newRecordAny.exerciseSource = recordForm.exerciseSource
-      newRecordAny.exerciseDifficulty = recordForm.exerciseDifficulty
-      newRecordAny.knowledgePoint = [...recordForm.knowledgePoint]
-    } else if (recordForm.type === 'practical') {
-      newRecordAny.techTags = [...recordForm.techTags]
-      newRecordAny.projectType = [...recordForm.projectType]
-    } else if (recordForm.type === 'fragment') {
-      newRecordAny.fragmentCategory = [...recordForm.fragmentCategory]
-      newRecordAny.fragmentTheme = [...recordForm.fragmentTheme]
-      newRecordAny.importance = recordForm.importance
-    }
-
-    todayRecords.value.unshift(newRecord)
-    alert('记录保存成功！')
+  // 准备提交的数据
+  const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
+  
+  const noteData: any = {
+    type: recordForm.type,
+    title: recordForm.title,
+    summary: recordForm.summary,
+    content: finalContent
+  }
+  
+  // 添加类型特定字段
+  if (recordForm.type === 'framework') {
+    noteData.subjectType = recordForm.subjectType.join(',')
+    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+  } else if (recordForm.type === 'study') {
+    noteData.studySubject = recordForm.studySubject.join(',')
+    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+  } else if (recordForm.type === 'memorization') {
+    noteData.project = recordForm.project
+    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+    noteData.originalText = recordForm.originalText
+    noteData.explanation = recordForm.explanation
+    noteData.cue = recordForm.cue
+  } else if (recordForm.type === 'exercise') {
+    noteData.exerciseSource = recordForm.exerciseSource
+    noteData.exerciseSubject = recordForm.exerciseSubject
+    noteData.exerciseKnowledge = recordForm.exerciseKnowledge.join(',')
+    noteData.exerciseDifficulty = recordForm.exerciseDifficulty
+  } else if (recordForm.type === 'practical') {
+    noteData.techTags = recordForm.techTags.join(',')
+    noteData.projectType = recordForm.projectType.join(',')
+  } else if (recordForm.type === 'fragment') {
+    noteData.fragmentCategory = recordForm.fragmentCategory.join(',')
+    noteData.fragmentTheme = recordForm.fragmentTheme.join(',')
+    noteData.importance = recordForm.importance
   }
 
-  closeModal()
+  try {
+    if (isEditing.value && editingRecordId.value) {
+      // 编辑现有记录
+      noteData.id = editingRecordId.value
+      const response = await request.put('/note', noteData)
+      
+      if (response.code === 200) {
+        alert('记录修改成功！')
+        // 重新加载数据
+        await loadNotes()
+      } else {
+        alert('修改失败：' + (response.message || '未知错误'))
+      }
+    } else {
+      // 创建新记录
+      const response = await request.post('/note', noteData)
+      
+      if (response.code === 200) {
+        alert('记录保存成功！')
+        // 重新加载数据
+        await loadNotes()
+      } else {
+        alert('保存失败：' + (response.message || '未知错误'))
+      }
+    }
+    
+    closeModal()
+  } catch (error) {
+    console.error('保存笔记失败:', error)
+    alert('保存失败，请检查网络连接')
+  }
 }
 
 // 重置表单

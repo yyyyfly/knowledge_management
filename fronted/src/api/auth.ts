@@ -20,14 +20,16 @@ export const login = (username: string, password: string) => {
 /**
  * 用户注册
  */
-export const register = (username: string, password: string, nickname: string) => {
+export const register = (username: string, password: string, nickname: string, email: string, phone?: string) => {
   return request({
     url: '/auth/register',
     method: 'post',
     data: {
       username,
       password,
-      nickname
+      nickname,
+      email,
+      phone
     }
   })
 }
@@ -49,6 +51,46 @@ export const logout = () => {
   return request({
     url: '/auth/logout',
     method: 'post'
+  })
+}
+
+/**
+ * 重置密码
+ */
+export const resetPassword = (username: string, email: string, newPassword: string) => {
+  return request({
+    url: '/auth/reset-password',
+    method: 'post',
+    data: {
+      username,
+      email,
+      newPassword
+    }
+  })
+}
+
+/**
+ * 更新用户信息
+ */
+export const updateUserInfo = (userInfo: { nickname: string, email: string, phone?: string }) => {
+  return request({
+    url: '/auth/update-info',
+    method: 'post',
+    data: userInfo
+  })
+}
+
+/**
+ * 修改密码（已登录用户）
+ */
+export const changePassword = (oldPassword: string, newPassword: string) => {
+  return request({
+    url: '/auth/change-password',
+    method: 'post',
+    data: {
+      oldPassword,
+      newPassword
+    }
   })
 }
 
