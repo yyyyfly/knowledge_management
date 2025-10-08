@@ -42,7 +42,10 @@
       <!-- 按大版本分组 -->
       <div v-for="majorGroup in groupedVersions" :key="majorGroup.major" class="relative">
         <!-- 大版本标题卡片 -->
-        <div class="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-xl shadow-2xl overflow-hidden">
+        <div 
+          class="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-xl shadow-2xl overflow-hidden cursor-pointer hover:shadow-3xl transition-all duration-300"
+          @click="toggleMajorVersion(majorGroup.major)"
+        >
           <div class="p-6">
             <!-- 标题行 -->
             <div class="flex items-center justify-between mb-4">
@@ -55,8 +58,17 @@
                   <p class="text-blue-100 text-sm">{{ majorGroup.versions.length }} 个迭代版本</p>
                 </div>
               </div>
-              <div class="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
-                <span class="text-white text-sm font-medium">{{ getMajorVersionDateRange(majorGroup.versions) }}</span>
+              <div class="flex items-center space-x-3">
+                <div class="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
+                  <span class="text-white text-sm font-medium">{{ getMajorVersionDateRange(majorGroup.versions) }}</span>
+                </div>
+                <!-- 折叠/展开图标 -->
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <i 
+                    :class="expandedMajorVersions[majorGroup.major] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" 
+                    class="text-white text-sm transition-transform duration-300"
+                  ></i>
+                </div>
               </div>
             </div>
             
@@ -77,9 +89,10 @@
         </div>
 
         <!-- 时间线容器 -->
-        <div class="relative ml-8">
-          <!-- 时间线竖线 -->
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 rounded-full"></div>
+        <transition name="slide-fade">
+          <div v-if="expandedMajorVersions[majorGroup.major]" class="relative ml-8">
+            <!-- 时间线竖线 -->
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 rounded-full"></div>
           
           <div class="space-y-6 pl-12">
             <!-- 小版本卡片 -->
@@ -181,7 +194,8 @@
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -211,6 +225,7 @@ const sortAscending = ref(true)
 
 // 折叠/展开状态
 const expandedVersions = ref<Record<string, boolean>>({})
+const expandedMajorVersions = ref<Record<string, boolean>>({}) // 大版本折叠状态
 const allExpanded = ref(true) // 默认全部展开
 
 // 大版本描述配置
@@ -356,7 +371,7 @@ const versions = ref([
     version: 'v1.5.0',
     date: '2025-10-08',
     timestamp: '2025-10-08',
-    isLatest: true,
+    isLatest: false,
     isInitial: false,
     isMajor: false, // 小版本
     features: [
@@ -390,16 +405,65 @@ const versions = ref([
       '修复系统总结页面偶尔报错的问题',
       '修复所有笔记类型的数据刷新、标签显示等一系列体验问题'
     ]
+  },
+  {
+    version: 'v1.6.0',
+    date: '2025-10-08',
+    timestamp: '2025-10-08',
+    isLatest: true,
+    isInitial: false,
+    isMajor: false, // 小版本
+    features: [
+      '笔记分类标签管理：全新的配置管理系统，可以自定义所有笔记类型的分类和标签',
+      '统一管理入口：在素材记录页面新增"笔记分类标签管理"功能，六大笔记的标签都可以在这里统一管理',
+      '自由定制标签：想要添加新的分类或标签？直接在管理界面操作即可，无需重启系统',
+      '分类维度灵活：每种笔记都有独立的分类方式，比如碎片笔记有"分类"和"主题"两个维度'
+    ],
+    improvements: [
+      '便捷的操作方式：添加和删除标签就像编辑待办事项一样简单，点几下就能完成',
+      '折叠式设计：配置管理区域可以收起来，不需要时不占用页面空间',
+      '即时生效：刚添加的标签，新建笔记时立刻就能在下拉框中看到',
+      '页面更流畅：优化了图表显示逻辑，切换页面时更加顺滑',
+      '界面响应更快：提升了页面切换和数据加载的速度'
+    ],
+    bugfixes: [
+      '修复框架笔记页面切换时偶尔卡顿的问题',
+      '修复图表显示异常的问题',
+      '修复笔记配置保存失败的问题',
+      '修复标签管理功能无法正常使用的问题'
+    ]
   }
 ])
 
 // 按大版本分组并排序
 const groupedVersions = computed(() => {
-  // 先按时间排序所有版本
+  // 辅助函数：解析版本号为数字数组
+  const parseVersion = (version: string) => {
+    // 移除 'v' 前缀，然后按 '.' 分割
+    return version.substring(1).split('.').map(Number)
+  }
+
+  // 辅助函数：比较两个版本号
+  const compareVersions = (versionA: string, versionB: string) => {
+    const partsA = parseVersion(versionA)
+    const partsB = parseVersion(versionB)
+    
+    // 逐段比较版本号
+    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+      const partA = partsA[i] || 0
+      const partB = partsB[i] || 0
+      
+      if (partA !== partB) {
+        return partA - partB
+      }
+    }
+    return 0
+  }
+
+  // 按版本号排序所有版本
   const sorted = [...versions.value].sort((a, b) => {
-    const dateA = new Date(a.timestamp).getTime()
-    const dateB = new Date(b.timestamp).getTime()
-    return sortAscending.value ? dateA - dateB : dateB - dateA
+    const result = compareVersions(a.version, b.version)
+    return sortAscending.value ? result : -result
   })
 
   // 按主版本号分组
@@ -412,23 +476,20 @@ const groupedVersions = computed(() => {
     groups[major].push(version)
   })
 
-  // 转换为数组格式，并计算每个大版本的最早时间
+  // 转换为数组格式
   const result = Object.keys(groups).map(major => {
-    const versionsInGroup = groups[major]
-    // 找到该大版本中最早的时间戳
-    const timestamps = versionsInGroup.map(v => new Date(v.timestamp).getTime())
-    const earliestTime = Math.min(...timestamps)
-    
     return {
       major,
-      versions: versionsInGroup,
-      earliestTime
+      versions: groups[major]
     }
   })
 
-  // 按大版本的最早时间排序（这样能真正体现时间顺序）
+  // 按大版本号排序（v1, v2, v3...）
   result.sort((a, b) => {
-    return sortAscending.value ? a.earliestTime - b.earliestTime : b.earliestTime - a.earliestTime
+    const majorA = parseInt(a.major.substring(1))
+    const majorB = parseInt(b.major.substring(1))
+    const majorResult = majorA - majorB
+    return sortAscending.value ? majorResult : -majorResult
   })
 
   return result
@@ -444,12 +505,24 @@ const toggleVersion = (versionKey: string) => {
   expandedVersions.value[versionKey] = !expandedVersions.value[versionKey]
 }
 
+// 切换大版本的展开/折叠状态
+const toggleMajorVersion = (major: string) => {
+  expandedMajorVersions.value[major] = !expandedMajorVersions.value[major]
+}
+
 // 一键全部展开/折叠
 const toggleAllVersions = () => {
   allExpanded.value = !allExpanded.value
   const newState = allExpanded.value
+  
+  // 展开/折叠所有小版本
   versions.value.forEach(v => {
     expandedVersions.value[v.version] = newState
+  })
+  
+  // 展开/折叠所有大版本
+  Object.keys(majorVersionDescriptions).forEach(major => {
+    expandedMajorVersions.value[major] = newState
   })
 }
 
@@ -458,6 +531,13 @@ const initExpandedStates = () => {
   versions.value.forEach(v => {
     if (expandedVersions.value[v.version] === undefined) {
       expandedVersions.value[v.version] = true
+    }
+  })
+  
+  // 初始化所有大版本为展开状态
+  Object.keys(majorVersionDescriptions).forEach(major => {
+    if (expandedMajorVersions.value[major] === undefined) {
+      expandedMajorVersions.value[major] = true
     }
   })
 }

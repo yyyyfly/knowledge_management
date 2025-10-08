@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-6 bg-gray-50">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-2">碎片笔记</h1>
       <p class="text-gray-600">零散思考和知识碎片的统计概览</p>
@@ -93,8 +93,8 @@
             </span>
           </div>
         </div>
-        </div>
       </div>
+    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
       <!-- 统计图表区域 -->
@@ -103,7 +103,7 @@
           <!-- 月度新增趋势 -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-6">月度新增趋势</h2>
-            <div class="h-80">
+            <div class="h-64">
               <Line :data="lineChartData" :options="lineChartOptions" />
             </div>
           </div>
@@ -111,7 +111,7 @@
           <!-- 重要性分布 -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-6">重要性分布</h2>
-            <div class="h-80">
+            <div class="h-64">
               <Bar :data="importanceChartData" :options="importanceChartOptions" />
             </div>
           </div>
@@ -120,7 +120,7 @@
         <!-- 分类分布图表 -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">分类分布统计</h2>
-          <div class="h-80 overflow-y-auto">
+          <div class="max-h-64 overflow-y-auto">
             <div class="space-y-4">
               <div v-for="category in paginatedCategoryStats" :key="category.name" class="flex items-center">
                 <div class="w-40 text-sm text-gray-600 truncate">{{ category.name }}</div>
@@ -308,12 +308,13 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 笔记列表弹窗 -->
-    <Transition name="modal-fade">
-      <div v-if="showNotesList" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <Transition name="modal-slide">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+  <!-- 笔记列表弹窗 -->
+  <Transition name="modal-fade">
+    <div v-if="showNotesList" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <Transition name="modal-slide">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
             <!-- 弹窗头部 -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
               <div class="flex items-center space-x-3">
@@ -417,13 +418,13 @@
           </div>
         </Transition>
       </div>
-    </Transition>
+  </Transition>
 
-    <!-- 笔记详情弹窗 -->
-    <Transition name="modal-fade">
-      <div v-if="showNoteDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <Transition name="modal-slide">
-          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+  <!-- 笔记详情弹窗 -->
+  <Transition name="modal-fade">
+    <div v-if="showNoteDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Transition name="modal-slide">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-gray-900">笔记详情</h3>
               <button 
@@ -468,7 +469,6 @@
         </Transition>
       </div>
     </Transition>
-  </div>
 </template>
 
 <script setup lang="ts">

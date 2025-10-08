@@ -435,6 +435,7 @@
       </Transition>
     </div>
   </Transition>
+
 </template>
 
 <script setup lang="ts">
@@ -681,7 +682,11 @@ onMounted(async () => {
 onActivated(async () => {
   await loadNotes()
   nextTick(() => {
-    updateCharts()
+    if (pieChart && barChart) {
+      updateCharts()
+    } else {
+      initCharts()
+    }
   })
 })
 
@@ -690,22 +695,21 @@ watch([subjectStats, frameworkNotes], () => {
   nextTick(() => {
     if (pieChart && barChart) {
       updateCharts()
-    } else {
-      initCharts()
     }
   })
 }, { deep: true })
 
-// 监听canvas元素变化
-watch([pieChartRef, barChartRef], () => {
-  nextTick(() => {
-    if (pieChartRef.value && barChartRef.value) {
-      initCharts()
-    }
-  })
-})
-
 const initCharts = () => {
+  // 销毁旧的图表实例
+  if (pieChart) {
+    pieChart.destroy()
+    pieChart = null
+  }
+  if (barChart) {
+    barChart.destroy()
+    barChart = null
+  }
+
   // 初始化饼图
   if (pieChartRef.value) {
     const ctx = pieChartRef.value.getContext('2d')
@@ -873,8 +877,14 @@ const updateCharts = () => {
 
 // 组件卸载时的图表清理逻辑
 onUnmounted(() => {
-  pieChart = null
-  barChart = null
+  if (pieChart) {
+    pieChart.destroy()
+    pieChart = null
+  }
+  if (barChart) {
+    barChart.destroy()
+    barChart = null
+  }
 })
   </script>
 

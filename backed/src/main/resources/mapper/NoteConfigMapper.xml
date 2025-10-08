@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.NoteConfigMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.NoteConfig">
+        <id column="id" property="id"/>
+        <result column="note_type" property="noteType"/>
+        <result column="config_type" property="configType"/>
+        <result column="config_name" property="configName"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+    </resultMap>
+    
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_note_config
+        WHERE id = #{id} AND rec_creator = #{recCreator}
+    </select>
+    
+    <!-- 查询所有配置 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_note_config
+        WHERE rec_creator = #{recCreator}
+        ORDER BY note_type, config_type, sort_order, rec_create_time DESC
+    </select>
+    
+    <!-- 根据笔记类型查询 -->
+    <select id="selectByNoteType" resultMap="BaseResultMap">
+        SELECT * FROM km_note_config
+        WHERE note_type = #{noteType} AND rec_creator = #{recCreator}
+        ORDER BY config_type, sort_order, rec_create_time DESC
+    </select>
+    
+    <!-- 根据笔记类型和配置类型查询 -->
+    <select id="selectByNoteAndConfigType" resultMap="BaseResultMap">
+        SELECT * FROM km_note_config
+        WHERE note_type = #{noteType} AND config_type = #{configType} AND rec_creator = #{recCreator}
+        ORDER BY sort_order, rec_create_time DESC
+    </select>
+    
+    <!-- 插入配置 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_note_config (
+            note_type,
+            config_type,
+            config_name,
+            sort_order,
+            rec_creator,
+            rec_create_time,
+            rec_revisor,
+            rec_revise_time
+        ) VALUES (
+            #{noteType},
+            #{configType},
+            #{configName},
+            #{sortOrder},
+            #{recCreator},
+            NOW(),
+            #{recCreator},
+            NOW()
+        )
+    </insert>
+    
+    <!-- 更新配置 -->
+    <update id="update">
+        UPDATE km_note_config
+        SET config_name = #{configName},
+            sort_order = #{sortOrder},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除配置 -->
+    <delete id="deleteById">
+        DELETE FROM km_note_config WHERE id = #{id}
+    </delete>
+    
+    <!-- 检查配置名称是否已存在 -->
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*) FROM km_note_config
+        WHERE note_type = #{noteType}
+        AND config_type = #{configType}
+        AND config_name = #{configName}
+        AND rec_creator = #{recCreator}
+    </select>
+</mapper>
+

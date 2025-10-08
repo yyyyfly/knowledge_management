@@ -9,6 +9,121 @@
       <p class="text-gray-600">记录日常学习、阅读、思考的素材和笔记，为项目制作积累素材</p>
     </div>
 
+    <!-- 笔记配置管理 -->
+    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-cog text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-900">笔记分类标签管理</h3>
+            <p class="text-sm text-gray-600">配置专属于此笔记类型的特殊字段</p>
+          </div>
+        </div>
+        <button 
+          @click="showConfigManagement = !showConfigManagement"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+        >
+          <i :class="showConfigManagement ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+          <span>{{ showConfigManagement ? '收起' : '展开' }}</span>
+        </button>
+      </div>
+
+      <Transition name="slide-fade">
+        <div v-if="showConfigManagement" class="space-y-6">
+          <!-- 配置类型选择 -->
+          <div class="flex items-center space-x-2 border-b pb-4">
+            <button 
+              v-for="noteType in noteTypes" 
+              :key="noteType.value"
+              @click="selectedConfigNoteType = noteType.value"
+              :class="selectedConfigNoteType === noteType.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <i :class="noteType.icon"></i>
+              <span>{{ noteType.label }}</span>
+            </button>
+          </div>
+
+          <!-- 配置管理内容区 -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 配置类型1 -->
+            <div v-if="getConfigTypes(selectedConfigNoteType).type1" class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+                  <i class="fas fa-tag text-blue-500"></i>
+                  <span>{{ getConfigTypes(selectedConfigNoteType).type1.label }}</span>
+                </h4>
+                <button 
+                  @click="openAddConfigModal(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type1.key)"
+                  class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-1"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span>添加</span>
+                </button>
+              </div>
+              <div class="space-y-2 max-h-60 overflow-y-auto">
+                <div 
+                  v-for="item in getConfigItems(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type1.key)" 
+                  :key="item.id"
+                  class="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                >
+                  <span class="text-sm text-gray-700">{{ item.configName }}</span>
+                  <button 
+                    @click="deleteConfigItem(item.id)"
+                    class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity text-sm"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+                <div v-if="getConfigItems(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type1.key).length === 0" class="text-center py-8 text-gray-400">
+                  <i class="fas fa-inbox text-3xl mb-2"></i>
+                  <p class="text-sm">暂无配置项</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 配置类型2 -->
+            <div v-if="getConfigTypes(selectedConfigNoteType).type2" class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+                  <i class="fas fa-tags text-green-500"></i>
+                  <span>{{ getConfigTypes(selectedConfigNoteType).type2.label }}</span>
+                </h4>
+                <button 
+                  @click="openAddConfigModal(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type2.key)"
+                  class="px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-1"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span>添加</span>
+                </button>
+              </div>
+              <div class="space-y-2 max-h-60 overflow-y-auto">
+                <div 
+                  v-for="item in getConfigItems(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type2.key)" 
+                  :key="item.id"
+                  class="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                >
+                  <span class="text-sm text-gray-700">{{ item.configName }}</span>
+                  <button 
+                    @click="deleteConfigItem(item.id)"
+                    class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity text-sm"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+                <div v-if="getConfigItems(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type2.key).length === 0" class="text-center py-8 text-gray-400">
+                  <i class="fas fa-inbox text-3xl mb-2"></i>
+                  <p class="text-sm">暂无配置项</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </div>
+
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
@@ -373,7 +488,17 @@
                     <h4 class="text-lg font-semibold text-purple-900">碎片笔记配置</h4>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">分类</label>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">分类</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('fragment', 'category')"
+                        class="text-sm text-purple-600 hover:text-purple-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
                     
                     <!-- 预设分类选择 -->
                     <div class="mb-3">
@@ -431,7 +556,17 @@
               </div>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">主题</label>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">主题</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('fragment', 'theme')"
+                        class="text-sm text-purple-600 hover:text-purple-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
                     
                     <!-- 预设主题选择 -->
                     <div class="mb-3">
@@ -521,7 +656,7 @@
                       <label class="block text-sm font-medium text-gray-700">学科类型</label>
                       <button 
                         type="button"
-                        @click="showFrameworkSubjectManager = true"
+                        @click="openConfigManager('framework', 'subjectType')"
                         class="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
@@ -587,7 +722,7 @@
                       <label class="block text-sm font-medium text-gray-700">知识点类型</label>
                       <button 
                         type="button"
-                        @click="showFrameworkKnowledgeManager = true"
+                        @click="openConfigManager('framework', 'knowledgePoint')"
                         class="text-sm text-green-600 hover:text-green-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
@@ -659,7 +794,17 @@
                   
                   <!-- 学科 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">学科</label>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">学科</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('study', 'subject')"
+                        class="text-sm text-emerald-600 hover:text-emerald-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
                     <div class="space-y-2">
                       <div class="flex flex-wrap gap-2 mb-2">
                         <button 
@@ -715,11 +860,21 @@
 
                   <!-- 知识点 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">知识点</label>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">知识点</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('study', 'knowledgePoint')"
+                        class="text-sm text-emerald-600 hover:text-emerald-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
                     <div class="space-y-2">
                       <div class="flex flex-wrap gap-2 mb-2">
                         <button 
-                          v-for="point in availableKnowledgePoints" 
+                          v-for="point in availableStudyKnowledge" 
                           :key="point"
                           type="button"
                           @click="selectKnowledgePoint(point)"
@@ -771,59 +926,48 @@
                 </div>
 
                 <!-- 背诵笔记 -->
-                <div v-if="recordForm.type === 'memorization'" class="space-y-3">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">学科项目</label>
-                    <div class="space-y-2">
-                      <select v-model="recordForm.project" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input">
-                        <option value="">请选择学科项目</option>
-                        <option v-for="option in allProjectOptions" :key="option" :value="option">{{ option }}</option>
-                        <option value="other">其他（手动输入）</option>
-                      </select>
-                      <div v-if="recordForm.project === 'other'" class="mt-2">
-                        <input 
-                          v-model="customProject"
-                          type="text" 
-                          placeholder="请输入自定义学科项目"
-                          @blur="handleCustomProject"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                        >
-                      </div>
+                <div v-if="recordForm.type === 'memorization'" class="space-y-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200 shadow-sm">
+                  <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
+                      <i class="fas fa-bookmark text-white text-sm"></i>
                     </div>
+                    <h4 class="text-lg font-semibold text-amber-900">背诵笔记配置</h4>
                   </div>
+                  
+                  <!-- 科目 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">知识点</label>
-                    <div class="flex items-center space-x-2">
-                      <input 
-                        v-model="newKnowledgePoint"
-                        type="text" 
-                        placeholder="输入知识点（如：力与运动、刑法总则）"
-                        @keyup.enter="addKnowledgePoint"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                      >
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">科目</label>
                       <button 
                         type="button"
-                        @click="addKnowledgePoint"
-                        :disabled="!newKnowledgePoint.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
+                        @click="openConfigManager('memorization', 'subject')"
+                        class="text-sm text-amber-600 hover:text-amber-800 flex items-center space-x-1"
                       >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
                       </button>
                     </div>
-                    <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前知识点: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="point in recordForm.knowledgePoint" 
-                          :key="point"
-                          class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
+                    <div class="space-y-2">
+                      <div class="flex flex-wrap gap-2 mb-2">
+                        <button 
+                          v-for="subject in availableMemorizationSubjects" 
+                          :key="subject"
+                          type="button"
+                          @click="recordForm.project = subject"
+                          :class="recordForm.project === subject ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-amber-100'"
+                          class="px-3 py-1 rounded-full text-sm border transition-colors"
                         >
-                          <span>{{ point }}</span>
+                          {{ subject }}
+                        </button>
+                      </div>
+                      <div v-if="recordForm.project" class="mt-2">
+                        <span class="text-sm text-gray-500">当前科目: </span>
+                        <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
+                          <span>{{ recordForm.project }}</span>
                           <button 
                             type="button"
-                            @click="removeKnowledgePoint(point)"
-                            class="text-blue-500 hover:text-blue-700"
+                            @click="recordForm.project = ''"
+                            class="text-amber-500 hover:text-amber-700"
                           >
                             <i class="fas fa-times"></i>
                           </button>
@@ -832,14 +976,62 @@
                     </div>
                   </div>
                   
-                  <!-- 背诵笔记专用内容字段 -->
-                  <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200 shadow-sm mt-4">
-                    <div class="flex items-center mb-6">
-                      <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
-                        <i class="fas fa-brain text-white text-sm"></i>
+                  <!-- 知识点 -->
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">知识点</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('memorization', 'knowledgePoint')"
+                        class="text-sm text-amber-600 hover:text-amber-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex flex-wrap gap-2 mb-2">
+                        <button 
+                          v-for="point in availableMemorizationKnowledge" 
+                          :key="point"
+                          type="button"
+                          @click="selectMemorizationKnowledge(point)"
+                          :class="recordForm.knowledgePoint.includes(point) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-orange-100'"
+                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                        >
+                          {{ point }}
+                        </button>
                       </div>
-                      <h4 class="text-lg font-semibold text-amber-900">背诵内容编辑</h4>
-                </div>
+                      <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
+                        <span class="text-sm text-gray-500">当前知识点: </span>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                          <span 
+                            v-for="point in recordForm.knowledgePoint" 
+                            :key="point"
+                            class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
+                          >
+                            <span>{{ point }}</span>
+                            <button 
+                              type="button"
+                              @click="removeKnowledgePoint(point)"
+                              class="text-orange-500 hover:text-orange-700"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- 背诵笔记专用内容字段 -->
+                  <div class="pt-4 border-t border-amber-200 mt-4">
+                    <div class="flex items-center mb-4">
+                      <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mr-2">
+                        <i class="fas fa-brain text-white text-xs"></i>
+                      </div>
+                      <h5 class="text-md font-semibold text-amber-800">背诵内容编辑</h5>
+                    </div>
 
                     <!-- 标题 -->
                     <div v-if="recordForm.type" class="mb-4">
@@ -1098,6 +1290,18 @@
                           >
                             <i class="fas fa-redo"></i>
                           </button>
+                          
+                          <div class="border-l border-gray-300 h-6 mx-1"></div>
+                          
+                          <!-- 导入MD -->
+                          <button 
+                            type="button"
+                            @click="importMarkdown(originalTextEditor)"
+                            class="p-2 rounded hover:bg-gray-200"
+                            title="导入Markdown文件"
+                          >
+                            <i class="fab fa-markdown"></i>
+                          </button>
                     </div>
                         <EditorContent :editor="originalTextEditor" />
                       </div>
@@ -1332,6 +1536,18 @@
                             title="重做"
                           >
                             <i class="fas fa-redo"></i>
+                          </button>
+                          
+                          <div class="border-l border-gray-300 h-6 mx-1"></div>
+                          
+                          <!-- 导入MD -->
+                          <button 
+                            type="button"
+                            @click="importMarkdown(explanationEditor)"
+                            class="p-2 rounded hover:bg-gray-200"
+                            title="导入Markdown文件"
+                          >
+                            <i class="fab fa-markdown"></i>
                           </button>
                         </div>
                         <EditorContent :editor="explanationEditor" />
@@ -1568,6 +1784,18 @@
                           >
                             <i class="fas fa-redo"></i>
                           </button>
+                          
+                          <div class="border-l border-gray-300 h-6 mx-1"></div>
+                          
+                          <!-- 导入MD -->
+                          <button 
+                            type="button"
+                            @click="importMarkdown(cueEditor)"
+                            class="p-2 rounded hover:bg-gray-200"
+                            title="导入Markdown文件"
+                          >
+                            <i class="fab fa-markdown"></i>
+                          </button>
                       </div>
                         <EditorContent :editor="cueEditor" />
                       </div>
@@ -1586,19 +1814,20 @@
                   </div>
                   <!-- 题目来源 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      题目来源
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">题目来源</label>
                       <button 
                         type="button"
-                        @click="showExerciseSourceManager = true"
-                        class="ml-2 text-xs text-blue-600 hover:text-blue-800"
+                        @click="openConfigManager('exercise', 'source')"
+                        class="text-sm text-rose-600 hover:text-rose-800 flex items-center space-x-1"
                       >
-                        <i class="fas fa-cog"></i> 管理
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
                       </button>
-                    </label>
+                    </div>
                     <div class="space-y-2">
                       <select 
-                      v-model="recordForm.exerciseSource"
+                        v-model="recordForm.exerciseSource"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 form-input"
                       >
                         <option value="">请选择题目来源</option>
@@ -1606,39 +1835,22 @@
                           {{ source }}
                         </option>
                       </select>
-                      <!-- 快速添加 -->
-                    <div class="flex items-center space-x-2">
-                      <input 
-                          v-model="newExerciseSource"
-                        type="text" 
-                          placeholder="输入新的题目来源"
-                          @keyup.enter="addCustomExerciseSource"
-                          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 form-input text-sm"
-                      >
-                      <button 
-                        type="button"
-                          @click="addCustomExerciseSource"
-                          :disabled="!newExerciseSource.trim()"
-                          class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
-                      >
-                        <i class="fas fa-plus"></i>
-                      </button>
-                    </div>
                     </div>
                   </div>
 
                   <!-- 学科类型 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      学科类型
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">学科类型</label>
                       <button 
                         type="button"
-                        @click="showExerciseSubjectManager = true"
-                        class="ml-2 text-xs text-blue-600 hover:text-blue-800"
+                        @click="openConfigManager('exercise', 'subject')"
+                        class="text-sm text-rose-600 hover:text-rose-800 flex items-center space-x-1"
                       >
-                        <i class="fas fa-cog"></i> 管理
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
                       </button>
-                    </label>
+                    </div>
                     <div class="space-y-2">
                       <select 
                         v-model="recordForm.exerciseSubject"
@@ -1649,89 +1861,6 @@
                           {{ subject }}
                         </option>
                       </select>
-                      <!-- 快速添加 -->
-                      <div class="flex items-center space-x-2">
-                        <input 
-                          v-model="newExerciseSubject"
-                          type="text" 
-                          placeholder="输入新的学科类型"
-                          @keyup.enter="addCustomExerciseSubject"
-                          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input text-sm"
-                        >
-                          <button 
-                            type="button"
-                          @click="addCustomExerciseSubject"
-                          :disabled="!newExerciseSubject.trim()"
-                          class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
-                          >
-                          <i class="fas fa-plus"></i>
-                          </button>
-                      </div>
-                    </div>
-                  </div>
-
-                                        <!-- 知识点类型 -->
-                  <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                          知识点类型
-                          <button 
-                            type="button"
-                            @click="showExerciseKnowledgeManager = true"
-                            class="ml-2 text-xs text-green-600 hover:text-green-800"
-                          >
-                            <i class="fas fa-cog"></i> 管理
-                          </button>
-                        </label>
-                        <div class="space-y-2">
-                          <div class="flex flex-wrap gap-2 mb-2">
-                            <button 
-                              v-for="knowledge in availableExerciseKnowledge" 
-                              :key="knowledge"
-                              type="button"
-                              @click="selectExerciseKnowledge(knowledge)"
-                              :class="recordForm.exerciseKnowledge.includes(knowledge) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-green-100'"
-                              class="px-3 py-1 rounded-full text-sm border transition-colors"
-                            >
-                              {{ knowledge }}
-                            </button>
-                          </div>
-                    <div class="flex items-center space-x-2">
-                      <input 
-                              v-model="newExerciseKnowledge"
-                        type="text" 
-                              placeholder="输入知识点（如：动态规划、二叉树、滑动窗口等）"
-                              @keyup.enter="addExerciseKnowledge"
-                              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input"
-                      >
-                      <button 
-                        type="button"
-                              @click="addExerciseKnowledge"
-                              :disabled="!newExerciseKnowledge.trim()"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                      >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                      </button>
-                    </div>
-                        </div>
-                        <div v-if="recordForm.exerciseKnowledge.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前知识点: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                              v-for="knowledge in recordForm.exerciseKnowledge" 
-                              :key="knowledge"
-                          class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                              <span>{{ knowledge }}</span>
-                          <button 
-                            type="button"
-                                @click="removeExerciseKnowledge(knowledge)"
-                            class="text-green-500 hover:text-green-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
                     </div>
                   </div>
                   <div>
@@ -1761,43 +1890,93 @@
                     </div>
                     <h4 class="text-lg font-semibold text-cyan-900">实战笔记配置</h4>
                   </div>
+                  
+                  <!-- 领域 -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">技术栈</label>
-                    <div class="flex items-center space-x-2">
-                      <input 
-                        v-model="newTechTag"
-                        type="text" 
-                        placeholder="输入技术标签（如：Vue3、TypeScript、Node.js）"
-                        @keyup.enter="addTechTag"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                      >
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">项目领域</label>
                       <button 
                         type="button"
-                        @click="addTechTag"
-                        :disabled="!newTechTag.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
+                        @click="openConfigManager('practical', 'domain')"
+                        class="text-sm text-cyan-600 hover:text-cyan-800 flex items-center space-x-1"
                       >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
                       </button>
                     </div>
-                    <div v-if="recordForm.techTags.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前技术栈: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="tag in recordForm.techTags" 
-                          :key="tag"
-                          class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
+                    <div class="space-y-2">
+                      <div class="flex flex-wrap gap-2 mb-2">
+                        <button 
+                          v-for="domain in availablePracticalDomains" 
+                          :key="domain"
+                          type="button"
+                          @click="selectPracticalDomain(domain)"
+                          :class="recordForm.projectDomain === domain ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-cyan-100'"
+                          class="px-3 py-1 rounded-full text-sm border transition-colors"
                         >
-                          <span>{{ tag }}</span>
+                          {{ domain }}
+                        </button>
+                      </div>
+                      <div v-if="recordForm.projectDomain" class="mt-2">
+                        <span class="text-sm text-gray-500">当前领域: </span>
+                        <span class="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
+                          <span>{{ recordForm.projectDomain }}</span>
                           <button 
                             type="button"
-                            @click="removeTechTag(tag)"
-                            class="text-blue-500 hover:text-blue-700"
+                            @click="recordForm.projectDomain = ''"
+                            class="text-cyan-500 hover:text-cyan-700"
                           >
                             <i class="fas fa-times"></i>
                           </button>
                         </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- 技术栈 -->
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-sm font-medium text-gray-700">技术栈</label>
+                      <button 
+                        type="button"
+                        @click="openConfigManager('practical', 'techStack')"
+                        class="text-sm text-cyan-600 hover:text-cyan-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex flex-wrap gap-2 mb-2">
+                        <button 
+                          v-for="tech in availablePracticalTechStacks" 
+                          :key="tech"
+                          type="button"
+                          @click="selectPracticalTech(tech)"
+                          :class="recordForm.techTags.includes(tech) ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-teal-100'"
+                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                        >
+                          {{ tech }}
+                        </button>
+                      </div>
+                      <div v-if="recordForm.techTags.length > 0" class="mt-2">
+                        <span class="text-sm text-gray-500">当前技术栈: </span>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                          <span 
+                            v-for="tag in recordForm.techTags" 
+                            :key="tag"
+                            class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
+                          >
+                            <span>{{ tag }}</span>
+                            <button 
+                              type="button"
+                              @click="removeTechTag(tag)"
+                              class="text-teal-500 hover:text-teal-700"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2027,6 +2206,14 @@
                       title="上传图片"
                     >
                       <i class="fas fa-upload"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="importMarkdown(editor)"
+                      class="p-2 rounded hover:bg-gray-200"
+                      title="导入Markdown文件"
+                    >
+                      <i class="fab fa-markdown"></i>
                     </button>
                     
                     <div class="w-px h-6 bg-gray-300 mx-1"></div>
@@ -2359,11 +2546,124 @@
         </button>
       </div>
     </div>
+
+    <!-- 添加配置弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showAddConfigDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">添加配置项</h3>
+            <button 
+              @click="showAddConfigDialog = false"
+              class="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">配置名称</label>
+            <input 
+              v-model="configDialogForm.configName"
+              type="text" 
+              placeholder="输入配置名称"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              @keyup.enter="addConfigItem"
+            />
+          </div>
+
+          <div class="flex items-center justify-end space-x-3">
+            <button 
+              @click="showAddConfigDialog = false"
+              class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              取消
+            </button>
+            <button 
+              @click="addConfigItem"
+              class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              添加
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </div>
+
+  <!-- 通用配置管理弹窗 -->
+  <div v-if="showConfigManagerDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeConfigManager">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
+      <!-- 标题 -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">{{ configManagerDialog.title }}</h3>
+        <button 
+          @click="closeConfigManager"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- 所有配置项来源列表 -->
+      <div class="flex-1 overflow-hidden flex flex-col">
+        <p class="text-sm text-gray-600 mb-3">所有{{ configManagerDialog.title.replace('管理', '') }}：</p>
+        <div class="flex-1 overflow-y-auto space-y-2 pr-2">
+          <div 
+            v-for="item in configManagerDialog.items" 
+            :key="item.id" 
+            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <span class="text-gray-800">{{ item.configName }}</span>
+            <button 
+              @click="deleteConfigManagerItem(item.id)"
+              class="text-red-600 hover:text-red-800 px-3 py-1 rounded transition-colors flex items-center space-x-1"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+          <div v-if="configManagerDialog.items.length === 0" class="text-center py-8 text-gray-400">
+            <i class="fas fa-inbox text-3xl mb-2"></i>
+            <p class="text-sm">暂无配置项</p>
+          </div>
+        </div>
+
+        <!-- 添加新项 -->
+        <div class="flex-shrink-0 mt-4 pt-4 border-t border-gray-200">
+          <div class="flex space-x-2">
+            <input 
+              v-model="configManagerDialog.newItemName"
+              type="text" 
+              :placeholder="'添加新的' + configManagerDialog.title.replace('管理', '')"
+              @keyup.enter="addConfigManagerItem"
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+            <button 
+              @click="addConfigManagerItem"
+              :disabled="!configManagerDialog.newItemName.trim()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              添加
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关闭按钮 -->
+      <div class="flex justify-end mt-4 pt-4 border-t border-gray-200">
+        <button 
+          @click="closeConfigManager"
+          class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+        >
+          关闭
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onActivated, onBeforeUnmount, computed, watch } from 'vue'
+import { ref, reactive, onMounted, onActivated, onBeforeUnmount, computed, watch, nextTick } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
@@ -2382,11 +2682,43 @@ import Color from '@tiptap/extension-color'
 import TextStyle from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import request from '@/api/request'
+import { getConfigsByNoteType, createConfig, deleteConfig as deleteConfigAPI, type NoteConfig } from '@/api/noteConfig'
 
 type Note = any
 
 // 响应式数据
 const allNotes = ref<Note[]>([])
+
+// 配置管理相关
+const showConfigManagement = ref(false)
+const selectedConfigNoteType = ref('fragment')
+const allConfigs = ref<NoteConfig[]>([])
+const showAddConfigDialog = ref(false)
+const configDialogForm = reactive({
+  noteType: '',
+  configType: '',
+  configName: ''
+})
+
+// 笔记类型配置
+const noteTypes = [
+  { value: 'fragment', label: '碎片笔记', icon: 'fas fa-puzzle-piece' },
+  { value: 'study', label: '求学笔记', icon: 'fas fa-graduation-cap' },
+  { value: 'memorization', label: '背诵笔记', icon: 'fas fa-bookmark' },
+  { value: 'exercise', label: '刷题笔记', icon: 'fas fa-code' },
+  { value: 'practical', label: '实战笔记', icon: 'fas fa-tools' },
+  { value: 'framework', label: '框架笔记', icon: 'fas fa-sitemap' }
+]
+
+// 配置类型映射
+const configTypeMap: Record<string, { type1: { key: string, label: string }, type2: { key: string, label: string } }> = {
+  fragment: { type1: { key: 'category', label: '分类' }, type2: { key: 'theme', label: '主题' } },
+  study: { type1: { key: 'subject', label: '学科' }, type2: { key: 'knowledgePoint', label: '知识点' } },
+  memorization: { type1: { key: 'subject', label: '科目' }, type2: { key: 'knowledgePoint', label: '知识点' } },
+  exercise: { type1: { key: 'source', label: '题目来源' }, type2: { key: 'subject', label: '学科类型' } },
+  practical: { type1: { key: 'domain', label: '领域' }, type2: { key: 'techStack', label: '技术栈' } },
+  framework: { type1: { key: 'subjectType', label: '学科类型' }, type2: { key: 'knowledgePoint', label: '知识点类型' } }
+}
 
 // 加载笔记数据
 const loadNotes = async () => {
@@ -2401,6 +2733,232 @@ const loadNotes = async () => {
   } catch (error) {
     console.error('加载笔记失败:', error)
   }
+}
+
+// 加载所有配置
+const loadAllConfigs = async () => {
+  try {
+    const types = ['fragment', 'study', 'memorization', 'exercise', 'practical', 'framework']
+    const promises = types.map(type => getConfigsByNoteType(type))
+    const results = await Promise.all(promises)
+    
+    allConfigs.value = []
+    results.forEach(res => {
+      if (res.code === 200 && res.data) {
+        allConfigs.value.push(...res.data)
+      }
+    })
+    
+    updatePresetsFromConfigs()
+  } catch (error) {
+    console.error('加载配置失败:', error)
+  }
+}
+
+// 从配置更新预设选项（注：availableFragmentCategories是computed，会自动从allConfigs获取）
+const updatePresetsFromConfigs = () => {
+  // 这个函数现在不需要做任何事，因为computed属性会自动响应allConfigs的变化
+  // 保留函数只是为了兼容性
+}
+
+// 获取配置类型
+const getConfigTypes = (noteType: string) => {
+  return configTypeMap[noteType] || { type1: null, type2: null }
+}
+
+// 获取配置项
+const getConfigItems = (noteType: string, configType: string) => {
+  return allConfigs.value.filter(c => c.noteType === noteType && c.configType === configType)
+}
+
+// 打开添加配置弹窗
+const openAddConfigModal = (noteType: string, configType: string) => {
+  configDialogForm.noteType = noteType
+  configDialogForm.configType = configType
+  configDialogForm.configName = ''
+  showAddConfigDialog.value = true
+}
+
+// 添加配置
+const addConfigItem = async () => {
+  if (!configDialogForm.configName.trim()) {
+    alert('请输入配置名称')
+    return
+  }
+  
+  try {
+    const res = await createConfig({
+      noteType: configDialogForm.noteType,
+      configType: configDialogForm.configType,
+      configName: configDialogForm.configName.trim()
+    })
+    
+    if (res.code === 200) {
+      await loadAllConfigs()
+      showAddConfigDialog.value = false
+      alert('添加成功')
+    } else {
+      alert(res.message || '添加失败')
+    }
+  } catch (error: any) {
+    console.error('添加配置失败:', error)
+    alert(error.message || '添加失败')
+  }
+}
+
+// 删除配置
+const deleteConfigItem = async (id: number) => {
+  if (!confirm('确定要删除这个配置吗？')) {
+    return
+  }
+  
+  try {
+    const res = await deleteConfigAPI(id)
+    if (res.code === 200) {
+      await loadAllConfigs()
+      alert('删除成功')
+    } else {
+      alert(res.message || '删除失败')
+    }
+  } catch (error: any) {
+    console.error('删除配置失败:', error)
+    alert(error.message || '删除失败')
+  }
+}
+
+// 通用的配置管理弹窗状态
+const showConfigManagerDialog = ref(false)
+const configManagerDialog = reactive({
+  show: false,
+  noteType: '',
+  configType: '',
+  title: '',
+  items: [] as any[],
+  newItemName: ''
+})
+
+// 打开配置管理弹窗
+const openConfigManager = async (noteType: string, configType: string) => {
+  console.log('打开配置管理弹窗:', noteType, configType)
+  
+  configManagerDialog.noteType = noteType
+  configManagerDialog.configType = configType
+  configManagerDialog.title = getConfigManagerTitle(noteType, configType)
+  configManagerDialog.newItemName = ''
+  
+  console.log('弹窗标题:', configManagerDialog.title)
+  
+  // 从API加载配置项
+  await loadConfigManagerItems(noteType, configType)
+  
+  console.log('加载的配置项:', configManagerDialog.items)
+  
+  showConfigManagerDialog.value = true
+  configManagerDialog.show = true
+  console.log('弹窗显示状态 ref:', showConfigManagerDialog.value)
+  console.log('弹窗显示状态 reactive:', configManagerDialog.show)
+  console.log('configManagerDialog对象:', configManagerDialog)
+  
+  // 强制触发视图更新
+  nextTick(() => {
+    const element = document.querySelector('.z-\\[9999\\]')
+    console.log('nextTick - 弹窗元素:', element)
+    if (element) {
+      console.log('✅ 弹窗已渲染到DOM！')
+    } else {
+      console.error('❌ 弹窗未渲染到DOM')
+    }
+  })
+}
+
+// 获取弹窗标题
+const getConfigManagerTitle = (noteType: string, configType: string): string => {
+  const titles: Record<string, Record<string, string>> = {
+    fragment: { category: '管理分类', theme: '管理主题' },
+    study: { subject: '管理学科', knowledgePoint: '管理知识点' },
+    memorization: { subject: '管理科目', knowledgePoint: '管理知识点' },
+    exercise: { source: '管理题目来源', subject: '管理学科类型' },
+    practical: { domain: '管理领域', techStack: '管理技术栈' },
+    framework: { subjectType: '管理学科类型', knowledgePoint: '管理知识点类型' }
+  }
+  return titles[noteType]?.[configType] || '管理配置'
+}
+
+// 加载配置管理弹窗的项目
+const loadConfigManagerItems = async (noteType: string, configType: string) => {
+  console.log('开始加载配置项:', noteType, configType)
+  try {
+    const res = await getConfigsByNoteType(noteType)
+    console.log('API返回结果:', res)
+    if (res.code === 200 && res.data) {
+      const filteredItems = res.data.filter((item: any) => item.configType === configType)
+      console.log('过滤后的配置项:', filteredItems)
+      configManagerDialog.items = filteredItems
+    } else {
+      console.warn('API返回非200状态或无数据:', res)
+    }
+  } catch (error) {
+    console.error('加载配置项失败:', error)
+  }
+}
+
+// 在配置管理弹窗中添加新项
+const addConfigManagerItem = async () => {
+  if (!configManagerDialog.newItemName.trim()) {
+    alert('请输入配置名称')
+    return
+  }
+  
+  try {
+    const res = await createConfig({
+      noteType: configManagerDialog.noteType,
+      configType: configManagerDialog.configType,
+      configName: configManagerDialog.newItemName.trim(),
+      sortOrder: 999,
+      recCreator: 'admin'
+    })
+    
+    if (res.code === 200) {
+      // 刷新配置项列表
+      await loadConfigManagerItems(configManagerDialog.noteType, configManagerDialog.configType)
+      // 刷新所有配置（更新下拉选项）
+      await loadAllConfigs()
+      configManagerDialog.newItemName = ''
+    } else {
+      alert(res.message || '添加失败')
+    }
+  } catch (error: any) {
+    console.error('添加配置失败:', error)
+    alert(error.message || '添加失败')
+  }
+}
+
+// 在配置管理弹窗中删除项
+const deleteConfigManagerItem = async (id: number) => {
+  if (!confirm('确定要删除这个配置吗？')) {
+    return
+  }
+  
+  try {
+    const res = await deleteConfigAPI(id)
+    if (res.code === 200) {
+      // 刷新配置项列表
+      await loadConfigManagerItems(configManagerDialog.noteType, configManagerDialog.configType)
+      // 刷新所有配置（更新下拉选项）
+      await loadAllConfigs()
+    } else {
+      alert(res.message || '删除失败')
+    }
+  } catch (error: any) {
+    console.error('删除配置失败:', error)
+    alert(error.message || '删除失败')
+  }
+}
+
+// 关闭配置管理弹窗
+const closeConfigManager = () => {
+  showConfigManagerDialog.value = false
+  configManagerDialog.show = false
 }
 
 // 默认配置（保留原有配置）
@@ -2447,6 +3005,7 @@ const recordForm = reactive({
   exerciseKnowledge: [] as string[],   // 知识点类型 - 多标签
   exerciseDifficulty: '',
   // 实战笔记字段
+  projectDomain: '',                   // 项目领域
   techTags: [] as string[],
   projectType: [] as string[],
   // 碎片笔记字段
@@ -2578,106 +3137,112 @@ const customProjectTypeOptions = ref<string[]>([])
 // 碎片笔记可用分类（动态获取，与素材组页面保持完全一致）
 const availableFragmentCategories = computed(() => {
   const categories = new Set<string>()
-  // 从现有笔记中获取分类（与FragmentNotes.vue的uniqueCategories逻辑相同）
+  // 优先从配置加载
+  allConfigs.value
+    .filter(c => c.noteType === 'fragment' && c.configType === 'category')
+    .forEach(c => categories.add(c.configName))
+  // 如果配置为空，使用默认值
+  if (categories.size === 0) {
+    defaultFragmentCategories.forEach(cat => categories.add(cat))
+  }
+  // 从现有笔记中也获取（保留动态特性）
   todayRecords.value.forEach(record => {
     if (record.type === 'fragment' && record.fragmentCategory && Array.isArray(record.fragmentCategory)) {
       record.fragmentCategory.forEach(cat => categories.add(cat))
     }
   })
-  // 添加一些常用分类确保选项丰富
-  defaultFragmentCategories.forEach(cat => categories.add(cat))
   return Array.from(categories).sort()
 })
 
 // 碎片笔记可用主题（动态获取，与素材组页面保持完全一致）
 const availableFragmentThemes = computed(() => {
   const themes = new Set<string>()
-  // 从现有笔记中获取主题（与FragmentNotes.vue的uniqueThemes逻辑相同）
+  // 优先从配置加载
+  allConfigs.value
+    .filter(c => c.noteType === 'fragment' && c.configType === 'theme')
+    .forEach(c => themes.add(c.configName))
+  // 如果配置为空，使用默认值
+  if (themes.size === 0) {
+    defaultFragmentThemes.forEach(theme => themes.add(theme))
+  }
+  // 从现有笔记中也获取（保留动态特性）
   todayRecords.value.forEach(record => {
     if (record.type === 'fragment' && record.fragmentTheme && Array.isArray(record.fragmentTheme)) {
       record.fragmentTheme.forEach(theme => themes.add(theme))
     }
   })
-  // 添加一些常用主题确保选项丰富
-  defaultFragmentThemes.forEach(theme => themes.add(theme))
   return Array.from(themes).sort()
 })
 
 // 求学笔记可用学科（动态获取）
 const availableStudySubjects = computed(() => {
-  const subjects = new Set<string>()
-  // 从现有笔记中获取学科
-  todayRecords.value.forEach(record => {
-    if (record.type === 'study' && record.studySubject && Array.isArray(record.studySubject)) {
-      record.studySubject.forEach(subject => subjects.add(subject))
-    }
-  })
-  // 添加一些常用学科确保选项丰富
-  defaultStudySubjects.forEach(subject => subjects.add(subject))
-  return Array.from(subjects).sort()
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'study' && c.configType === 'subject')
+  return configs.map(c => c.configName).sort()
+})
+
+// 求学笔记可用知识点
+const availableStudyKnowledge = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'study' && c.configType === 'knowledgePoint')
+  return configs.map(c => c.configName).sort()
 })
 
 // 框架笔记可用学科类型
 const availableFrameworkSubjects = computed(() => {
-  const subjects = new Set<string>()
-  // 从存储的数组中获取
-  storedFrameworkSubjects.value.forEach(subject => subjects.add(subject))
-  // 从现有笔记中获取
-  todayRecords.value.forEach(record => {
-    if (record.type === 'framework' && record.subjectType && Array.isArray(record.subjectType)) {
-      record.subjectType.forEach(subject => subjects.add(subject))
-    }
-  })
-  return Array.from(subjects).sort()
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'framework' && c.configType === 'subjectType')
+  return configs.map(c => c.configName).sort()
 })
 
 // 框架笔记可用知识点
 const availableFrameworkKnowledge = computed(() => {
-  const knowledge = new Set<string>()
-  // 从存储的数组中获取
-  storedFrameworkKnowledge.value.forEach(point => knowledge.add(point))
-  // 从现有笔记中获取
-  todayRecords.value.forEach(record => {
-    if (record.type === 'framework' && record.knowledgePoint && Array.isArray(record.knowledgePoint)) {
-      record.knowledgePoint.forEach(point => knowledge.add(point))
-    }
-  })
-  return Array.from(knowledge).sort()
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'framework' && c.configType === 'knowledgePoint')
+  return configs.map(c => c.configName).sort()
 })
 
-// 求学笔记可用知识点（动态获取）
-const availableKnowledgePoints = computed(() => {
-  const points = new Set<string>()
-  // 从现有笔记中获取知识点
-  todayRecords.value.forEach(record => {
-    if (record.type === 'study' && record.knowledgePoint && Array.isArray(record.knowledgePoint)) {
-      record.knowledgePoint.forEach(point => points.add(point))
-    }
-  })
-  // 添加一些常用知识点确保选项丰富
-  const commonPoints = [
-    '算法', '数据结构', '操作系统', '计算机网络', '数据库', '编程语言',
-    '机器学习算法', '深度学习', '自然语言处理', '计算机视觉',
-    '线性代数', '微积分', '概率统计', '离散数学',
-    '设计模式', '软件架构', '系统设计', '代码规范', '测试理论'
-  ]
-  commonPoints.forEach(point => points.add(point))
-  return Array.from(points).sort()
-})
 
 // 刷题笔记可用题目来源
 const availableExerciseSources = computed(() => {
-  return allExerciseSources.value.sort()
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'exercise' && c.configType === 'source')
+  return configs.map(c => c.configName).sort()
 })
 
 // 刷题笔记可用学科类型
 const availableExerciseSubjects = computed(() => {
-  return allExerciseSubjects.value.sort()
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'exercise' && c.configType === 'subject')
+  return configs.map(c => c.configName).sort()
 })
 
-// 刷题笔记可用知识点类型
-const availableExerciseKnowledge = computed(() => {
-  return allExerciseKnowledge.value.sort()
+// 背诵笔记可用科目
+const availableMemorizationSubjects = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'memorization' && c.configType === 'subject')
+  return configs.map(c => c.configName).sort()
+})
+
+// 背诵笔记可用知识点
+const availableMemorizationKnowledge = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'memorization' && c.configType === 'knowledgePoint')
+  return configs.map(c => c.configName).sort()
+})
+
+// 实战笔记可用领域
+const availablePracticalDomains = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'practical' && c.configType === 'domain')
+  return configs.map(c => c.configName).sort()
+})
+
+// 实战笔记可用技术栈
+const availablePracticalTechStacks = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'practical' && c.configType === 'techStack')
+  return configs.map(c => c.configName).sort()
 })
 
 // 学科类型和项目类型选项（已从 defaultOptions.ts 导入）
@@ -2742,6 +3307,7 @@ function normalizeRecordArrays() {
 
 onMounted(async () => {
   loadNotes()
+  loadAllConfigs()  // 加载配置
   loadStoredTypes()
   
   // 加载项目模板
@@ -3471,6 +4037,136 @@ const uploadImage = () => {
         editor.value?.chain().focus().setImage({ src: url }).run()
       }
       reader.readAsDataURL(file)
+    }
+  }
+  input.click()
+}
+
+// Markdown 转 HTML 的改进实现
+const markdownToHtml = (markdown: string): string => {
+  // 预处理：标准化换行符
+  let html = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  
+  // 1. 代码块（```）- 必须最先处理，避免内部内容被转换
+  const codeBlocks: string[] = []
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`
+    codeBlocks.push(`<pre><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`)
+    return placeholder
+  })
+  
+  // 2. 行内代码（`code`）- 保护起来避免被其他规则处理
+  const inlineCodes: string[] = []
+  html = html.replace(/`([^`]+)`/g, (match, code) => {
+    const placeholder = `__INLINE_CODE_${inlineCodes.length}__`
+    inlineCodes.push(`<code>${code}</code>`)
+    return placeholder
+  })
+  
+  // 3. 表格处理
+  html = html.replace(/^\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+\|\n?)*)/gm, (match, header, rows) => {
+    const headers = header.split('|').filter(h => h.trim()).map(h => `<th>${h.trim()}</th>`).join('')
+    const rowsHtml = rows.trim().split('\n').map(row => {
+      const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('')
+      return `<tr>${cells}</tr>`
+    }).join('')
+    return `<table><thead><tr>${headers}</tr></thead><tbody>${rowsHtml}</tbody></table>`
+  })
+  
+  // 4. 标题（从大到小，避免误匹配）
+  html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>')
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>')
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>')
+  
+  // 5. 分割线
+  html = html.replace(/^[-*_]{3,}$/gim, '<hr>')
+  
+  // 6. 引用块
+  html = html.replace(/^> (.+)$/gim, '<blockquote>$1</blockquote>')
+  
+  // 7. 处理列表（改进版）
+  // 有序列表
+  html = html.replace(/^(\d+)\. (.+)$/gim, '<li>$2</li>')
+  // 无序列表
+  html = html.replace(/^[*+-] (.+)$/gim, '<li>$1</li>')
+  
+  // 包裹连续的列表项
+  html = html.replace(/(<li>.*?<\/li>\n?)+/g, (match) => {
+    return `<ul>${match}</ul>`
+  })
+  
+  // 8. 图片（必须在链接之前处理）
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />')
+  
+  // 9. 链接
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+  
+  // 10. 文本样式
+  // 粗体（**text** 或 __text__）
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>')
+  
+  // 斜体（*text* 或 _text_）
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  html = html.replace(/_(.+?)_/g, '<em>$1</em>')
+  
+  // 删除线（~~text~~）
+  html = html.replace(/~~(.+?)~~/g, '<s>$1</s>')
+  
+  // 11. 恢复代码块和行内代码
+  codeBlocks.forEach((code, index) => {
+    html = html.replace(`__CODE_BLOCK_${index}__`, code)
+  })
+  inlineCodes.forEach((code, index) => {
+    html = html.replace(`__INLINE_CODE_${index}__`, code)
+  })
+  
+  // 12. 段落处理
+  // 分割成段落（双换行分隔）
+  const paragraphs = html.split(/\n\n+/)
+  html = paragraphs.map(para => {
+    para = para.trim()
+    // 跳过已经是块级元素的内容
+    if (!para || 
+        para.startsWith('<h') || 
+        para.startsWith('<ul') || 
+        para.startsWith('<ol') || 
+        para.startsWith('<pre') || 
+        para.startsWith('<blockquote') || 
+        para.startsWith('<table') || 
+        para.startsWith('<hr')) {
+      return para
+    }
+    // 单换行转为 <br>
+    para = para.replace(/\n/g, '<br>')
+    return `<p>${para}</p>`
+  }).join('\n')
+  
+  return html
+}
+
+// 导入 Markdown 文件
+const importMarkdown = (targetEditor: any) => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.md,.markdown'
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const markdownContent = e.target?.result as string
+        const htmlContent = markdownToHtml(markdownContent)
+        
+        // 如果传入了编辑器实例，使用该编辑器；否则使用主编辑器
+        if (targetEditor && targetEditor.chain) {
+          targetEditor.chain().focus().setContent(htmlContent).run()
+        } else if (editor.value) {
+          editor.value.chain().focus().setContent(htmlContent).run()
+        }
+      }
+      reader.readAsText(file, 'UTF-8')
     }
   }
   input.click()
@@ -4407,6 +5103,25 @@ const removeKnowledgePoint = (point: string) => {
   recordForm.knowledgePoint = recordForm.knowledgePoint.filter(p => p !== point)
 }
 
+// 选择背诵笔记知识点
+const selectMemorizationKnowledge = (point: string) => {
+  if (!recordForm.knowledgePoint.includes(point)) {
+    recordForm.knowledgePoint.push(point)
+  }
+}
+
+// 选择实战笔记领域
+const selectPracticalDomain = (domain: string) => {
+  recordForm.projectDomain = domain
+}
+
+// 选择实战笔记技术栈
+const selectPracticalTech = (tech: string) => {
+  if (!recordForm.techTags.includes(tech)) {
+    recordForm.techTags.push(tech)
+  }
+}
+
 // 切换项目类型
 const toggleProjectType = (type: string) => {
   if (recordForm.projectType.includes(type)) {
@@ -4717,6 +5432,25 @@ const resetImageSize = () => {
 .form-input:focus {
   transform: scale(1.01);
   transition: transform 0.2s ease-in-out;
+}
+
+/* 配置管理折叠动画 */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
 }
 
 /* 管理笔记渐入渐出动画 */

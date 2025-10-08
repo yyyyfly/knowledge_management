@@ -269,7 +269,7 @@
           行动组
         </h3>
         <p class="text-gray-500 text-sm mt-2">项目执行与任务管理</p>
-      </div>
+          </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- 战争行动 -->
         <div class="bg-white rounded-2xl p-6 border-2 border-red-200 hover:border-red-300 hover:shadow-2xl transition-all duration-300 group">
@@ -295,7 +295,7 @@
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-folder text-white text-sm"></i>
-                </div>
+              </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
               </div>
               <div class="text-4xl font-black text-red-600 mb-3">{{ statsByCategory.defense.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
@@ -307,18 +307,18 @@
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">进行中</span>
                   <span class="font-bold text-blue-600">{{ statsByCategory.defense.projects.active }}</span>
-                </div>
+            </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">规划中</span>
                   <span class="font-bold text-yellow-600">{{ statsByCategory.defense.projects.planning }}</span>
-                </div>
+              </div>
               </div>
             </div>
             <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-list-check text-white text-sm"></i>
-                </div>
+              </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
               </div>
               <div class="text-4xl font-black text-red-600 mb-3">{{ statsByCategory.defense.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
@@ -334,45 +334,45 @@
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">待开始</span>
                   <span class="font-bold text-yellow-600">{{ statsByCategory.defense.tasks.pending }}</span>
-                </div>
+            </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">已停止</span>
                   <span class="font-bold text-gray-500">{{ statsByCategory.defense.tasks.stopped }}</span>
-                </div>
+              </div>
               </div>
             </div>
           </div>
-
+          
           <!-- 紧急任务提醒 -->
           <div class="mb-5">
             <div 
               @click="toggleCategory('defense')" 
               class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200 cursor-pointer hover:border-orange-300 hover:shadow-md transition-all group"
             >
-              <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                   <i class="fas fa-exclamation-triangle text-white text-sm"></i>
-                </div>
-                <div>
+              </div>
+              <div>
                   <span class="text-sm font-bold text-gray-900">紧急任务</span>
                   <p class="text-xs text-gray-500">点击查看详情</p>
-                </div>
               </div>
+            </div>
               <div class="flex items-center space-x-3">
                 <span :class="urgentTasksByCategory.defense.count > 0 ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
                   {{ urgentTasksByCategory.defense.count > 0 ? `${urgentTasksByCategory.defense.count} 个` : '无' }}
                 </span>
                 <i :class="`fas fa-chevron-${expandedCategories.defense ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
+          </div>
               </div>
-            </div>
             <transition name="slide-fade">
               <div v-show="expandedCategories.defense" class="mt-3 space-y-2">
                 <div v-if="urgentTasksByCategory.defense.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <div class="flex items-center justify-center space-x-2">
                   <i class="fas fa-check-circle text-green-500 text-lg"></i>
                   <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
-                </div>
               </div>
+                </div>
               <div 
                 v-else
                 v-for="task in urgentTasksByCategory.defense.tasks" 
@@ -399,12 +399,12 @@
                         <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
                         <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
                       </span>
-                    </div>
+                </div>
                     <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
                     <div class="flex items-center space-x-2 text-xs text-gray-500">
                       <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
-                    </div>
-                  </div>
+                </div>
+              </div>
                   <button 
                     @click="goToProjectRecord(task)"
                     :class="{
@@ -415,22 +415,22 @@
                   >
                     处理
                   </button>
-                </div>
+            </div>
               </div>
               </div>
             </transition>
           </div>
-
+          
           <!-- 最近更新 -->
           <div class="flex items-center justify-between pt-4 mt-5 border-t-2 border-dashed border-red-200">
             <div class="flex items-center space-x-2">
               <div class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
                 <i class="far fa-clock text-red-600 text-xs"></i>
-              </div>
+            </div>
               <div>
                 <p class="text-xs text-gray-500">最近更新</p>
                 <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('defense') }}</p>
-              </div>
+        </div>
             </div>
             <router-link to="/actions/defense-projects" class="text-xs font-semibold text-red-600 hover:text-red-700 flex items-center space-x-1 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors">
               <span>查看详情</span>
@@ -463,7 +463,7 @@
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-folder text-white text-sm"></i>
-                </div>
+              </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
               </div>
               <div class="text-4xl font-black text-blue-600 mb-3">{{ statsByCategory.construction.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
@@ -486,7 +486,7 @@
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-list-check text-white text-sm"></i>
-                </div>
+              </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
               </div>
               <div class="text-4xl font-black text-blue-600 mb-3">{{ statsByCategory.construction.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
@@ -510,7 +510,7 @@
               </div>
             </div>
           </div>
-
+          
           <!-- 紧急任务提醒 -->
           <div class="mb-5">
             <div 
@@ -520,27 +520,27 @@
               <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                   <i class="fas fa-exclamation-triangle text-white text-sm"></i>
-                </div>
+            </div>
                 <div>
                   <span class="text-sm font-bold text-gray-900">紧急任务</span>
                   <p class="text-xs text-gray-500">点击查看详情</p>
-                </div>
-              </div>
+            </div>
+          </div>
               <div class="flex items-center space-x-3">
                 <span :class="urgentTasksByCategory.construction.count > 0 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
                   {{ urgentTasksByCategory.construction.count > 0 ? `${urgentTasksByCategory.construction.count} 个` : '无' }}
                 </span>
                 <i :class="`fas fa-chevron-${expandedCategories.construction ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
-              </div>
-            </div>
+        </div>
+      </div>
             <transition name="slide-fade">
               <div v-show="expandedCategories.construction" class="mt-3 space-y-2">
                 <div v-if="urgentTasksByCategory.construction.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <div class="flex items-center justify-center space-x-2">
                   <i class="fas fa-check-circle text-green-500 text-lg"></i>
                   <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
-                </div>
-              </div>
+    </div>
+        </div>
               <div 
                 v-else
                 v-for="task in urgentTasksByCategory.construction.tasks" 
@@ -567,12 +567,12 @@
                         <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
                         <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
                       </span>
-                    </div>
+        </div>
                     <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
                     <div class="flex items-center space-x-2 text-xs text-gray-500">
                       <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
-                    </div>
-                  </div>
+      </div>
+        </div>
                   <button 
                     @click="goToProjectRecord(task)"
                     :class="{
@@ -583,29 +583,29 @@
                   >
                     处理
                   </button>
-                </div>
-              </div>
+        </div>
+      </div>
               </div>
             </transition>
-          </div>
+    </div>
 
           <!-- 最近更新 -->
           <div class="flex items-center justify-between pt-4 mt-5 border-t-2 border-dashed border-blue-200">
             <div class="flex items-center space-x-2">
               <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i class="far fa-clock text-blue-600 text-xs"></i>
-              </div>
+      </div>
               <div>
                 <p class="text-xs text-gray-500">最近更新</p>
                 <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('construction') }}</p>
-              </div>
+          </div>
             </div>
             <router-link to="/actions/construction-projects" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center space-x-1 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
               <span>查看详情</span>
               <i class="fas fa-arrow-right text-xs"></i>
             </router-link>
           </div>
-        </div>
+          </div>
 
         <!-- 外交行动 -->
         <div class="bg-white rounded-2xl p-6 border-2 border-green-200 hover:border-green-300 hover:shadow-2xl transition-all duration-300 group">
@@ -613,11 +613,11 @@
             <div class="flex items-center">
               <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3 shadow-lg group-hover:scale-110 transition-transform">
                 <i class="fa-solid fa-handshake text-white text-xl"></i>
-              </div>
+        </div>
               <div>
                 <h4 class="text-xl font-bold text-gray-900">外交行动</h4>
                 <p class="text-xs text-green-600 font-medium">对外推广管理</p>
-              </div>
+          </div>
             </div>
             <router-link to="/actions/diplomatic-projects" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg">
               对外推广
@@ -631,52 +631,52 @@
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-folder text-white text-sm"></i>
-                </div>
+          </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">项目总数</span>
-              </div>
+        </div>
               <div class="text-4xl font-black text-green-600 mb-3">{{ statsByCategory.diplomatic.projects.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
               <div class="space-y-1">
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">已完成</span>
                   <span class="font-bold text-green-600">{{ statsByCategory.diplomatic.projects.completed }}</span>
-                </div>
+          </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">进行中</span>
                   <span class="font-bold text-blue-600">{{ statsByCategory.diplomatic.projects.active }}</span>
-                </div>
+            </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">规划中</span>
                   <span class="font-bold text-yellow-600">{{ statsByCategory.diplomatic.projects.planning }}</span>
-                </div>
-              </div>
-            </div>
+          </div>
+          </div>
+        </div>
             <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
               <div class="flex items-center mb-3">
                 <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-2 shadow-sm">
                   <i class="fa-solid fa-list-check text-white text-sm"></i>
-                </div>
+          </div>
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">任务总数</span>
-              </div>
+            </div>
               <div class="text-4xl font-black text-green-600 mb-3">{{ statsByCategory.diplomatic.tasks.total }}<span class="text-lg font-medium text-gray-400 ml-1">个</span></div>
               <div class="space-y-1">
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">已完成</span>
                   <span class="font-bold text-green-600">{{ statsByCategory.diplomatic.tasks.completed }}</span>
-                </div>
+          </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">进行中</span>
                   <span class="font-bold text-blue-600">{{ statsByCategory.diplomatic.tasks.inProgress }}</span>
-                </div>
+          </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">待开始</span>
                   <span class="font-bold text-yellow-600">{{ statsByCategory.diplomatic.tasks.pending }}</span>
-                </div>
+        </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-gray-600">已停止</span>
                   <span class="font-bold text-gray-500">{{ statsByCategory.diplomatic.tasks.stopped }}</span>
-                </div>
-              </div>
+          </div>
             </div>
+          </div>
           </div>
 
           <!-- 紧急任务提醒 -->
@@ -688,27 +688,27 @@
               <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                   <i class="fas fa-exclamation-triangle text-white text-sm"></i>
-                </div>
+        </div>
                 <div>
                   <span class="text-sm font-bold text-gray-900">紧急任务</span>
                   <p class="text-xs text-gray-500">点击查看详情</p>
-                </div>
-              </div>
+          </div>
+            </div>
               <div class="flex items-center space-x-3">
                 <span :class="urgentTasksByCategory.diplomatic.count > 0 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'" class="px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
                   {{ urgentTasksByCategory.diplomatic.count > 0 ? `${urgentTasksByCategory.diplomatic.count} 个` : '无' }}
                 </span>
                 <i :class="`fas fa-chevron-${expandedCategories.diplomatic ? 'up' : 'down'} text-gray-500 text-sm group-hover:text-gray-700 transition-colors`"></i>
-              </div>
-            </div>
+          </div>
+          </div>
             <transition name="slide-fade">
               <div v-show="expandedCategories.diplomatic" class="mt-3 space-y-2">
                 <div v-if="urgentTasksByCategory.diplomatic.count === 0" class="text-center py-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                 <div class="flex items-center justify-center space-x-2">
                   <i class="fas fa-check-circle text-green-500 text-lg"></i>
                   <p class="text-sm font-semibold text-green-700">当前无紧急任务</p>
-                </div>
-              </div>
+        </div>
+          </div>
               <div 
                 v-else
                 v-for="task in urgentTasksByCategory.diplomatic.tasks" 
@@ -721,8 +721,8 @@
                 }"
               >
                 <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center space-x-2 mb-1">
+          <div class="flex-1">
+            <div class="flex items-center space-x-2 mb-1">
                       <h5 class="text-xs font-semibold text-gray-900">{{ task.name }}</h5>
                       <span 
                         class="px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1"
@@ -735,12 +735,12 @@
                         <i v-if="task.isOverdue" class="fas fa-fire text-xs"></i>
                         <span class="text-xs">{{ task.isOverdue ? `逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天' : task.daysLeft === 1 ? '明天' : `${task.daysLeft}天` }}</span>
                       </span>
-                    </div>
+            </div>
                     <p class="text-xs text-gray-600 mb-1 line-clamp-1">{{ task.description }}</p>
                     <div class="flex items-center space-x-2 text-xs text-gray-500">
                       <span><i class="far fa-calendar mr-1"></i>{{ task.deadline }}</span>
-                    </div>
-                  </div>
+          </div>
+          </div>
                   <button 
                     @click="goToProjectRecord(task)"
                     :class="{
@@ -751,9 +751,9 @@
                   >
                     处理
                   </button>
-                </div>
-              </div>
-              </div>
+        </div>
+          </div>
+            </div>
             </transition>
           </div>
 
@@ -762,20 +762,20 @@
             <div class="flex items-center space-x-2">
               <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
                 <i class="far fa-clock text-green-600 text-xs"></i>
-              </div>
+          </div>
               <div>
                 <p class="text-xs text-gray-500">最近更新</p>
                 <p class="text-xs font-bold text-gray-700">{{ getLastUpdateTime('diplomatic') }}</p>
-              </div>
-            </div>
+        </div>
+          </div>
             <router-link to="/actions/diplomatic-projects" class="text-xs font-semibold text-green-600 hover:text-green-700 flex items-center space-x-1 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors">
               <span>查看详情</span>
               <i class="fas fa-arrow-right text-xs"></i>
             </router-link>
+            </div>
+          </div>
           </div>
         </div>
-      </div>
-    </div>
     <!-- 统计图表 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <!-- 素材增长趋势 -->
@@ -785,11 +785,11 @@
             <i class="fa-solid fa-chart-line text-primary mr-3"></i>
             素材增长趋势
           </h3>
-        </div>
+          </div>
         <div class="h-64">
           <canvas ref="materialsChartRef"></canvas>
-        </div>
-      </div>
+            </div>
+          </div>
 
       <!-- 行动组月度统计 -->
       <div class="bg-white rounded-xl shadow-soft p-6">
@@ -798,12 +798,12 @@
             <i class="fa-solid fa-briefcase text-secondary mr-3"></i>
             行动组月度统计
           </h3>
-        </div>
+          </div>
         <div class="h-64">
           <canvas ref="actionsChartRef"></canvas>
         </div>
-      </div>
-    </div>
+          </div>
+            </div>
 
     <!-- 最近活动 -->
     <div class="bg-white rounded-xl shadow-soft p-6">
@@ -813,11 +813,11 @@
           最近活动
         </h3>
         <p class="text-gray-600 text-sm mt-1">系统操作记录与动态追踪</p>
-      </div>
+          </div>
       <div v-if="recentActivities.length === 0" class="text-center py-12 text-gray-500">
         <i class="fas fa-inbox text-4xl mb-3"></i>
         <p>暂无最近活动</p>
-      </div>
+          </div>
       <div v-else class="space-y-4">
         <div 
           v-for="note in recentActivities" 
@@ -827,7 +827,7 @@
         >
           <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-sm" :class="getNoteTypeConfig(note.type).iconBgClass">
             <i class="fas text-lg" :class="`${getNoteTypeConfig(note.type).icon} ${getNoteTypeConfig(note.type).iconColorClass}`"></i>
-          </div>
+        </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2 mb-1">
               <p class="text-sm font-medium text-gray-900 truncate">{{ note.title || '无标题' }}</p>
