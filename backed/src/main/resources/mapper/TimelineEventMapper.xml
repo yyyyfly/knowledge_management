@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.TimelineEventMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.TimelineEvent">
+        <id column="id" property="id" />
+        <result column="event_type" property="eventType" />
+        <result column="title" property="title" />
+        <result column="description" property="description" />
+        <result column="event_date" property="eventDate" />
+        <result column="topic_id" property="topicId" />
+        <result column="rec_creator" property="recCreator" />
+        <result column="rec_create_time" property="recCreateTime" />
+        <result column="rec_revisor" property="recRevisor" />
+        <result column="rec_revise_time" property="recReviseTime" />
+        <result column="arch_flag" property="archFlag" />
+    </resultMap>
+
+    <!-- 插入事件 -->
+    <insert id="insert" parameterType="com.knowledge.entity.TimelineEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_timeline_event (
+            event_type,
+            title,
+            description,
+            event_date,
+            topic_id,
+            rec_creator,
+            rec_create_time,
+            arch_flag
+        ) VALUES (
+            #{eventType},
+            #{title},
+            #{description},
+            #{eventDate},
+            #{topicId},
+            #{recCreator},
+            NOW(),
+            1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_timeline_event
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有全局历史事件 -->
+    <select id="selectGlobalEvents" resultMap="BaseResultMap">
+        SELECT * FROM km_timeline_event
+        WHERE event_type = 'global' AND arch_flag = 1
+        ORDER BY event_date DESC, rec_create_time DESC
+    </select>
+
+    <!-- 查询所有专项时间轴里程碑 -->
+    <select id="selectMilestones" resultMap="BaseResultMap">
+        SELECT * FROM km_timeline_event
+        WHERE event_type = 'milestone' AND arch_flag = 1
+        ORDER BY event_date DESC, rec_create_time DESC
+    </select>
+
+    <!-- 根据主题ID查询里程碑 -->
+    <select id="selectByTopicId" resultMap="BaseResultMap">
+        SELECT * FROM km_timeline_event
+        WHERE event_type = 'milestone' 
+          AND topic_id = #{topicId} 
+          AND arch_flag = 1
+        ORDER BY event_date DESC, rec_create_time DESC
+    </select>
+
+    <!-- 删除事件（逻辑删除） -->
+    <update id="deleteById">
+        UPDATE km_timeline_event
+        SET arch_flag = 0,
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据主题ID删除所有里程碑（级联逻辑删除） -->
+    <update id="deleteByTopicId">
+        UPDATE km_timeline_event
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE event_type = 'milestone' 
+          AND topic_id = #{topicId}
+          AND arch_flag = 1
+    </update>
+
+    <!-- 更新事件 -->
+    <update id="update" parameterType="com.knowledge.entity.TimelineEvent">
+        UPDATE km_timeline_event
+        SET event_type = #{eventType},
+            title = #{title},
+            description = #{description},
+            event_date = #{eventDate},
+            topic_id = #{topicId},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

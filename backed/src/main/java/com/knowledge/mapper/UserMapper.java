@@ -38,5 +38,15 @@ public interface UserMapper {
      * 更新用户信息
      */
     int updateUserInfo(User user);
+
+    /**
+     * 查询所有用户（仅管理员可用）
+     */
+    java.util.List<User> findAllUsers();
+
+    /**
+     * 检查用户名是否已存在
+     */
+    int countByUsername(@Param("username") String username);
 }
 

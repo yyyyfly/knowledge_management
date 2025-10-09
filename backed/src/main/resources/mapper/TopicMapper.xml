@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.TopicMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.Topic">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="rec_creator" property="recCreator" />
+        <result column="rec_create_time" property="recCreateTime" />
+        <result column="rec_revisor" property="recRevisor" />
+        <result column="rec_revise_time" property="recReviseTime" />
+        <result column="arch_flag" property="archFlag" />
+    </resultMap>
+
+    <!-- 插入主题 -->
+    <insert id="insert" parameterType="com.knowledge.entity.Topic">
+        INSERT INTO km_topic (
+            id,
+            name,
+            rec_creator,
+            rec_create_time,
+            arch_flag
+        ) VALUES (
+            #{id},
+            #{name},
+            #{recCreator},
+            NOW(),
+            1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_topic
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有主题 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_topic
+        WHERE arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 删除主题（逻辑删除） -->
+    <update id="deleteById">
+        UPDATE km_topic
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新主题 -->
+    <update id="update" parameterType="com.knowledge.entity.Topic">
+        UPDATE km_topic
+        SET name = #{name},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

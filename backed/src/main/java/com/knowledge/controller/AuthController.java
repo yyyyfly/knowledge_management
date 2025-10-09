@@ -166,5 +166,43 @@ public class AuthController {
             return Result.error(e.getMessage());
         }
     }
+
+    /**
+     * 获取所有用户列表（仅管理员）
+     */
+    @GetMapping("/users")
+    public Result<java.util.List<User>> getAllUsers(@RequestHeader("Authorization") String token) {
+        try {
+            // 去掉 "Bearer " 前缀
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            
+            String username = JwtUtil.getUsernameFromToken(token);
+            
+            // 权限检查：只有admin用户可以访问
+            if (!"admin".equals(username)) {
+                return Result.error("权限不足，只有管理员可以访问");
+            }
+            
+            java.util.List<User> users = authService.getAllUsers();
+            return Result.success(users);
+        } catch (Exception e) {
+            return Result.error("获取用户列表失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 检查用户名是否已存在（公开接口）
+     */
+    @GetMapping("/check-username")
+    public Result<Boolean> checkUsername(@RequestParam("username") String username) {
+        try {
+            boolean exists = authService.isUsernameExists(username);
+            return Result.success(exists);
+        } catch (Exception e) {
+            return Result.error("检查失败：" + e.getMessage());
+        }
+    }
 }
 

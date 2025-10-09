@@ -124,5 +124,21 @@ public class AuthServiceImpl implements AuthService {
         
         return result > 0;
     }
+
+    @Override
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = userMapper.findAllUsers();
+        // 清除所有用户的密码信息
+        for (User user : users) {
+            user.setPassword(null);
+        }
+        return users;
+    }
+
+    @Override
+    public boolean isUsernameExists(String username) {
+        int count = userMapper.countByUsername(username);
+        return count > 0;
+    }
 }
 

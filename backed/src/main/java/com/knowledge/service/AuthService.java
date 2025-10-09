@@ -56,5 +56,18 @@ public interface AuthService {
      * @return 是否修改成功
      */
     boolean changePassword(String username, String oldPassword, String newPassword);
+
+    /**
+     * 获取所有用户列表（仅管理员）
+     * @return 用户列表（不包含密码）
+     */
+    java.util.List<User> getAllUsers();
+
+    /**
+     * 检查用户名是否已存在
+     * @param username 用户名
+     * @return 是否存在
+     */
+    boolean isUsernameExists(String username);
 }
 

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '@/views/Dashboard.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import ForgotPassword from '@/views/ForgotPassword.vue'
@@ -25,10 +24,23 @@ const router = createRouter({
       component: ForgotPassword,
       meta: { requiresAuth: false }
     },
+    // 主仪表盘 > 驾驶舱 - 重定向到总仪表盘
     {
       path: '/',
-      name: 'dashboard',
-      component: Dashboard,
+      redirect: '/overview/data'
+    },
+    // 主仪表盘 > 驾驶舱 > 总仪表盘
+    {
+      path: '/overview/data',
+      name: 'data-overview',
+      component: () => import('@/views/overview/DataOverview.vue'),
+      meta: { requiresAuth: true }
+    },
+    // 主仪表盘 > 驾驶舱 > 时光轨迹
+    {
+      path: '/overview/timeline',
+      name: 'timeline-review',
+      component: () => import('@/views/overview/TimelineReview.vue'),
       meta: { requiresAuth: true }
     },
     // 日常行动
@@ -140,6 +152,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/user-management',
+      name: 'user-management',
+      component: () => import('@/views/system/UserManagement.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
       path: '/account-settings',
       name: 'account-settings',
       component: () => import('@/views/AccountSettings.vue'),
@@ -148,7 +166,7 @@ const router = createRouter({
   ]
 })
 
-// 路由守卫：检查登录状态
+// 路由守卫：检查登录状态和权限
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   
@@ -170,7 +188,30 @@ router.beforeEach((to, from, next) => {
       // 未登录，跳转到登录页
       next({ path: '/login', query: { redirect: to.fullPath } })
     } else {
-      next()
+      // 检查是否需要管理员权限
+      if (to.meta.requiresAdmin) {
+        const userStr = localStorage.getItem('user')
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr)
+            if (user.username === 'admin') {
+              next()
+            } else {
+              // 非管理员，跳转到首页并提示
+              alert('权限不足，该页面仅管理员可访问')
+              next('/')
+            }
+          } catch (e) {
+            // 解析失败，跳转到首页
+            next('/')
+          }
+        } else {
+          // 没有用户信息，跳转到首页
+          next('/')
+        }
+      } else {
+        next()
+      }
     }
   } else {
     next()

@@ -12,7 +12,7 @@
       </div>
 
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        <!-- 主仪表盘分组 -->
+        <!-- 主仪表盘 - 顶级分组 -->
         <div class="space-y-1">
           <button 
             @click="toggleGroup('main')" 
@@ -28,32 +28,56 @@
           </button>
           
           <div v-show="expandedGroups.main" class="space-y-1">
-            <!-- 主仪表盘链接 -->
-            <div class="pl-8 space-y-1">
-              <router-link to="/" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
-              <div class="w-6 flex justify-center">
-                  <i class="fa-solid fa-chart-line"></i>
+            <!-- 驾驶舱 -->
+            <div class="pl-4 space-y-1">
+              <button 
+                @click="toggleGroup('overview')" 
+                class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
+              >
+                <div class="flex items-center">
+                  <div class="w-6 flex justify-center">
+                    <i class="fa-solid fa-chart-line"></i>
+                  </div>
+                  <span class="ml-3">驾驶舱</span>
+                </div>
+                <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.overview }"></i>
+              </button>
+              
+              <div v-show="expandedGroups.overview" class="pl-8 space-y-1">
+                <!-- 总仪表盘 -->
+                <router-link to="/overview/data" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+                  <div class="w-6 flex justify-center">
+                    <i class="fa-solid fa-chart-bar"></i>
+                  </div>
+                  <span class="ml-3">总仪表盘</span>
+                </router-link>
+                
+                <!-- 时光轨迹 -->
+                <router-link to="/overview/timeline" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+                  <div class="w-6 flex justify-center">
+                    <i class="fa-solid fa-history"></i>
+                  </div>
+                  <span class="ml-3">时光轨迹</span>
+                </router-link>
               </div>
-                <span class="ml-3">总览面板</span>
-            </router-link>
-        </div>
+            </div>
 
-        <!-- 素材组 -->
-            <div class="pl-8 space-y-1">
+            <!-- 素材组 -->
+            <div class="pl-4 space-y-1">
               <button 
                 @click="toggleGroup('materials')" 
                 class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
               >
                 <div class="flex items-center">
-            <div class="w-6 flex justify-center">
+                  <div class="w-6 flex justify-center">
                     <i class="fa-solid fa-chart-pie"></i>
-            </div>
-            <span class="ml-3">素材组</span>
+                  </div>
+                  <span class="ml-3">素材组</span>
                 </div>
                 <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.materials }"></i>
-          </button>
+              </button>
               
-              <!-- 素材组子菜单 - 使用配置对象确保顺序 -->
+              <!-- 素材组子菜单 -->
               <div v-show="expandedGroups.materials" class="pl-8 space-y-1">
                 <router-link 
                   v-for="item in materialsConfig" 
@@ -61,16 +85,16 @@
                   :to="item.path" 
                   class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
                 >
-              <div class="w-6 flex justify-center">
+                  <div class="w-6 flex justify-center">
                     <i :class="item.icon"></i>
-              </div>
+                  </div>
                   <span class="ml-3">{{ item.name }}</span>
-            </router-link>
-          </div>
-        </div>
+                </router-link>
+              </div>
+            </div>
 
             <!-- 行动组 -->
-            <div class="pl-8 space-y-1">
+            <div class="pl-4 space-y-1">
               <button 
                 @click="toggleGroup('actions')" 
                 class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
@@ -208,6 +232,13 @@
               </div>
               <span class="ml-3">版本更新</span>
             </router-link>
+            <!-- 用户管理（仅管理员可见） -->
+            <router-link v-if="isAdmin" to="/user-management" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-users-cog"></i>
+              </div>
+              <span class="ml-3">用户管理</span>
+            </router-link>
             <router-link to="/account-settings" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
               <div class="w-6 flex justify-center">
                 <i class="fa-solid fa-user-cog"></i>
@@ -222,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 // ======= 素材组唯一权威顺序配置，严禁其他地方定义或引用 =======
 const materialsConfig = [
@@ -235,9 +266,24 @@ const materialsConfig = [
 ]
 // ======= 只允许在本文件Sidebar.vue中用 materialsConfig 渲染素材组 =======
 
+// 检查是否是管理员
+const isAdmin = computed(() => {
+  const userStr = localStorage.getItem('user')
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr)
+      return user.username === 'admin'
+    } catch {
+      return false
+    }
+  }
+  return false
+})
+
 const isOpen = ref(false)
 const expandedGroups = ref({
   main: true, // 默认展开主仪表盘
+  overview: true, // 默认展开驾驶舱
   materials: false,
   actions: false,
   headquarters: false,

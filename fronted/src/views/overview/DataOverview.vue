@@ -805,44 +805,6 @@
           </div>
             </div>
 
-    <!-- 最近活动 -->
-    <div class="bg-white rounded-xl shadow-soft p-6">
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-          <i class="fa-solid fa-history text-accent mr-3"></i>
-          最近活动
-        </h3>
-        <p class="text-gray-600 text-sm mt-1">系统操作记录与动态追踪</p>
-          </div>
-      <div v-if="recentActivities.length === 0" class="text-center py-12 text-gray-500">
-        <i class="fas fa-inbox text-4xl mb-3"></i>
-        <p>暂无最近活动</p>
-          </div>
-      <div v-else class="space-y-4">
-        <div 
-          v-for="note in recentActivities" 
-          :key="note.id" 
-          class="flex items-center space-x-4 p-4 bg-gradient-to-r rounded-lg border hover:shadow-md transition-shadow"
-          :class="`${getNoteTypeConfig(note.type).bgClass} ${getNoteTypeConfig(note.type).borderClass}`"
-        >
-          <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-sm" :class="getNoteTypeConfig(note.type).iconBgClass">
-            <i class="fas text-lg" :class="`${getNoteTypeConfig(note.type).icon} ${getNoteTypeConfig(note.type).iconColorClass}`"></i>
-        </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center space-x-2 mb-1">
-              <p class="text-sm font-medium text-gray-900 truncate">{{ note.title || '无标题' }}</p>
-              <span class="px-2 py-1 rounded-full text-xs font-medium flex-shrink-0" :class="`${getNoteTypeConfig(note.type).badgeBgClass} ${getNoteTypeConfig(note.type).badgeTextClass}`">
-                {{ getNoteTypeConfig(note.type).label }}
-              </span>
-            </div>
-            <p class="text-xs text-gray-600 line-clamp-1">{{ note.content || '暂无内容' }}</p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <span class="text-xs text-gray-500 font-medium">{{ formatNoteTime(note) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
   </section>
 </template>
 
@@ -930,31 +892,6 @@ const diplomaticTaskStats = computed(() => {
   return { total: diplomaticTasks.length, completed, inProgress, notStarted, stopped }
 })
 
-// 获取最近活动（最新的笔记）
-const recentActivities = computed(() => {
-  // 取最新的12条笔记
-  return [...allNotes.value]
-    .sort((a, b) => {
-      const timeA = new Date(a.createTime || a.recCreateTime || 0).getTime()
-      const timeB = new Date(b.createTime || b.recCreateTime || 0).getTime()
-      return timeB - timeA
-    })
-    .slice(0, 12)
-})
-
-// 获取笔记类型的配置
-const getNoteTypeConfig = (type: string) => {
-  const configs: Record<string, any> = {
-    fragment: { label: '碎片笔记', icon: 'fa-puzzle-piece', bgClass: 'from-indigo-50 to-indigo-100', borderClass: 'border-indigo-200', iconBgClass: 'bg-indigo-200', iconColorClass: 'text-indigo-600', badgeBgClass: 'bg-indigo-200', badgeTextClass: 'text-indigo-700' },
-    framework: { label: '框架笔记', icon: 'fa-sitemap', bgClass: 'from-purple-50 to-purple-100', borderClass: 'border-purple-200', iconBgClass: 'bg-purple-200', iconColorClass: 'text-purple-600', badgeBgClass: 'bg-purple-200', badgeTextClass: 'text-purple-700' },
-    study: { label: '求学笔记', icon: 'fa-graduation-cap', bgClass: 'from-blue-50 to-blue-100', borderClass: 'border-blue-200', iconBgClass: 'bg-blue-200', iconColorClass: 'text-blue-600', badgeBgClass: 'bg-blue-200', badgeTextClass: 'text-blue-700' },
-    memorization: { label: '背诵笔记', icon: 'fa-lightbulb', bgClass: 'from-green-50 to-green-100', borderClass: 'border-green-200', iconBgClass: 'bg-green-200', iconColorClass: 'text-green-600', badgeBgClass: 'bg-green-200', badgeTextClass: 'text-green-700' },
-    exercise: { label: '刷题笔记', icon: 'fa-pen-to-square', bgClass: 'from-orange-50 to-orange-100', borderClass: 'border-orange-200', iconBgClass: 'bg-orange-200', iconColorClass: 'text-orange-600', badgeBgClass: 'bg-orange-200', badgeTextClass: 'text-orange-700' },
-    practical: { label: '实战笔记', icon: 'fa-flask', bgClass: 'from-red-50 to-red-100', borderClass: 'border-red-200', iconBgClass: 'bg-red-200', iconColorClass: 'text-red-600', badgeBgClass: 'bg-red-200', badgeTextClass: 'text-red-700' }
-  }
-  return configs[type] || configs.fragment
-}
-
 // 获取各项目类型最近更新时间
 const getProjectLatestUpdate = (category: string) => {
   // 依赖currentTime.value以实现自动更新
@@ -973,15 +910,6 @@ const getProjectLatestUpdate = (category: string) => {
   
   const latest = allTimes.reduce((max, time) => time > max ? time : max, allTimes[0])
   return dayjs(latest).fromNow()
-}
-
-// 格式化笔记创建时间为相对时间
-const formatNoteTime = (note: any) => {
-  // 依赖currentTime.value以实现自动更新
-  currentTime.value // 触发响应式更新
-  
-  const time = note.createTime || note.recCreateTime
-  return time ? dayjs(time).fromNow() : '-'
 }
 
 // 加载所有数据
