@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.CalendarEventMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.CalendarEvent">
+        <id column="id" property="id"/>
+        <result column="event_title" property="eventTitle"/>
+        <result column="event_date" property="eventDate"/>
+        <result column="event_type" property="eventType"/>
+        <result column="repeat_type" property="repeatType"/>
+        <result column="description" property="description"/>
+        <result column="color" property="color"/>
+        <result column="show_countdown" property="showCountdown"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <!-- 插入事件 -->
+    <insert id="insert" parameterType="com.knowledge.entity.CalendarEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_calendar_event (
+            event_title,
+            event_date,
+            event_type,
+            repeat_type,
+            description,
+            color,
+            show_countdown,
+            rec_creator,
+            rec_create_time,
+            rec_revisor,
+            rec_revise_time,
+            arch_flag
+        ) VALUES (
+            #{eventTitle},
+            #{eventDate},
+            #{eventType},
+            #{repeatType},
+            #{description},
+            #{color},
+            #{showCountdown},
+            #{recCreator},
+            NOW(),
+            #{recRevisor},
+            NOW(),
+            1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_calendar_event
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有事件（按用户过滤） -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_calendar_event
+        WHERE rec_creator = #{username} AND arch_flag = 1
+        ORDER BY event_date ASC, rec_create_time DESC
+    </select>
+
+    <!-- 根据日期范围查询事件 -->
+    <select id="selectByDateRange" resultMap="BaseResultMap">
+        SELECT * FROM km_calendar_event
+        WHERE event_date BETWEEN #{startDate} AND #{endDate}
+        AND rec_creator = #{username}
+        AND arch_flag = 1
+        ORDER BY event_date ASC
+    </select>
+
+    <!-- 更新事件 -->
+    <update id="update" parameterType="com.knowledge.entity.CalendarEvent">
+        UPDATE km_calendar_event
+        SET event_title = #{eventTitle},
+            event_date = #{eventDate},
+            event_type = #{eventType},
+            repeat_type = #{repeatType},
+            description = #{description},
+            color = #{color},
+            show_countdown = #{showCountdown},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="delete">
+        UPDATE km_calendar_event
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

@@ -12,7 +12,7 @@
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- 任务执行 -->
         <div 
           @click="openOperation('taskExecution')"
@@ -24,6 +24,20 @@
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">任务执行</h4>
             <p class="text-gray-600">查看和执行系统决策中创建的任务，记录执行进度</p>
+          </div>
+        </div>
+
+        <!-- 问题管理 -->
+        <div 
+          @click="openOperation('issueManagement')"
+          class="p-6 border-2 border-dashed border-orange-300 rounded-xl hover:border-orange-500 hover:bg-orange-50 cursor-pointer transition-all duration-200"
+        >
+          <div class="text-center">
+            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-exclamation-triangle text-2xl text-orange-600"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">问题管理</h4>
+            <p class="text-gray-600">记录项目执行过程中遇到的问题，跟踪问题处理进度</p>
           </div>
         </div>
 
@@ -578,6 +592,162 @@
               >
                 创建新心得
               </button>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- 问题管理 -->
+      <template v-else-if="currentOperation === 'issueManagement'">
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-8 max-h-[80vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <h3 class="text-xl font-semibold text-gray-900">问题管理</h3>
+            <div class="flex space-x-2">
+              <button 
+                @click="showCreateIssue = true"
+                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center space-x-2"
+              >
+                <i class="fas fa-plus"></i>
+                <span>记录问题</span>
+              </button>
+              <button 
+                @click="closeOperation()"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 搜索和筛选 -->
+          <div class="mb-6 flex-shrink-0">
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex-1">
+                <input 
+                  v-model="issueSearchQuery"
+                  type="text" 
+                  placeholder="搜索问题标题或描述..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+              </div>
+              <div>
+                <select v-model="issueFilterProject" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                  <option value="">全部项目</option>
+                  <option v-for="project in projects" :key="project.id" :value="project.id">
+                    {{ project.name }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <select v-model="issueFilterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                  <option value="">全部状态</option>
+                  <option value="open">待处理</option>
+                  <option value="in_progress">处理中</option>
+                  <option value="resolved">已解决</option>
+                  <option value="closed">已关闭</option>
+                </select>
+              </div>
+              <div>
+                <select v-model="issueFilterPriority" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                  <option value="">全部优先级</option>
+                  <option value="urgent">紧急</option>
+                  <option value="high">高</option>
+                  <option value="medium">中</option>
+                  <option value="low">低</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 问题列表 -->
+          <div class="space-y-4 flex-1 overflow-y-auto">
+            <div v-for="issue in filteredIssues" :key="issue.id" class="p-4 border-2 rounded-lg hover:shadow-md transition-shadow"
+              :class="{
+                'border-red-200 bg-red-50': issue.priority === 'urgent',
+                'border-orange-200 bg-orange-50': issue.priority === 'high',
+                'border-yellow-200 bg-yellow-50': issue.priority === 'medium',
+                'border-gray-200 bg-gray-50': issue.priority === 'low'
+              }">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h4 class="text-lg font-medium text-gray-900">{{ issue.issueTitle }}</h4>
+                    <span class="px-2 py-1 rounded text-xs font-medium"
+                      :class="{
+                        'bg-red-100 text-red-700': issue.priority === 'urgent',
+                        'bg-orange-100 text-orange-700': issue.priority === 'high',
+                        'bg-yellow-100 text-yellow-700': issue.priority === 'medium',
+                        'bg-gray-100 text-gray-700': issue.priority === 'low'
+                      }">
+                      {{ getPriorityText(issue.priority) }}
+                    </span>
+                    <span class="px-2 py-1 rounded text-xs font-medium"
+                      :class="{
+                        'bg-gray-100 text-gray-700': issue.status === 'open',
+                        'bg-blue-100 text-blue-700': issue.status === 'in_progress',
+                        'bg-green-100 text-green-700': issue.status === 'resolved',
+                        'bg-slate-100 text-slate-700': issue.status === 'closed'
+                      }">
+                      {{ getIssueStatusText(issue.status) }}
+                    </span>
+                  </div>
+                  
+                  <div class="bg-white p-3 rounded-lg mb-3">
+                    <p class="text-sm font-medium text-gray-700 mb-1">问题描述：</p>
+                    <p class="text-sm text-gray-600">{{ issue.issueDescription }}</p>
+                  </div>
+                  
+                  <!-- 解决方案 -->
+                  <div v-if="issue.solution" class="bg-green-50 p-3 rounded-lg mb-3 border border-green-200">
+                    <p class="text-sm font-medium text-green-700 mb-1">✅ 解决方案：</p>
+                    <p class="text-sm text-gray-700">{{ issue.solution }}</p>
+                    <p v-if="issue.resolveTime" class="text-xs text-gray-500 mt-2">
+                      解决时间：{{ formatDate(issue.resolveTime) }}
+                    </p>
+                  </div>
+                  
+                  <div class="flex items-center space-x-4 text-sm text-gray-500">
+                    <span>项目：{{ getProjectName(issue.projectId) }}</span>
+                    <span>类型：{{ getIssueTypeText(issue.issueType) }}</span>
+                    <span>{{ formatDate(issue.recCreateTime) }}</span>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <!-- 未解决状态的操作 -->
+                  <button 
+                    v-if="issue.status !== 'resolved' && issue.status !== 'closed'"
+                    @click="resolveIssue(issue)" 
+                    class="text-green-600 hover:text-green-800"
+                    title="处理问题"
+                  >
+                    <i class="fas fa-check-circle"></i>
+                  </button>
+                  
+                  <!-- 已解决状态的退回按钮 -->
+                  <button 
+                    v-if="issue.status === 'resolved'"
+                    @click="reopenIssueFromExecution(issue.id)" 
+                    class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition-colors text-sm"
+                    title="退回重新处理"
+                  >
+                    <i class="fas fa-undo mr-1"></i>退回
+                  </button>
+                  
+                  <button @click="editIssue(issue)" class="text-blue-600 hover:text-blue-800" title="编辑">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button @click="deleteIssue(issue.id)" class="text-red-600 hover:text-red-800" title="删除">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 空状态 -->
+            <div v-if="filteredIssues.length === 0" class="text-center py-12 text-gray-500">
+              <i class="fas fa-exclamation-triangle text-4xl mb-4 text-orange-400"></i>
+              <p class="text-lg font-medium mb-2">暂无问题记录</p>
+              <p class="text-sm">项目很顺利！也可以点击上方按钮记录遇到的问题</p>
             </div>
           </div>
         </div>
@@ -1605,6 +1775,200 @@
                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   保存修改
+                </button>
+              </div>
+            </form>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+
+    <!-- 新建问题弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showCreateIssue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-semibold text-gray-900">{{ currentIssue ? '编辑问题' : '记录问题' }}</h3>
+              <button 
+                @click="closeCreateIssue"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <form @submit.prevent="submitIssue" class="space-y-6">
+              <!-- 项目选择 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">关联项目 *</label>
+                <select v-model="issueForm.projectId" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                  <option value="">请选择项目</option>
+                  <option v-for="project in projects" :key="project.id" :value="project.id">
+                    {{ project.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- 问题标题 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">问题标题 *</label>
+                <input 
+                  v-model="issueForm.issueTitle" 
+                  type="text" 
+                  required
+                  placeholder="请输入问题标题"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+              </div>
+
+              <!-- 问题描述 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">问题描述 *</label>
+                <textarea 
+                  v-model="issueForm.issueDescription" 
+                  rows="4"
+                  required
+                  placeholder="请详细描述遇到的问题..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                ></textarea>
+              </div>
+
+              <!-- 问题类型 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">问题类型 *</label>
+                <select v-model="issueForm.issueType" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                  <option value="technical">技术问题</option>
+                  <option value="requirement">需求问题</option>
+                  <option value="design">设计问题</option>
+                  <option value="other">其他问题</option>
+                </select>
+              </div>
+
+              <!-- 优先级 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">优先级 *</label>
+                <div class="grid grid-cols-4 gap-3">
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.priority === 'urgent' ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-red-300'">
+                    <input type="radio" v-model="issueForm.priority" value="urgent" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.priority === 'urgent' ? 'text-red-700' : 'text-gray-700'">🔴 紧急</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.priority === 'high' ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-300'">
+                    <input type="radio" v-model="issueForm.priority" value="high" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.priority === 'high' ? 'text-orange-700' : 'text-gray-700'">🟠 高</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.priority === 'medium' ? 'border-yellow-500 bg-yellow-50' : 'border-gray-300 hover:border-yellow-300'">
+                    <input type="radio" v-model="issueForm.priority" value="medium" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.priority === 'medium' ? 'text-yellow-700' : 'text-gray-700'">🟡 中</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.priority === 'low' ? 'border-gray-500 bg-gray-50' : 'border-gray-300 hover:border-gray-400'">
+                    <input type="radio" v-model="issueForm.priority" value="low" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.priority === 'low' ? 'text-gray-700' : 'text-gray-600'">⚪ 低</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 问题状态（编辑时显示） -->
+              <div v-if="currentIssue">
+                <label class="block text-sm font-medium text-gray-700 mb-2">问题状态 *</label>
+                <div class="grid grid-cols-3 gap-3">
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.status === 'open' ? 'border-gray-500 bg-gray-50' : 'border-gray-300 hover:border-gray-400'">
+                    <input type="radio" v-model="issueForm.status" value="open" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.status === 'open' ? 'text-gray-700' : 'text-gray-600'">⏸️ 待处理</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.status === 'in_progress' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-300'">
+                    <input type="radio" v-model="issueForm.status" value="in_progress" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.status === 'in_progress' ? 'text-blue-700' : 'text-gray-700'">🔄 处理中</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="issueForm.status === 'resolved' ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-300'">
+                    <input type="radio" v-model="issueForm.status" value="resolved" class="hidden">
+                    <span class="text-sm font-medium" :class="issueForm.status === 'resolved' ? 'text-green-700' : 'text-gray-700'">✅ 已解决</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="flex justify-end space-x-4">
+                <button 
+                  type="button" 
+                  @click="closeCreateIssue"
+                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button 
+                  type="submit" 
+                  class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+                >
+                  {{ currentIssue ? '保存修改' : '记录问题' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+
+    <!-- 处理问题弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showResolveIssue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-semibold text-gray-900">处理问题</h3>
+              <button 
+                @click="closeResolveIssue"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <!-- 问题信息 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h4 class="font-medium text-gray-900 mb-2">{{ currentIssue?.issueTitle }}</h4>
+              <p class="text-sm text-gray-600 mb-3">{{ currentIssue?.issueDescription }}</p>
+              <div class="flex items-center space-x-3 text-sm text-gray-500">
+                <span>项目：{{ getProjectName(currentIssue?.projectId) }}</span>
+                <span>优先级：{{ getPriorityText(currentIssue?.priority) }}</span>
+                <span>类型：{{ getIssueTypeText(currentIssue?.issueType) }}</span>
+              </div>
+            </div>
+
+            <form @submit.prevent="submitResolveIssue" class="space-y-6">
+              <!-- 解决方案 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">解决方案 *</label>
+                <textarea 
+                  v-model="resolveForm.solution" 
+                  rows="6"
+                  required
+                  placeholder="请详细描述解决方案..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                ></textarea>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="flex justify-end space-x-4">
+                <button 
+                  type="button" 
+                  @click="closeResolveIssue"
+                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button 
+                  type="submit" 
+                  class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  标记为已解决
                 </button>
               </div>
             </form>
@@ -2808,11 +3172,15 @@ const toggleTimeGroupCollapse = (timeGroupKey: string) => {
 // 操作视图控制
 const currentOperation = ref('')
 
-const openOperation = (operation: 'taskExecution' | 'projectRecord') => {
+const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueManagement') => {
   // 关闭所有相关视图（为未来扩展预留）
   currentOperation.value = ''
   setTimeout(() => {
     currentOperation.value = operation
+    // 如果打开问题管理，加载问题列表
+    if (operation === 'issueManagement') {
+      loadIssues()
+    }
   }, 0)
 }
 
@@ -2841,6 +3209,222 @@ onActivated(() => {
   // 页面激活时重新加载数据
   loadData()
 })
+
+// ========== 问题管理相关 ==========
+
+// 问题管理状态
+const showCreateIssue = ref(false)
+const showResolveIssue = ref(false)
+const currentIssue = ref<any>(null)
+const issues = ref<any[]>([])
+
+// 问题表单
+const issueForm = reactive({
+  projectId: '',
+  issueTitle: '',
+  issueDescription: '',
+  issueType: 'technical',
+  priority: 'medium',
+  status: 'open'
+})
+
+// 处理问题表单
+const resolveForm = reactive({
+  solution: ''
+})
+
+// 问题筛选
+const issueSearchQuery = ref('')
+const issueFilterProject = ref('')
+const issueFilterStatus = ref('')
+const issueFilterPriority = ref('')
+
+// 问题过滤列表
+const filteredIssues = computed(() => {
+  return issues.value.filter(issue => {
+    const matchSearch = !issueSearchQuery.value || 
+      issue.issueTitle.toLowerCase().includes(issueSearchQuery.value.toLowerCase()) ||
+      (issue.issueDescription && issue.issueDescription.toLowerCase().includes(issueSearchQuery.value.toLowerCase()))
+    
+    const matchProject = !issueFilterProject.value || issue.projectId === parseInt(issueFilterProject.value)
+    const matchStatus = !issueFilterStatus.value || issue.status === issueFilterStatus.value
+    const matchPriority = !issueFilterPriority.value || issue.priority === issueFilterPriority.value
+    
+    return matchSearch && matchProject && matchStatus && matchPriority
+  })
+})
+
+// 加载问题列表
+const loadIssues = async () => {
+  try {
+    const response = await request.get('/project/issue/list')
+    if (response.code === 200) {
+      issues.value = response.data || []
+    }
+  } catch (error) {
+    console.error('加载问题列表失败:', error)
+  }
+}
+
+// 提交问题
+const submitIssue = async () => {
+  try {
+    // 判断是新建还是编辑
+    const isEdit = currentIssue.value !== null
+    const url = isEdit ? `/project/issue/${currentIssue.value.id}` : '/project/issue'
+    const method = isEdit ? 'put' : 'post'
+    
+    const response = await request[method](url, {
+      ...issueForm,
+      projectId: parseInt(issueForm.projectId)
+    })
+    
+    if (response.code === 200) {
+      alert(isEdit ? '✅ 问题更新成功' : '✅ 问题记录成功')
+      closeCreateIssue()
+      await loadIssues()
+    } else {
+      alert((isEdit ? '更新' : '记录') + '失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error((currentIssue.value ? '更新' : '记录') + '问题失败:', error)
+    alert((currentIssue.value ? '更新' : '记录') + '失败，请稍后重试')
+  }
+}
+
+// 关闭创建问题弹窗
+const closeCreateIssue = () => {
+  showCreateIssue.value = false
+  currentIssue.value = null
+  issueForm.projectId = ''
+  issueForm.issueTitle = ''
+  issueForm.issueDescription = ''
+  issueForm.issueType = 'technical'
+  issueForm.priority = 'medium'
+  issueForm.status = 'open'
+}
+
+// 编辑问题
+const editIssue = (issue: any) => {
+  issueForm.projectId = issue.projectId.toString()
+  issueForm.issueTitle = issue.issueTitle
+  issueForm.issueDescription = issue.issueDescription
+  issueForm.issueType = issue.issueType
+  issueForm.priority = issue.priority
+  issueForm.status = issue.status || 'open'
+  currentIssue.value = issue
+  showCreateIssue.value = true
+}
+
+// 处理问题
+const resolveIssue = (issue: any) => {
+  currentIssue.value = issue
+  resolveForm.solution = ''
+  showResolveIssue.value = true
+}
+
+// 提交解决方案
+const submitResolveIssue = async () => {
+  if (!currentIssue.value) return
+  
+  try {
+    const response = await request.put(`/project/issue/${currentIssue.value.id}/resolve`, resolveForm)
+    if (response.code === 200) {
+      alert('✅ 问题已标记为已解决')
+      closeResolveIssue()
+      await loadIssues()
+    } else {
+      alert('处理失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('处理问题失败:', error)
+    alert('处理失败，请稍后重试')
+  }
+}
+
+// 关闭处理问题弹窗
+const closeResolveIssue = () => {
+  showResolveIssue.value = false
+  currentIssue.value = null
+  resolveForm.solution = ''
+}
+
+// 删除问题
+const deleteIssue = async (id: number) => {
+  if (!confirm('确定要删除这个问题吗？')) return
+  
+  try {
+    const response = await request.delete(`/project/issue/${id}`)
+    if (response.code === 200) {
+      alert('✅ 问题已删除')
+      await loadIssues()
+    } else {
+      alert('删除失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('删除问题失败:', error)
+    alert('删除失败，请稍后重试')
+  }
+}
+
+// 退回问题（从执行端退回给决策端）
+const reopenIssueFromExecution = async (id: number) => {
+  if (!confirm('发现处理方案不合适？确定要退回重新处理吗？')) return
+  
+  try {
+    const response = await request.put(`/project/issue/${id}/reopen`)
+    if (response.code === 200) {
+      alert('✅ 问题已退回，可以重新制定解决方案了')
+      await loadIssues()
+    } else {
+      alert('退回失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('退回问题失败:', error)
+    alert('退回失败，请稍后重试')
+  }
+}
+
+// 获取优先级文本
+const getPriorityText = (priority: string) => {
+  const texts: Record<string, string> = {
+    urgent: '紧急',
+    high: '高',
+    medium: '中',
+    low: '低'
+  }
+  return texts[priority] || priority
+}
+
+// 获取问题状态文本
+const getIssueStatusText = (status: string) => {
+  const texts: Record<string, string> = {
+    open: '待处理',
+    in_progress: '处理中',
+    resolved: '已解决',
+    closed: '已关闭'
+  }
+  return texts[status] || status
+}
+
+// 获取问题类型文本
+const getIssueTypeText = (type: string) => {
+  const texts: Record<string, string> = {
+    technical: '技术问题',
+    requirement: '需求问题',
+    design: '设计问题',
+    other: '其他问题'
+  }
+  return texts[type] || type
+}
+
+// 格式化日期
+const formatDate = (date: any) => {
+  if (!date) return ''
+  const d = new Date(date)
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
 </script>
 
 <style scoped>

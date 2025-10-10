@@ -231,7 +231,7 @@ const allExpanded = ref(true) // 默认全部展开
 // 大版本描述配置
 const majorVersionDescriptions: Record<string, string> = {
   'v1': '🚀 基础架构的奠基之作。从零到一构建完整的个人知识管理体系，建立素材组、行动组、首脑组三大核心模块，实现知识积累与项目管理的闭环。这是系统从概念到实现的关键突破，为后续所有功能奠定了坚实基础。',
-  'v2': '🔥 智能化与协作的全面革新。引入AI助手、团队协作、知识图谱等颠覆性功能，将个人知识管理提升到智能化、网络化的新高度。这是从工具到平台的质的飞跃。',
+  'v2': '🔥 笔记展示的全面革新。对导航栏六大笔记模块的展示方式进行彻底重构，带来更舒适的浏览体验和更高效的知识管理方式。这是从基础功能到精致体验的重要升级。',
   'v3': '🌟 生态化与开放的战略转型。构建插件系统、开放API、跨平台同步等能力，打造知识管理生态圈。这是从封闭到开放、从产品到生态的历史性跨越。'
 }
 
@@ -239,8 +239,8 @@ const majorVersionDescriptions: Record<string, string> = {
 const versions = ref([
   {
     version: 'v1.0.0',
-    date: '2025-09-15',
-    timestamp: '2025-09-15',
+    date: '2025-10-01',
+    timestamp: '2025-10-01',
     isLatest: false,
     isInitial: true,
     isMajor: true, // 大版本
@@ -407,10 +407,86 @@ const versions = ref([
     ]
   },
   {
-    version: 'v1.8.0',
+    version: 'v2.0.0',
     date: '2025-10-09',
     timestamp: '2025-10-09',
     isLatest: true,
+    isInitial: false,
+    isMajor: true, // 大版本
+    features: [
+      '笔记展示大换血：对导航栏六大笔记模块（碎片笔记、框架笔记、求学笔记、背诵笔记、刷题笔记、实战笔记）的展示方式进行重构'
+    ],
+    improvements: [
+      '🚧 开发中...'
+    ],
+    bugfixes: [
+      '🚧 开发中...'
+    ]
+  },
+  {
+    version: 'v1.10.0',
+    date: '2025-10-09',
+    timestamp: '2025-10-09',
+    isLatest: false,
+    isInitial: false,
+    isMajor: false, // 小版本
+    features: [
+      '日历节假日完整显示：国庆节、春节等长假期现在会完整显示所有假期天数，不再只显示节日当天',
+      '节假日智能扩展：系统会根据官方放假安排，自动把连休的假期都标记出来，一眼就能看到哪些天是假期',
+      '倒计时提醒功能：给重要日期加上倒计时开关，在数据概览页面顶部会显示"距离XX还有X天"',
+      '倒计时智能隐藏：过期的日期会自动隐藏，但当天和昨天的事件还会显示，避免错过重要事情',
+      '倒计时颜色分级：根据紧急程度显示不同颜色，今天是红色，一周内是橙色，一个月内是黄色',
+      '即将到来的节假日：日历下方会显示最近6个即将到来的节假日，提前知道什么时候放假',
+      '节日假期区分：节日当天显示节日名称（如"国庆节"），假期其余天显示"XX假期"（如"国庆节假期"）'
+    ],
+    improvements: [
+      '倒计时提醒优化：数据概览页面顶部会显示所有开启了倒计时的重要日期，按远近排序',
+      '倒计时空状态：没有倒计时时会显示友好的提示，告诉你去哪里添加',
+      '日期输入优化：点击"添加日期"按钮时，日期输入框会自动填充当前日期，不用手动输入了',
+      '日历事件删除：鼠标悬停在事件上时会显示删除按钮，可以快速删除不需要的事件',
+      '节假日标记样式：法定假日显示为红色🎉标记，补班工作日显示为橙色💼标记，一目了然',
+      '智能过滤优化："即将到来的节假日"只显示真正的假期，不显示补班日，避免混淆',
+      '页面自动刷新：切换回数据概览页面时，倒计时会自动更新，始终显示最新的数据'
+    ],
+    bugfixes: [
+      '修复了节假日不显示的问题：之前只显示节日当天，现在会自动展开成完整假期了',
+      '修复了日期显示错误的问题：日期格式统一了，不会再出现2001年这种奇怪的年份',
+      '修复了编辑日期报错的问题：编辑或添加日期时不会再提示"字段不能为空"的错误了',
+      '修复了节假日异常数据的问题：API返回的错误连休天数会被自动过滤，不会显示70多天的假期了'
+    ]
+  },
+  {
+    version: 'v1.9.0',
+    date: '2025-10-09',
+    timestamp: '2025-10-09',
+    isLatest: false,
+    isInitial: false,
+    isMajor: false, // 小版本
+    features: [
+      '问题管理中心：项目执行过程中遇到问题？现在可以在项目记录页面直接记录问题了',
+      '问题跟踪看板：记录的所有问题一目了然，可以按项目、状态、优先级筛选，再也不怕问题被遗忘',
+      '决策处理系统：在系统决策页面专门设置了"问题处理"区域，记录的问题可以在这里制定解决方案',
+      '问题优先级标识：紧急、高、中、低四个优先级，用不同颜色标注，重要的问题一眼就能看到',
+      '问题状态追踪：待处理、处理中、已解决三种状态，问题的进展情况随时掌握',
+      '问题编辑功能：记录错了？没关系，可以随时编辑问题的内容、类型和优先级'
+    ],
+    improvements: [
+      '系统决策页面重新设计：原来的标签页改成了两个独立的折叠区域，项目管理和问题处理可以同时看到',
+      '问题记录简化：既然是自己用的系统，就不需要什么"报告人"、"负责人"这些繁琐的字段了',
+      '视觉效果优化：问题管理用橙红色主题，让问题更醒目；系统决策的配色也更加和谐美观',
+      '待处理提醒：问题处理区域会显示待处理问题数量的小红点，提醒你还有多少问题需要解决',
+      '界面交互提升：所有问题卡片都支持折叠展开，长长的问题列表也能轻松浏览'
+    ],
+    bugfixes: [
+      '修复了点击编辑问题时却新建了一个问题的bug，现在编辑和新建终于分开了',
+      '修复了问题表单提交后的成功提示，现在新建显示"记录成功"，编辑显示"更新成功"'
+    ]
+  },
+  {
+    version: 'v1.8.0',
+    date: '2025-10-09',
+    timestamp: '2025-10-09',
+    isLatest: false,
     isInitial: false,
     isMajor: false, // 小版本
     features: [
@@ -612,19 +688,20 @@ const getMajorVersionDescription = (major: string): string => {
 // 获取大版本时间范围
 const getMajorVersionDateRange = (versions: any[]): string => {
   if (versions.length === 0) return ''
-  if (versions.length === 1) return versions[0].date
+  
+  // 提取月份和日期（去掉年份）
+  const formatShort = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-')
+    return `${month}-${day}`
+  }
+  
+  if (versions.length === 1) return formatShort(versions[0].date)
   
   const dates = versions.map(v => v.date).sort()
   const startDate = dates[0]
   const endDate = dates[dates.length - 1]
   
-  // 提取月份和日期
-  const formatShort = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-')
-    return `${month}.${day}`
-  }
-  
-  return `${formatShort(startDate)} - ${formatShort(endDate)}`
+  return `${formatShort(startDate)} ~ ${formatShort(endDate)}`
 }
 
 // 初始化展开状态

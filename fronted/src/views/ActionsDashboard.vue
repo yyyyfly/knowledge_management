@@ -196,8 +196,8 @@
             </div>
           </div>
           <span class="text-xs text-gray-400">{{ formatDueDate(task.dueDate) }}</span>
-        </div>
-      </div>
+            </div>
+          </div>
       <div v-else class="text-center py-8 text-gray-500">
         <i class="fas fa-check-circle text-4xl mb-2"></i>
         <p>暂无紧急待办任务</p>

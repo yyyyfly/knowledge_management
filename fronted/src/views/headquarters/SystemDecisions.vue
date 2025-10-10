@@ -4,25 +4,193 @@
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
         <h1 class="text-3xl font-bold text-gray-900">系统决策</h1>
-        <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">项目管理</span>
+        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">战略管理</span>
       </div>
-      <p class="text-gray-600">管理项目结构和任务分配，为项目执行提供决策支持</p>
+      <p class="text-gray-600">管理项目结构、任务分配和问题处理，为项目执行提供决策支持</p>
+    </div>
+
+    <!-- 日历管理界面 -->
+    <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
+      <button 
+        @click="toggleCalendarSection"
+        class="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all flex items-center justify-between text-white"
+      >
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-calendar-alt text-xl"></i>
+          <h3 class="text-xl font-semibold">重要日期</h3>
+        </div>
+        <i :class="isCalendarSectionExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-xl transition-transform"></i>
+      </button>
+      
+      <Transition name="collapse">
+        <div v-if="isCalendarSectionExpanded" class="p-6">
+          <!-- 月份导航栏 -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+              <button 
+                @click="previousMonth"
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-700 transition-colors"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <h3 class="text-2xl font-bold text-gray-900">
+                {{ currentYear }}年{{ currentMonth }}月
+              </h3>
+              <button 
+                @click="nextMonth"
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-700 transition-colors"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              <button 
+                @click="goToToday"
+                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+              >
+                今天
+              </button>
+            </div>
+            <button 
+              @click="openCreateEventModal"
+              class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center space-x-2"
+            >
+              <i class="fas fa-plus"></i>
+              <span>添加日期</span>
+            </button>
+          </div>
+
+          <!-- 日历网格 -->
+          <div class="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+            <!-- 星期表头 -->
+            <div class="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+              <div v-for="day in weekDays" :key="day" 
+                class="text-center py-3 text-sm font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">
+                {{ day }}
+              </div>
+            </div>
+            
+            <!-- 日期网格 -->
+            <div class="grid grid-cols-7">
+              <div 
+                v-for="(day, index) in calendarDays" 
+                :key="index"
+                class="min-h-[120px] border-b border-r border-gray-200 last:border-r-0 p-2 transition-all hover:bg-gray-50"
+                :class="{
+                  'bg-gray-50': !day.isCurrentMonth,
+                  'bg-blue-50': day.isToday,
+                  'cursor-pointer': day.isCurrentMonth
+                }"
+                @click="day.isCurrentMonth && selectDate(day.date)"
+              >
+                <!-- 日期数字 -->
+                <div class="flex items-center justify-between mb-1">
+                  <span 
+                    class="text-sm font-medium"
+                    :class="{
+                      'text-gray-400': !day.isCurrentMonth,
+                      'text-blue-600 font-bold': day.isToday,
+                      'text-gray-900': day.isCurrentMonth && !day.isToday
+                    }"
+                  >
+                    {{ day.day }}
+                  </span>
+                  <span v-if="day.isToday" class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">今</span>
+                </div>
+                
+                <!-- 节假日/补班标记 -->
+                <div v-if="day.holiday" class="mb-1">
+                  <!-- 法定假日 -->
+                  <div v-if="day.holiday.isHoliday" 
+                    class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded truncate font-semibold" 
+                    :title="`${day.holiday.name} - ${day.holiday.type}`">
+                    🎉 {{ day.holiday.name }}
+                  </div>
+                  <!-- 补班工作日 -->
+                  <div v-else 
+                    class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded truncate font-semibold border border-orange-300" 
+                    :title="`${day.holiday.name} - 工作日`">
+                    💼 {{ day.holiday.name }}
+                  </div>
+                </div>
+                
+                <!-- 事件列表 -->
+                <div class="space-y-1">
+                  <div 
+                    v-for="event in day.events.slice(0, 2)" 
+                    :key="event.id"
+                    class="text-xs px-2 py-1 rounded truncate group flex items-center justify-between"
+                    :style="{ backgroundColor: event.color, color: '#fff' }"
+                    :title="event.eventTitle + (event.description ? '\n' + event.description : '')"
+                  >
+                    <span class="flex-1 cursor-pointer" @click.stop="editEvent(event)">{{ event.eventTitle }}</span>
+                    <button 
+                      @click.stop="deleteEventQuick(event.id)"
+                      class="ml-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20 rounded px-1"
+                      title="删除"
+                    >
+                      <i class="fas fa-times text-xs"></i>
+                    </button>
+                  </div>
+                  <div 
+                    v-if="day.events.length > 2"
+                    class="text-xs text-gray-600 px-2 py-1 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
+                    @click.stop="showDayEvents(day)"
+                  >
+                    +{{ day.events.length - 2 }} 更多
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 即将到来的节假日 -->
+          <div v-if="upcomingHolidays.length > 0" class="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
+            <h4 class="text-sm font-semibold text-red-700 mb-3 flex items-center">
+              <i class="fas fa-gift mr-2"></i>
+              即将到来的节假日
+            </h4>
+            <div class="grid grid-cols-3 gap-3">
+              <div 
+                v-for="holiday in upcomingHolidays.slice(0, 6)" 
+                :key="holiday.date"
+                class="bg-white rounded-lg p-3 border border-red-200 hover:border-red-400 transition-all"
+              >
+                <div class="text-xs text-gray-500 mb-1">{{ holiday.date }}</div>
+                <div class="text-sm font-medium text-gray-900">{{ holiday.name }}</div>
+                <div class="text-xs text-red-600 mt-1">{{ holiday.type }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </div>
 
     <!-- 项目管理界面 -->
-    <div class="bg-white rounded-xl shadow-soft p-6 mb-8 max-h-[80vh] flex flex-col">
-      <div class="flex items-center justify-between mb-6 flex-shrink-0">
-        <h3 class="text-xl font-semibold text-gray-900">项目管理</h3>
-        <div class="flex space-x-2">
-          <button 
-            @click="showCreateProject = true"
-            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-          >
-            <i class="fas fa-plus"></i>
-            <span>新建项目</span>
-          </button>
+    <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
+      <button 
+        @click="toggleProjectSection"
+        class="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 transition-all flex items-center justify-between text-white"
+      >
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-project-diagram text-xl"></i>
+          <h3 class="text-xl font-semibold">项目管理</h3>
         </div>
-      </div>
+        <i :class="isProjectSectionExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-xl transition-transform"></i>
+      </button>
+      
+      <Transition name="collapse">
+        <div v-if="isProjectSectionExpanded" class="p-6 max-h-[70vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <div class="text-gray-600 text-sm">管理项目结构和任务分配</div>
+            <div class="flex space-x-2">
+              <button 
+                @click="showCreateProject = true"
+                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+              >
+                <i class="fas fa-plus"></i>
+                <span>新建项目</span>
+              </button>
+            </div>
+          </div>
       
       <!-- 项目搜索和分类筛选 -->
       <div class="mb-6 flex-shrink-0">
@@ -222,8 +390,375 @@
         >
           下一页<i class="fas fa-chevron-right ml-1"></i>
         </button>
-      </div>
+        </div>
+        </div>
+      </Transition>
     </div>
+
+    <!-- 问题处理界面 -->
+    <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
+      <button 
+        @click="toggleIssueSection"
+        class="w-full px-6 py-4 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 transition-all flex items-center justify-between text-white"
+      >
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-exclamation-circle text-xl"></i>
+          <h3 class="text-xl font-semibold">问题处理</h3>
+          <span v-if="pendingIssuesCount > 0" class="bg-white/30 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-xs font-semibold border border-white/20">
+            {{ pendingIssuesCount }}
+          </span>
+        </div>
+        <i :class="isIssueSectionExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-xl transition-transform"></i>
+      </button>
+      
+      <Transition name="collapse">
+        <div v-if="isIssueSectionExpanded" class="p-6 max-h-[70vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <div class="text-gray-600 text-sm">
+              待处理：<span class="font-semibold text-orange-600">{{ pendingIssuesCount }}</span> | 
+              已解决：<span class="font-semibold text-green-600">{{ resolvedIssuesCount }}</span>
+            </div>
+          </div>
+
+      <!-- 问题筛选 -->
+      <div class="mb-6 flex-shrink-0">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <input 
+              v-model="issueSearchQuery"
+              type="text" 
+              placeholder="搜索问题标题或描述..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            >
+          </div>
+          <div>
+            <select v-model="issueFilterProject" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+              <option value="">全部项目</option>
+              <option v-for="project in projects" :key="project.id" :value="project.id">
+                {{ project.name }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <select v-model="issueFilterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+              <option value="">全部状态</option>
+              <option value="open">待处理</option>
+              <option value="in_progress">处理中</option>
+              <option value="resolved">已解决</option>
+            </select>
+          </div>
+          <div>
+            <select v-model="issueFilterPriority" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+              <option value="">全部优先级</option>
+              <option value="urgent">紧急</option>
+              <option value="high">高</option>
+              <option value="medium">中</option>
+              <option value="low">低</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 问题列表 -->
+      <div class="space-y-4 flex-1 overflow-y-auto">
+        <div v-for="issue in filteredDecisionIssues" :key="issue.id" 
+          class="border-2 rounded-lg p-5 transition-all hover:shadow-lg"
+          :class="{
+            'border-red-300 bg-red-50': issue.priority === 'urgent' && issue.status !== 'resolved',
+            'border-orange-300 bg-orange-50': issue.priority === 'high' && issue.status !== 'resolved',
+            'border-yellow-300 bg-yellow-50': issue.priority === 'medium' && issue.status !== 'resolved',
+            'border-gray-300 bg-gray-50': issue.priority === 'low' && issue.status !== 'resolved',
+            'border-green-300 bg-green-50': issue.status === 'resolved'
+          }">
+          
+          <!-- 问题头部 -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-2">
+                <h4 class="text-lg font-semibold text-gray-900">{{ issue.issueTitle }}</h4>
+                <span class="px-2 py-1 rounded text-xs font-medium"
+                  :class="{
+                    'bg-red-100 text-red-700': issue.priority === 'urgent',
+                    'bg-orange-100 text-orange-700': issue.priority === 'high',
+                    'bg-yellow-100 text-yellow-700': issue.priority === 'medium',
+                    'bg-gray-100 text-gray-700': issue.priority === 'low'
+                  }">
+                  {{ getIssuePriorityText(issue.priority) }}
+                </span>
+                <span class="px-2 py-1 rounded text-xs font-medium"
+                  :class="{
+                    'bg-gray-100 text-gray-700': issue.status === 'open',
+                    'bg-blue-100 text-blue-700': issue.status === 'in_progress',
+                    'bg-green-100 text-green-700': issue.status === 'resolved'
+                  }">
+                  {{ getIssueStatusTextDecision(issue.status) }}
+                </span>
+              </div>
+              
+              <p class="text-sm text-gray-700 mb-3 bg-white p-3 rounded-lg">{{ issue.issueDescription }}</p>
+              
+              <div class="flex items-center space-x-4 text-sm text-gray-500">
+                <span class="flex items-center"><i class="fas fa-project-diagram mr-1"></i>{{ getProjectName(issue.projectId) }}</span>
+                <span class="flex items-center"><i class="fas fa-tag mr-1"></i>{{ getIssueTypeTextDecision(issue.issueType) }}</span>
+                <span class="flex items-center"><i class="fas fa-clock mr-1"></i>{{ formatIssueDate(issue.recCreateTime) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 解决方案显示 -->
+          <div v-if="issue.solution" class="mt-4 bg-green-100 border border-green-300 rounded-lg p-4">
+            <div class="flex items-start">
+              <i class="fas fa-check-circle text-green-600 text-xl mr-3 mt-1"></i>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-green-800 mb-1">决策方案：</p>
+                <p class="text-sm text-gray-700">{{ issue.solution }}</p>
+                <p class="text-xs text-gray-500 mt-2">解决时间：{{ formatIssueDate(issue.resolveTime) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="mt-4 flex space-x-3">
+            <!-- 未解决状态的按钮 -->
+            <template v-if="issue.status !== 'resolved'">
+              <button 
+                @click="startDeciding(issue)"
+                class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2"
+              >
+                <i class="fas fa-lightbulb"></i>
+                <span>制定决策</span>
+              </button>
+              <button 
+                v-if="issue.status === 'open'"
+                @click="markIssueInProgress(issue.id)"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <i class="fas fa-play"></i>
+              </button>
+            </template>
+            
+            <!-- 已解决状态的按钮 -->
+            <template v-else>
+              <button 
+                @click="reopenIssue(issue.id)"
+                class="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2"
+              >
+                <i class="fas fa-undo"></i>
+                <span>取消解决，重新处理</span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+          <!-- 空状态 -->
+          <div v-if="filteredDecisionIssues.length === 0" class="text-center py-12 text-gray-500">
+            <i class="fas fa-check-circle text-6xl mb-4 text-green-400"></i>
+            <p class="text-lg font-medium mb-2">暂无待处理问题</p>
+            <p class="text-sm">所有问题都已妥善处理！</p>
+          </div>
+        </div>
+        </div>
+      </Transition>
+    </div>
+
+    <!-- 添加/编辑日期弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showCreateEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-semibold text-gray-900">{{ currentEvent ? '编辑日期' : '添加重要日期' }}</h3>
+              <button 
+                @click="closeEventModal"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <form @submit.prevent="submitEvent" class="space-y-6">
+              <!-- 事件标题 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">事件标题 *</label>
+                <input 
+                  v-model="eventForm.eventTitle" 
+                  type="text" 
+                  required
+                  placeholder="例如：项目发布、生日提醒等"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+              </div>
+
+              <!-- 事件日期 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">事件日期 *</label>
+                <input 
+                  v-model="eventForm.eventDate" 
+                  type="date" 
+                  required
+                  placeholder="yyyy-MM-dd"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+              </div>
+
+              <!-- 重复类型 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">重复类型 *</label>
+                <div class="grid grid-cols-4 gap-3">
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="eventForm.repeatType === 'once' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:border-emerald-300'">
+                    <input type="radio" v-model="eventForm.repeatType" value="once" class="hidden">
+                    <span class="text-sm font-medium" :class="eventForm.repeatType === 'once' ? 'text-emerald-700' : 'text-gray-700'">📅 单次</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="eventForm.repeatType === 'daily' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-300'">
+                    <input type="radio" v-model="eventForm.repeatType" value="daily" class="hidden">
+                    <span class="text-sm font-medium" :class="eventForm.repeatType === 'daily' ? 'text-blue-700' : 'text-gray-700'">🔄 每天</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="eventForm.repeatType === 'monthly' ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-300'">
+                    <input type="radio" v-model="eventForm.repeatType" value="monthly" class="hidden">
+                    <span class="text-sm font-medium" :class="eventForm.repeatType === 'monthly' ? 'text-purple-700' : 'text-gray-700'">📆 每月</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="eventForm.repeatType === 'yearly' ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-300'">
+                    <input type="radio" v-model="eventForm.repeatType" value="yearly" class="hidden">
+                    <span class="text-sm font-medium" :class="eventForm.repeatType === 'yearly' ? 'text-orange-700' : 'text-gray-700'">🎂 每年</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 倒计时功能 -->
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="flex items-center space-x-2">
+                  <i class="fas fa-hourglass-half text-emerald-600"></i>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700">启用倒计时</label>
+                    <p class="text-xs text-gray-500">在其他地方显示距离此日期的天数</p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    v-model="eventForm.showCountdown" 
+                    class="sr-only peer"
+                  >
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              <!-- 事件描述 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">事件描述</label>
+                <textarea 
+                  v-model="eventForm.description" 
+                  rows="3"
+                  placeholder="可选，添加更多说明..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                ></textarea>
+              </div>
+
+              <!-- 事件颜色 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">标记颜色</label>
+                <div class="flex space-x-3">
+                  <button 
+                    v-for="color in colorOptions" 
+                    :key="color"
+                    type="button"
+                    @click="eventForm.color = color"
+                    class="w-10 h-10 rounded-full border-2 transition-all"
+                    :class="eventForm.color === color ? 'border-gray-800 ring-2 ring-offset-2 ring-gray-400' : 'border-gray-300'"
+                    :style="{ backgroundColor: color }"
+                  ></button>
+                </div>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="flex justify-end space-x-4">
+                <button 
+                  type="button" 
+                  @click="closeEventModal"
+                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button 
+                  type="submit" 
+                  class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                >
+                  {{ currentEvent ? '保存修改' : '添加日期' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+
+    <!-- 制定决策弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showDecisionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-semibold text-gray-900">制定决策方案</h3>
+              <button 
+                @click="closeDecisionModal"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+
+            <!-- 问题信息 -->
+            <div class="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <h4 class="font-semibold text-gray-900 mb-2">{{ currentDecisionIssue?.issueTitle }}</h4>
+              <p class="text-sm text-gray-700 mb-3">{{ currentDecisionIssue?.issueDescription }}</p>
+              <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <span>项目：{{ getProjectName(currentDecisionIssue?.projectId) }}</span>
+                <span>优先级：{{ getIssuePriorityText(currentDecisionIssue?.priority) }}</span>
+                <span>类型：{{ getIssueTypeTextDecision(currentDecisionIssue?.issueType) }}</span>
+              </div>
+            </div>
+
+            <form @submit.prevent="submitDecision" class="space-y-6">
+              <!-- 决策方案 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-lightbulb text-orange-500 mr-2"></i>决策方案 *
+                </label>
+                <textarea 
+                  v-model="decisionForm.solution" 
+                  rows="8"
+                  required
+                  placeholder="请详细描述解决方案和决策思路..."
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                ></textarea>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="flex justify-end space-x-4">
+                <button 
+                  type="button" 
+                  @click="closeDecisionModal"
+                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button 
+                  type="submit" 
+                  class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center space-x-2"
+                >
+                  <i class="fas fa-check"></i>
+                  <span>确认决策</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
 
     <!-- 项目弹窗 -->
     <Transition name="modal-fade">
@@ -436,6 +971,405 @@ const projectSearchQuery = ref('')
 const projectFilterStatus = ref('')
 const projectFilterCategory = ref('')
 
+// ========== 日历事件相关 ==========
+
+// 日历折叠状态
+const isCalendarSectionExpanded = ref(true)
+
+// 切换日历折叠状态
+const toggleCalendarSection = () => {
+  isCalendarSectionExpanded.value = !isCalendarSectionExpanded.value
+  if (isCalendarSectionExpanded.value) {
+    loadCalendarEvents()
+    loadHolidays()
+  }
+}
+
+// 日历事件
+const calendarEvents = ref<any[]>([])
+const showCreateEvent = ref(false)
+const currentEvent = ref<any>(null)
+const holidays = ref<any[]>([])
+
+// 即将到来的节假日（未来的，只显示法定假日，不显示补班）
+const upcomingHolidays = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return holidays.value.filter(h => {
+    const hDate = new Date(h.date)
+    return h.isHoliday && hDate >= today // 只显示法定假日
+  }).slice(0, 6)
+})
+
+// 当前显示的年月
+const currentDate = ref(new Date())
+const currentYear = computed(() => currentDate.value.getFullYear())
+const currentMonth = computed(() => currentDate.value.getMonth() + 1)
+
+// 星期表头
+const weekDays = ['日', '一', '二', '三', '四', '五', '六']
+
+// 事件表单
+const eventForm = reactive({
+  eventTitle: '',
+  eventDate: '',
+  eventType: 'custom', // 事件类型：custom-自定义, holiday-节假日
+  repeatType: 'once',
+  description: '',
+  color: '#3b82f6',
+  showCountdown: false // 是否显示倒计时
+})
+
+// 颜色选项
+const colorOptions = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
+
+// 生成日历网格数据
+const calendarDays = computed(() => {
+  const year = currentDate.value.getFullYear()
+  const month = currentDate.value.getMonth()
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  // 显式依赖 holidays 和 calendarEvents，确保它们变化时重新计算
+  const holidaysCount = holidays.value.length
+  const eventsCount = calendarEvents.value.length
+  
+  // 当月第一天
+  const firstDay = new Date(year, month, 1)
+  const firstDayOfWeek = firstDay.getDay() // 0-6, 0是周日
+  
+  // 当月最后一天
+  const lastDay = new Date(year, month + 1, 0)
+  const daysInMonth = lastDay.getDate()
+  
+  // 上个月最后几天
+  const prevMonthDays = firstDayOfWeek
+  const prevMonth = month === 0 ? 11 : month - 1
+  const prevMonthYear = month === 0 ? year - 1 : year
+  const prevMonthLastDay = new Date(prevMonthYear, prevMonth + 1, 0).getDate()
+  
+  const days: any[] = []
+  
+  // 上个月的日期（灰色显示）
+  for (let i = prevMonthDays - 1; i >= 0; i--) {
+    const day = prevMonthLastDay - i
+    const date = new Date(prevMonthYear, prevMonth, day)
+    days.push({
+      day,
+      date,
+      isCurrentMonth: false,
+      isToday: false,
+      holiday: getHolidayForDate(date),
+      events: getEventsForDate(date)
+    })
+  }
+  
+  // 当月的日期
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day)
+    const isToday = date.getTime() === today.getTime()
+    days.push({
+      day,
+      date,
+      isCurrentMonth: true,
+      isToday,
+      holiday: getHolidayForDate(date),
+      events: getEventsForDate(date)
+    })
+  }
+  
+  // 下个月的日期（灰色显示）
+  const remainingDays = 42 - days.length // 6行 x 7列 = 42格
+  const nextMonth = month === 11 ? 0 : month + 1
+  const nextMonthYear = month === 11 ? year + 1 : year
+  for (let day = 1; day <= remainingDays; day++) {
+    const date = new Date(nextMonthYear, nextMonth, day)
+    days.push({
+      day,
+      date,
+      isCurrentMonth: false,
+      isToday: false,
+      holiday: getHolidayForDate(date),
+      events: getEventsForDate(date)
+    })
+  }
+  
+  return days
+})
+
+// 获取指定日期的节假日
+const getHolidayForDate = (date: Date) => {
+  const dateStr = formatDateToString(date)
+  return holidays.value.find(h => h.date === dateStr)
+}
+
+// 获取指定日期的事件
+const getEventsForDate = (date: Date) => {
+  const dateStr = formatDateToString(date)
+  
+  return calendarEvents.value.filter(event => {
+    const eventDate = new Date(event.eventDate)
+    
+    // 单次事件：日期完全匹配
+    if (event.repeatType === 'once') {
+      return formatDateToString(eventDate) === dateStr
+    }
+    
+    // 每天重复：所有日期都显示
+    if (event.repeatType === 'daily') {
+      return new Date(eventDate) <= date
+    }
+    
+    // 每月重复：日期相同
+    if (event.repeatType === 'monthly') {
+      return eventDate.getDate() === date.getDate() && new Date(eventDate) <= date
+    }
+    
+    // 每年重复：月日相同
+    if (event.repeatType === 'yearly') {
+      return eventDate.getMonth() === date.getMonth() && 
+             eventDate.getDate() === date.getDate() &&
+             eventDate.getFullYear() <= date.getFullYear()
+    }
+    
+    return false
+  })
+}
+
+// 格式化日期为字符串
+const formatDateToString = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// 上一月
+const previousMonth = () => {
+  const newDate = new Date(currentDate.value)
+  newDate.setMonth(newDate.getMonth() - 1)
+  currentDate.value = newDate
+}
+
+// 下一月
+const nextMonth = () => {
+  const newDate = new Date(currentDate.value)
+  newDate.setMonth(newDate.getMonth() + 1)
+  currentDate.value = newDate
+}
+
+// 回到今天
+const goToToday = () => {
+  currentDate.value = new Date()
+}
+
+// 选择日期（快速添加事件）
+const selectDate = (date: Date) => {
+  eventForm.eventDate = formatDateToString(date)
+  showCreateEvent.value = true
+}
+
+// 显示某天的所有事件
+const showDayEvents = (day: any) => {
+  if (day.events.length > 0) {
+    const eventList = day.events.map((e: any) => `• ${e.eventTitle}`).join('\n')
+    alert(`${day.date.toLocaleDateString('zh-CN')}\n\n${eventList}`)
+  }
+}
+
+// 加载日历事件
+const loadCalendarEvents = async () => {
+  try {
+    const response = await request.get('/calendar/list')
+    if (response.code === 200) {
+      calendarEvents.value = response.data || []
+    }
+  } catch (error) {
+    console.error('加载日历事件失败:', error)
+  }
+}
+
+// 加载节假日
+const loadHolidays = async () => {
+  try {
+    // 直接加载2025年的节假日
+    const response = await fetch('https://timor.tech/api/holiday/year/2025')
+    const data = await response.json()
+    
+    if (data.code === 0) {
+      
+      // 扩展节假日：不仅包括节日当天，还包括整个假期
+      const expandedHolidays: any[] = []
+      
+      Object.entries(data.holiday || {}).forEach(([date, info]: [string, any]) => {
+        // 修复日期格式：API返回的是 MM-DD，需要加上年份
+        const fullDate = `2025-${date}`
+        const baseDate = new Date(fullDate)
+        
+        // 限制连休天数（防止错误数据，最多10天）
+        let restDays = info.rest || 1
+        if (restDays > 10) {
+          console.warn(`⚠️ ${info.name} rest=${restDays}异常，限制为1天`)
+          restDays = 1
+        }
+        
+        // 添加节日/补班当天
+        expandedHolidays.push({
+          date: fullDate,
+          name: info.name,
+          type: info.holiday ? '法定假日' : '工作日',
+          isHoliday: info.holiday,
+          wage: info.wage
+        })
+        
+        // 如果是法定假日且有连休，添加后续假期天数
+        if (info.holiday && restDays > 1) {
+          for (let i = 1; i < restDays; i++) {
+            const nextDay = new Date(baseDate)
+            nextDay.setDate(baseDate.getDate() + i)
+            const nextDateStr = nextDay.toISOString().split('T')[0]
+            
+            expandedHolidays.push({
+              date: nextDateStr,
+              name: `${info.name}假期`,
+              type: '法定假日',
+              isHoliday: true,
+              wage: info.wage
+            })
+          }
+        }
+      })
+      
+      holidays.value = expandedHolidays.sort((a, b) => 
+        new Date(a.date).getTime() - new Date(b.date).getTime()
+      )
+      
+      const oct = holidays.value.filter(h => h.date && h.date.includes('2025-10') && h.isHoliday)
+      console.log(`✅ 2025年节假日加载成功: 共${holidays.value.length}个 | 10月法定假日${oct.length}天`)
+    } else {
+      console.warn('⚠️ 节假日API返回错误:', data)
+      holidays.value = []
+    }
+  } catch (error) {
+    console.error('❌ 加载节假日失败:', error)
+    holidays.value = []
+  }
+}
+
+// 提交事件
+const submitEvent = async () => {
+  try {
+    const isEdit = currentEvent.value !== null
+    const url = isEdit ? `/calendar/${currentEvent.value.id}` : '/calendar'
+    const method = isEdit ? 'put' : 'post'
+    
+    const response = await request[method](url, eventForm)
+    
+    if (response.code === 200) {
+      alert(isEdit ? '✅ 日期更新成功' : '✅ 日期添加成功')
+      closeEventModal()
+      await loadCalendarEvents()
+    } else {
+      alert((isEdit ? '更新' : '添加') + '失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error((currentEvent.value ? '更新' : '添加') + '事件失败:', error)
+    alert((currentEvent.value ? '更新' : '添加') + '失败，请稍后重试')
+  }
+}
+
+// 关闭事件弹窗
+const closeEventModal = () => {
+  showCreateEvent.value = false
+  currentEvent.value = null
+  eventForm.eventTitle = ''
+  eventForm.eventDate = ''
+  eventForm.eventType = 'custom'
+  eventForm.repeatType = 'once'
+  eventForm.description = ''
+  eventForm.color = '#3b82f6'
+  eventForm.showCountdown = false
+}
+
+// 打开创建事件模态框（设置默认日期为当前日期）
+const openCreateEventModal = () => {
+  const today = new Date()
+  eventForm.eventDate = formatDateToString(today)
+  showCreateEvent.value = true
+}
+
+// 编辑事件
+const editEvent = (event: any) => {
+  eventForm.eventTitle = event.eventTitle
+  eventForm.eventDate = event.eventDate.split('T')[0] // 转换为日期格式
+  eventForm.eventType = event.eventType || 'custom'
+  eventForm.repeatType = event.repeatType
+  eventForm.description = event.description || ''
+  eventForm.color = event.color || '#3b82f6'
+  eventForm.showCountdown = event.showCountdown || false
+  currentEvent.value = event
+  showCreateEvent.value = true
+}
+
+// 删除事件
+const deleteEvent = async (id: number) => {
+  if (!confirm('确定要删除这个日期吗？')) return
+  
+  try {
+    const response = await request.delete(`/calendar/${id}`)
+    if (response.code === 200) {
+      alert('✅ 日期已删除')
+      await loadCalendarEvents()
+    } else {
+      alert('删除失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('删除事件失败:', error)
+    alert('删除失败，请稍后重试')
+  }
+}
+
+// 快速删除事件（日历格子中）
+const deleteEventQuick = async (id: number) => {
+  if (!confirm('确定要删除这个事件吗？')) return
+  
+  try {
+    const response = await request.delete(`/calendar/${id}`)
+    if (response.code === 200) {
+      await loadCalendarEvents()
+    } else {
+      alert('删除失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('删除事件失败:', error)
+    alert('删除失败，请稍后重试')
+  }
+}
+
+// 格式化事件日期
+const formatEventDate = (date: any) => {
+  if (!date) return ''
+  const d = new Date(date)
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+}
+
+// 格式化节假日日期
+const formatHolidayDate = (date: string) => {
+  const d = new Date(date)
+  return d.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })
+}
+
+// 获取重复类型文本
+const getRepeatTypeText = (type: string) => {
+  const texts: Record<string, string> = {
+    once: '单次',
+    daily: '每天',
+    monthly: '每月',
+    yearly: '每年'
+  }
+  return texts[type] || type
+}
+
 // 项目展开状态
 const projectExpanded = ref<number[]>([])
 
@@ -443,6 +1377,15 @@ const projectExpanded = ref<number[]>([])
 onMounted(async () => {
   await loadData()
   projectExpanded.value = projects.value.map(project => project.id)
+  await loadDecisionIssues()
+  await loadCalendarEvents()
+  await loadHolidays()
+  
+  // 加载完成后验证
+  setTimeout(() => {
+    const oct = holidays.value.filter(h => h.date && h.date.includes('2025-10') && h.isHoliday)
+    console.log(`✅ 初始化完成 - 节假日:${holidays.value.length}个 | 10月法定假日:${oct.length}天`)
+  }, 200)
 })
 
 // 项目表单
@@ -810,11 +1753,203 @@ onUnmounted(() => {
     clearInterval(statusUpdateTimer)
   }
 })
+
+// ========== 问题处理相关 ==========
+
+// 折叠状态
+const isProjectSectionExpanded = ref(true)
+const isIssueSectionExpanded = ref(true)
+
+// 切换折叠状态
+const toggleProjectSection = () => {
+  isProjectSectionExpanded.value = !isProjectSectionExpanded.value
+}
+
+const toggleIssueSection = () => {
+  isIssueSectionExpanded.value = !isIssueSectionExpanded.value
+  if (isIssueSectionExpanded.value) {
+    loadDecisionIssues()
+  }
+}
+
+// 问题管理
+const decisionIssues = ref<any[]>([])
+const showDecisionModal = ref(false)
+const currentDecisionIssue = ref<any>(null)
+
+// 问题筛选
+const issueSearchQuery = ref('')
+const issueFilterProject = ref('')
+const issueFilterStatus = ref('')
+const issueFilterPriority = ref('')
+
+// 决策表单
+const decisionForm = reactive({
+  solution: ''
+})
+
+// 加载问题列表
+const loadDecisionIssues = async () => {
+  try {
+    const response = await request.get('/project/issue/list')
+    if (response.code === 200) {
+      decisionIssues.value = response.data || []
+    }
+  } catch (error) {
+    console.error('加载问题列表失败:', error)
+  }
+}
+
+// 待处理问题数量
+const pendingIssuesCount = computed(() => {
+  return decisionIssues.value.filter(issue => issue.status === 'open' || issue.status === 'in_progress').length
+})
+
+// 已解决问题数量
+const resolvedIssuesCount = computed(() => {
+  return decisionIssues.value.filter(issue => issue.status === 'resolved').length
+})
+
+// 过滤后的问题列表
+const filteredDecisionIssues = computed(() => {
+  return decisionIssues.value.filter(issue => {
+    const matchSearch = !issueSearchQuery.value || 
+      issue.issueTitle.toLowerCase().includes(issueSearchQuery.value.toLowerCase()) ||
+      (issue.issueDescription && issue.issueDescription.toLowerCase().includes(issueSearchQuery.value.toLowerCase()))
+    
+    const matchProject = !issueFilterProject.value || issue.projectId === parseInt(issueFilterProject.value)
+    const matchStatus = !issueFilterStatus.value || issue.status === issueFilterStatus.value
+    const matchPriority = !issueFilterPriority.value || issue.priority === issueFilterPriority.value
+    
+    return matchSearch && matchProject && matchStatus && matchPriority
+  })
+})
+
+// 开始制定决策
+const startDeciding = (issue: any) => {
+  currentDecisionIssue.value = issue
+  decisionForm.solution = ''
+  showDecisionModal.value = true
+}
+
+// 关闭决策弹窗
+const closeDecisionModal = () => {
+  showDecisionModal.value = false
+  currentDecisionIssue.value = null
+  decisionForm.solution = ''
+}
+
+// 提交决策
+const submitDecision = async () => {
+  if (!currentDecisionIssue.value) return
+  
+  try {
+    const response = await request.put(`/project/issue/${currentDecisionIssue.value.id}/resolve`, {
+      solution: decisionForm.solution
+    })
+    if (response.code === 200) {
+      alert('✅ 决策方案已确认，问题已解决')
+      closeDecisionModal()
+      await loadDecisionIssues()
+    } else {
+      alert('提交失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('提交决策失败:', error)
+    alert('提交失败，请稍后重试')
+  }
+}
+
+// 标记问题为处理中
+const markIssueInProgress = async (id: number) => {
+  try {
+    const response = await request.put(`/project/issue/${id}/status`, {
+      status: 'in_progress'
+    })
+    if (response.code === 200) {
+      await loadDecisionIssues()
+    }
+  } catch (error) {
+    console.error('更新状态失败:', error)
+  }
+}
+
+// 重新开启问题（取消解决）
+const reopenIssue = async (id: number) => {
+  if (!confirm('确定要取消解决此问题，重新处理吗？')) return
+  
+  try {
+    const response = await request.put(`/project/issue/${id}/reopen`)
+    if (response.code === 200) {
+      alert('✅ 问题已重新开启，可以重新处理了')
+      await loadDecisionIssues()
+    } else {
+      alert('操作失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('重新开启问题失败:', error)
+    alert('操作失败，请稍后重试')
+  }
+}
+
+// 获取问题优先级文本
+const getIssuePriorityText = (priority: string) => {
+  const texts: Record<string, string> = {
+    urgent: '紧急',
+    high: '高',
+    medium: '中',
+    low: '低'
+  }
+  return texts[priority] || priority
+}
+
+// 获取问题状态文本
+const getIssueStatusTextDecision = (status: string) => {
+  const texts: Record<string, string> = {
+    open: '待处理',
+    in_progress: '处理中',
+    resolved: '已解决'
+  }
+  return texts[status] || status
+}
+
+// 获取问题类型文本
+const getIssueTypeTextDecision = (type: string) => {
+  const texts: Record<string, string> = {
+    technical: '技术问题',
+    requirement: '需求问题',
+    design: '设计问题',
+    other: '其他问题'
+  }
+  return texts[type] || type
+}
+
+// 格式化问题日期
+const formatIssueDate = (date: any) => {
+  if (!date) return ''
+  const d = new Date(date)
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
 </script> 
 
 <style scoped>
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 折叠动画 */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.3s ease;
+  max-height: 1000px;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 
 @keyframes fadeIn {

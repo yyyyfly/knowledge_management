@@ -1,5 +1,49 @@
 <template>
   <section id="dashboard" class="p-6 animate-fade-in">
+    <!-- 倒计时提醒 -->
+    <div v-if="countdownEvents.length > 0" class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl shadow-soft p-6 mb-6 border border-purple-200">
+      <div class="flex items-center mb-4">
+        <i class="fas fa-hourglass-half text-purple-600 text-xl mr-3"></i>
+        <h3 class="text-xl font-semibold text-gray-900">重要日期倒计时</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div 
+          v-for="event in countdownEvents" 
+          :key="event.id"
+          class="bg-white rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow"
+          :class="getDaysUntilClass(event.daysUntil)"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <h4 class="font-semibold text-gray-900 mb-1">{{ event.eventTitle }}</h4>
+              <p class="text-sm text-gray-600 mb-2">{{ formatEventDate(event.eventDate) }}</p>
+              <div class="flex items-center">
+                <span class="text-2xl font-bold" :class="getDaysTextColor(event.daysUntil)">
+                  {{ Math.abs(event.daysUntil) }}
+                </span>
+                <span class="ml-2 text-sm text-gray-600">
+                  {{ event.daysUntil > 0 ? '天后' : event.daysUntil === 0 ? '今天' : '天前' }}
+                </span>
+              </div>
+            </div>
+            <div class="ml-4">
+              <span class="text-3xl">{{ getEventEmoji(event.daysUntil) }}</span>
+            </div>
+          </div>
+          <p v-if="event.description" class="text-xs text-gray-500 mt-2 line-clamp-2">{{ event.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 空状态（无倒计时） -->
+    <div v-else class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-soft p-6 mb-6 border border-gray-200">
+      <div class="text-center py-4">
+        <i class="fas fa-calendar-check text-gray-400 text-4xl mb-3"></i>
+        <p class="text-gray-500 text-sm">暂无重要日期倒计时</p>
+        <p class="text-gray-400 text-xs mt-1">在"系统决策"页面的日历中添加日期并启用倒计时功能</p>
+      </div>
+    </div>
+
     <!-- 荣誉战绩 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <div class="mb-6">
@@ -834,6 +878,9 @@ const allTasks = ref<any[]>([])
 const allProjects = ref<any[]>([])
 const loading = ref(true)
 
+// 倒计时事件
+const countdownEvents = ref<any[]>([])
+
 // 当前时间戳（用于自动更新相对时间）
 const currentTime = ref(Date.now())
 let timeUpdateTimer: number | null = null
@@ -1178,6 +1225,67 @@ const removeHonor = async (honorId: number) => {
   }
 }
 
+// 加载倒计时事件
+const loadCountdownEvents = async () => {
+  try {
+    const response = await request.get('/calendar/list')
+    if (response.code === 200) {
+      const allEvents = response.data || []
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      
+      // 过滤：只显示启用了倒计时的事件，且过期不超过1天
+      countdownEvents.value = allEvents
+        .filter((event: any) => event.showCountdown) // 只显示启用倒计时的
+        .map((event: any) => {
+          const eventDate = new Date(event.eventDate)
+          eventDate.setHours(0, 0, 0, 0)
+          const daysUntil = Math.floor((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+          return { ...event, daysUntil }
+        })
+        .filter((event: any) => event.daysUntil >= -1) // 过期超过1天的隐藏
+        .sort((a: any, b: any) => a.daysUntil - b.daysUntil) // 按距离排序
+    }
+  } catch (error) {
+    console.error('加载倒计时失败:', error)
+  }
+}
+
+// 格式化事件日期
+const formatEventDate = (dateStr: string) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+}
+
+// 获取天数显示的边框颜色类
+const getDaysUntilClass = (days: number) => {
+  if (days < 0) return 'border-gray-400' // 已过期
+  if (days === 0) return 'border-red-500' // 今天
+  if (days <= 7) return 'border-orange-500' // 一周内
+  if (days <= 30) return 'border-yellow-500' // 一月内
+  return 'border-blue-500' // 更远的未来
+}
+
+// 获取天数显示的文字颜色类
+const getDaysTextColor = (days: number) => {
+  if (days < 0) return 'text-gray-600' // 已过期
+  if (days === 0) return 'text-red-600' // 今天
+  if (days <= 7) return 'text-orange-600' // 一周内
+  if (days <= 30) return 'text-yellow-600' // 一月内
+  return 'text-blue-600' // 更远的未来
+}
+
+// 获取事件表情
+const getEventEmoji = (days: number) => {
+  if (days < 0) return '⏰' // 已过期
+  if (days === 0) return '🎯' // 今天
+  if (days <= 3) return '🔥' // 紧急
+  if (days <= 7) return '⚠️' // 一周内
+  if (days <= 30) return '📅' // 一月内
+  return '🗓️' // 更远的未来
+}
+
 // 动态获取各类笔记最近更新时间（改为异步）
 const getLatestUpdate = (type: 'framework' | 'study' | 'memorization' | 'exercise' | 'practical' | 'fragment') => {
   // 依赖currentTime.value以实现自动更新
@@ -1243,11 +1351,13 @@ onActivated(() => {
   console.log('【总览面板】页面被激活，刷新数据...')
   // 刷新所有数据，确保任务状态等信息是最新的
   loadData()
+  loadCountdownEvents()
 })
 
 onMounted(async () => {
   // 先加载数据
   await loadData()
+  await loadCountdownEvents()
   
   // 启动定时器，每分钟更新一次当前时间，让相对时间自动刷新
   timeUpdateTimer = window.setInterval(() => {

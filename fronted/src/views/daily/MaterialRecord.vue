@@ -972,8 +972,8 @@
                             <i class="fas fa-times"></i>
                           </button>
                         </span>
-                      </div>
                     </div>
+                  </div>
                   </div>
                   
                   <!-- 知识点 -->
@@ -991,34 +991,34 @@
                     </div>
                     <div class="space-y-2">
                       <div class="flex flex-wrap gap-2 mb-2">
-                        <button 
+                      <button 
                           v-for="point in availableMemorizationKnowledge" 
                           :key="point"
-                          type="button"
+                        type="button"
                           @click="selectMemorizationKnowledge(point)"
                           :class="recordForm.knowledgePoint.includes(point) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-orange-100'"
                           class="px-3 py-1 rounded-full text-sm border transition-colors"
                         >
                           {{ point }}
-                        </button>
-                      </div>
-                      <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
-                        <span class="text-sm text-gray-500">当前知识点: </span>
-                        <div class="flex flex-wrap gap-2 mt-1">
-                          <span 
-                            v-for="point in recordForm.knowledgePoint" 
-                            :key="point"
+                      </button>
+                    </div>
+                    <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
+                      <span class="text-sm text-gray-500">当前知识点: </span>
+                      <div class="flex flex-wrap gap-2 mt-1">
+                        <span 
+                          v-for="point in recordForm.knowledgePoint" 
+                          :key="point"
                             class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                          >
-                            <span>{{ point }}</span>
-                            <button 
-                              type="button"
-                              @click="removeKnowledgePoint(point)"
+                        >
+                          <span>{{ point }}</span>
+                          <button 
+                            type="button"
+                            @click="removeKnowledgePoint(point)"
                               class="text-orange-500 hover:text-orange-700"
-                            >
-                              <i class="fas fa-times"></i>
-                            </button>
-                          </span>
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </span>
                         </div>
                       </div>
                     </div>
@@ -1031,7 +1031,7 @@
                         <i class="fas fa-brain text-white text-xs"></i>
                       </div>
                       <h5 class="text-md font-semibold text-amber-800">背诵内容编辑</h5>
-                    </div>
+                </div>
 
                     <!-- 标题 -->
                     <div v-if="recordForm.type" class="mb-4">
@@ -1827,7 +1827,7 @@
                     </div>
                     <div class="space-y-2">
                       <select 
-                        v-model="recordForm.exerciseSource"
+                      v-model="recordForm.exerciseSource"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 form-input"
                       >
                         <option value="">请选择题目来源</option>
@@ -1906,10 +1906,10 @@
                     </div>
                     <div class="space-y-2">
                       <div class="flex flex-wrap gap-2 mb-2">
-                        <button 
+                      <button 
                           v-for="domain in availablePracticalDomains" 
                           :key="domain"
-                          type="button"
+                        type="button"
                           @click="selectPracticalDomain(domain)"
                           :class="recordForm.projectDomain === domain ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-cyan-100'"
                           class="px-3 py-1 rounded-full text-sm border transition-colors"
@@ -1957,25 +1957,25 @@
                           class="px-3 py-1 rounded-full text-sm border transition-colors"
                         >
                           {{ tech }}
-                        </button>
-                      </div>
-                      <div v-if="recordForm.techTags.length > 0" class="mt-2">
-                        <span class="text-sm text-gray-500">当前技术栈: </span>
-                        <div class="flex flex-wrap gap-2 mt-1">
-                          <span 
-                            v-for="tag in recordForm.techTags" 
-                            :key="tag"
+                      </button>
+                    </div>
+                    <div v-if="recordForm.techTags.length > 0" class="mt-2">
+                      <span class="text-sm text-gray-500">当前技术栈: </span>
+                      <div class="flex flex-wrap gap-2 mt-1">
+                        <span 
+                          v-for="tag in recordForm.techTags" 
+                          :key="tag"
                             class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                          >
-                            <span>{{ tag }}</span>
-                            <button 
-                              type="button"
-                              @click="removeTechTag(tag)"
+                        >
+                          <span>{{ tag }}</span>
+                          <button 
+                            type="button"
+                            @click="removeTechTag(tag)"
                               class="text-teal-500 hover:text-teal-700"
-                            >
-                              <i class="fas fa-times"></i>
-                            </button>
-                          </span>
+                          >
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </span>
                         </div>
                       </div>
                     </div>
@@ -3812,7 +3812,7 @@ const deleteRecord = async (id: number) => {
       const response = await request.delete(`/note/${id}`)
       
       if (response.code === 200) {
-        alert('记录已删除！')
+      alert('记录已删除！')
         // 重新加载数据
         await loadNotes()
       } else {
@@ -4324,37 +4324,37 @@ const submitRecord = async () => {
   }
 
   // 准备提交的数据
-  const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
-  
+      const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
+      
   const noteData: any = {
-    type: recordForm.type,
-    title: recordForm.title,
-    summary: recordForm.summary,
+        type: recordForm.type,
+        title: recordForm.title,
+        summary: recordForm.summary,
     content: finalContent
-  }
-  
+      }
+      
   // 添加类型特定字段
-  if (recordForm.type === 'framework') {
+      if (recordForm.type === 'framework') {
     noteData.subjectType = recordForm.subjectType.join(',')
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
-  } else if (recordForm.type === 'study') {
+      } else if (recordForm.type === 'study') {
     noteData.studySubject = recordForm.studySubject.join(',')
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
-  } else if (recordForm.type === 'memorization') {
+             } else if (recordForm.type === 'memorization') {
     noteData.project = recordForm.project
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
     noteData.originalText = recordForm.originalText
     noteData.explanation = recordForm.explanation
     noteData.cue = recordForm.cue
-  } else if (recordForm.type === 'exercise') {
+      } else if (recordForm.type === 'exercise') {
     noteData.exerciseSource = recordForm.exerciseSource
     noteData.exerciseSubject = recordForm.exerciseSubject
     noteData.exerciseKnowledge = recordForm.exerciseKnowledge.join(',')
     noteData.exerciseDifficulty = recordForm.exerciseDifficulty
-  } else if (recordForm.type === 'practical') {
+      } else if (recordForm.type === 'practical') {
     noteData.techTags = recordForm.techTags.join(',')
     noteData.projectType = recordForm.projectType.join(',')
-  } else if (recordForm.type === 'fragment') {
+      } else if (recordForm.type === 'fragment') {
     noteData.fragmentCategory = recordForm.fragmentCategory.join(',')
     noteData.fragmentTheme = recordForm.fragmentTheme.join(',')
     noteData.importance = recordForm.importance
@@ -4367,14 +4367,14 @@ const submitRecord = async () => {
       const response = await request.put('/note', noteData)
       
       if (response.code === 200) {
-        alert('记录修改成功！')
+      alert('记录修改成功！')
         // 重新加载数据
         await loadNotes()
       } else {
         alert('修改失败：' + (response.message || '未知错误'))
-      }
-    } else {
-      // 创建新记录
+    }
+  } else {
+    // 创建新记录
       const response = await request.post('/note', noteData)
       
       if (response.code === 200) {
@@ -4384,9 +4384,9 @@ const submitRecord = async () => {
       } else {
         alert('保存失败：' + (response.message || '未知错误'))
       }
-    }
-    
-    closeModal()
+  }
+
+  closeModal()
   } catch (error) {
     console.error('保存笔记失败:', error)
     alert('保存失败，请检查网络连接')

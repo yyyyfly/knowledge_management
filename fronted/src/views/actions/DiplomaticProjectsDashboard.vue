@@ -43,8 +43,8 @@
                 >
                   <i v-if="task.isOverdue" class="fas fa-fire"></i>
                   <span>{{ task.isOverdue ? `已逾期${Math.abs(task.daysLeft)}天` : task.daysLeft === 0 ? '今天到期' : task.daysLeft === 1 ? '明天到期' : `还剩${task.daysLeft}天` }}</span>
-                </span>
-              </div>
+              </span>
+            </div>
               <p class="text-sm text-gray-600 mb-2">{{ task.description }}</p>
               <div class="text-xs text-gray-500">
                 <i class="far fa-calendar mr-1"></i>截止时间：{{ task.deadline }}

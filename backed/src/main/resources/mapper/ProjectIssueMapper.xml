@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectIssueMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectIssue">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="issue_title" property="issueTitle"/>
+        <result column="issue_description" property="issueDescription"/>
+        <result column="issue_type" property="issueType"/>
+        <result column="priority" property="priority"/>
+        <result column="status" property="status"/>
+        <result column="solution" property="solution"/>
+        <result column="resolve_time" property="resolveTime"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <!-- 插入问题 -->
+    <insert id="insert" parameterType="com.knowledge.entity.ProjectIssue" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_project_issue (
+            project_id,
+            issue_title,
+            issue_description,
+            issue_type,
+            priority,
+            status,
+            rec_creator,
+            rec_create_time,
+            rec_revisor,
+            rec_revise_time,
+            arch_flag
+        ) VALUES (
+            #{projectId},
+            #{issueTitle},
+            #{issueDescription},
+            #{issueType},
+            #{priority},
+            #{status},
+            #{recCreator},
+            NOW(),
+            #{recRevisor},
+            NOW(),
+            1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_project_issue
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有问题（按用户过滤） -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_project_issue
+        WHERE rec_creator = #{username} AND arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据项目ID查询 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT * FROM km_project_issue
+        WHERE project_id = #{projectId} 
+        AND rec_creator = #{username} 
+        AND arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据状态查询 -->
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT * FROM km_project_issue
+        WHERE status = #{status} 
+        AND rec_creator = #{username} 
+        AND arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 更新问题 -->
+    <update id="update" parameterType="com.knowledge.entity.ProjectIssue">
+        UPDATE km_project_issue
+        SET project_id = #{projectId},
+            issue_title = #{issueTitle},
+            issue_description = #{issueDescription},
+            issue_type = #{issueType},
+            priority = #{priority},
+            status = #{status},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新问题状态 -->
+    <update id="updateStatus">
+        UPDATE km_project_issue
+        SET status = #{status},
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 处理问题 -->
+    <update id="resolveIssue">
+        UPDATE km_project_issue
+        SET solution = #{solution},
+            status = 'resolved',
+            resolve_time = NOW(),
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="delete">
+        UPDATE km_project_issue
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 重新开启问题（清空解决方案，状态改为待处理） -->
+    <update id="reopenIssue">
+        UPDATE km_project_issue
+        SET status = 'open',
+            solution = NULL,
+            resolve_time = NULL,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

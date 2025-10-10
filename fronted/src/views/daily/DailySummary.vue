@@ -31,7 +31,7 @@
               <i class="fas fa-info-circle text-blue-600 mr-2 mt-0.5"></i>
               <span>选择合适的日报模板，填写今日工作与成长内容。</span>
             </p>
-          </div>
+      </div>
 
           <!-- 日报模板选择 -->
           <div class="grid grid-cols-2 gap-3">
@@ -53,14 +53,14 @@
                   <i class="fas text-lg" :class="selectedDailyTemplate === 'general' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 </div>
               </div>
-            </button>
+          </button>
             
             <!-- 预留：未来可添加更多模板 -->
             <div class="p-4 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
               <i class="fas fa-plus-circle mr-2"></i>
               <span class="text-sm">预留更多模板...</span>
             </div>
-          </div>
+        </div>
 
           <!-- 通用日报表单内容 -->
           <transition name="slide-fade">
@@ -134,8 +134,8 @@
             </button>
           </div>
         </form>
-          </div>
-          </transition>
+      </div>
+    </transition>
         </div>
       </div>
 
@@ -828,7 +828,7 @@ const submitDaily = async () => {
     
     if (response.code === 200) {
       alert('日报已保存')
-      resetDailyForm()
+  resetDailyForm()
     } else {
       alert('保存失败：' + (response.message || '未知错误'))
     }

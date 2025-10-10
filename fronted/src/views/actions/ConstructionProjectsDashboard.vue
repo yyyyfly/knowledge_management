@@ -107,8 +107,8 @@
         <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">暂无工程建设项目</p>
         <p class="text-gray-400 text-sm mt-2">开始创建你的第一个实践项目吧！</p>
-      </div>
-      
+        </div>
+
       <!-- 项目列表 -->
       <div v-for="project in constructionProjects" :key="project.id" class="bg-white rounded-xl shadow-soft p-6">
         <div class="flex items-center justify-between mb-4">
@@ -134,10 +134,10 @@
                  'bg-red-50': task.status === 'stopped'
                }" 
                class="rounded-lg p-4">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
                 <span class="text-sm font-medium text-gray-900">{{ task.name }}</span>
-              </div>
+                </div>
               <span :class="{
                 'bg-green-100 text-green-600': task.status === 'completed',
                 'bg-blue-100 text-blue-600': task.status === 'in-progress',
@@ -146,7 +146,7 @@
               }" class="px-2 py-1 rounded-full text-xs">
                 {{ task.status === 'completed' ? '已完成' : task.status === 'in-progress' ? '进行中' : task.status === 'stopped' ? '已停止' : '未开始' }}
               </span>
-            </div>
+              </div>
             <p class="text-sm text-gray-600">{{ task.description || '暂无描述' }}</p>
           </div>
         </div>
@@ -276,4 +276,4 @@ const getStatusText = (status: string) => {
   }
   return texts[status as keyof typeof texts] || '未知'
 }
-</script>
+</script> 
