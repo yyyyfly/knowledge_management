@@ -144,7 +144,7 @@
         <div class="flex items-center space-x-3 mb-8">
           <div class="flex items-center space-x-3">
             <div class="w-2 h-12 bg-purple-500 rounded-full"></div>
-            <h1 class="text-3xl font-bold text-gray-900">历史事件记录</h1>
+            <h1 class="text-3xl font-bold text-gray-900">历史记录</h1>
           </div>
         </div>
         

@@ -45,6 +45,26 @@ public class NoteExercise extends BaseEntity {
      * 正确率
      */
     private BigDecimal accuracy;
+    
+    /**
+     * 难度等级:easy-简单,medium-中等,hard-困难
+     */
+    private String exerciseDifficulty;
+    
+    /**
+     * 题目描述（富文本）
+     */
+    private String questionDescription;
+    
+    /**
+     * 分析理解（富文本）
+     */
+    private String analysis;
+    
+    /**
+     * 参考答案（富文本）
+     */
+    private String referenceAnswer;
 }
 
 

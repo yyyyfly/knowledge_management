@@ -14,6 +14,12 @@
         <result column="knowledge_point" property="knowledgePoint"/>
         <!-- 求学笔记字段 -->
         <result column="study_subject" property="studySubject"/>
+        <result column="core_concept" property="coreConcept"/>
+        <result column="mechanism" property="mechanism"/>
+        <result column="application_case" property="applicationCase"/>
+        <result column="extension" property="extension"/>
+        <result column="common_mistake" property="commonMistake"/>
+        <result column="reflection" property="reflection"/>
         <!-- 背诵笔记字段 -->
         <result column="project" property="project"/>
         <result column="original_text" property="originalText"/>
@@ -24,9 +30,15 @@
         <result column="exercise_subject" property="exerciseSubject"/>
         <result column="exercise_knowledge" property="exerciseKnowledge"/>
         <result column="exercise_difficulty" property="exerciseDifficulty"/>
+        <result column="question_description" property="questionDescription"/>
+        <result column="analysis" property="analysis"/>
+        <result column="reference_answer" property="referenceAnswer"/>
         <!-- 实战笔记字段 -->
         <result column="tech_tags" property="techTags"/>
         <result column="project_type" property="projectType"/>
+        <result column="requirement_description" property="requirementDescription"/>
+        <result column="design_thinking" property="designThinking"/>
+        <result column="reference_design" property="referenceDesign"/>
         <!-- 碎片笔记字段 -->
         <result column="fragment_category" property="fragmentCategory"/>
         <result column="fragment_theme" property="fragmentTheme"/>
@@ -41,10 +53,12 @@
     
     <sql id="Base_Column_List">
         id, type, title, summary, content, tags,
-        subject_type, knowledge_point, study_subject,
+        subject_type, knowledge_point, 
+        study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
         project, original_text, explanation, cue,
         exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
-        tech_tags, project_type,
+        question_description, analysis, reference_answer,
+        tech_tags, project_type, requirement_description, design_thinking, reference_design,
         fragment_category, fragment_theme, importance,
         rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
     </sql>
@@ -80,18 +94,22 @@
     <insert id="insert" parameterType="com.knowledge.entity.Note" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO km_note (
             type, title, summary, content, tags,
-            subject_type, knowledge_point, study_subject,
+            subject_type, knowledge_point, 
+            study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
             project, original_text, explanation, cue,
             exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
-            tech_tags, project_type,
+            question_description, analysis, reference_answer,
+            tech_tags, project_type, requirement_description, design_thinking, reference_design,
             fragment_category, fragment_theme, importance,
             rec_creator, rec_create_time, arch_flag
         ) VALUES (
             #{type}, #{title}, #{summary}, #{content}, #{tags},
-            #{subjectType}, #{knowledgePoint}, #{studySubject},
+            #{subjectType}, #{knowledgePoint}, 
+            #{studySubject}, #{coreConcept}, #{mechanism}, #{applicationCase}, #{extension}, #{commonMistake}, #{reflection},
             #{project}, #{originalText}, #{explanation}, #{cue},
             #{exerciseSource}, #{exerciseSubject}, #{exerciseKnowledge}, #{exerciseDifficulty},
-            #{techTags}, #{projectType},
+            #{questionDescription}, #{analysis}, #{referenceAnswer},
+            #{techTags}, #{projectType}, #{requirementDescription}, #{designThinking}, #{referenceDesign},
             #{fragmentCategory}, #{fragmentTheme}, #{importance},
             #{recCreator}, NOW(), 0
         )
@@ -110,6 +128,12 @@
             <if test="knowledgePoint != null">knowledge_point = #{knowledgePoint},</if>
             <!-- 求学笔记字段 -->
             <if test="studySubject != null">study_subject = #{studySubject},</if>
+            <if test="coreConcept != null">core_concept = #{coreConcept},</if>
+            <if test="mechanism != null">mechanism = #{mechanism},</if>
+            <if test="applicationCase != null">application_case = #{applicationCase},</if>
+            <if test="extension != null">extension = #{extension},</if>
+            <if test="commonMistake != null">common_mistake = #{commonMistake},</if>
+            <if test="reflection != null">reflection = #{reflection},</if>
             <!-- 背诵笔记字段 -->
             <if test="project != null">project = #{project},</if>
             <if test="originalText != null">original_text = #{originalText},</if>
@@ -120,9 +144,15 @@
             <if test="exerciseSubject != null">exercise_subject = #{exerciseSubject},</if>
             <if test="exerciseKnowledge != null">exercise_knowledge = #{exerciseKnowledge},</if>
             <if test="exerciseDifficulty != null">exercise_difficulty = #{exerciseDifficulty},</if>
+            <if test="questionDescription != null">question_description = #{questionDescription},</if>
+            <if test="analysis != null">analysis = #{analysis},</if>
+            <if test="referenceAnswer != null">reference_answer = #{referenceAnswer},</if>
             <!-- 实战笔记字段 -->
             <if test="techTags != null">tech_tags = #{techTags},</if>
             <if test="projectType != null">project_type = #{projectType},</if>
+            <if test="requirementDescription != null">requirement_description = #{requirementDescription},</if>
+            <if test="designThinking != null">design_thinking = #{designThinking},</if>
+            <if test="referenceDesign != null">reference_design = #{referenceDesign},</if>
             <!-- 碎片笔记字段 -->
             <if test="fragmentCategory != null">fragment_category = #{fragmentCategory},</if>
             <if test="fragmentTheme != null">fragment_theme = #{fragmentTheme},</if>

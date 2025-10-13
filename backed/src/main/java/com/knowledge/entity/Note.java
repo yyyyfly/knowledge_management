@@ -56,6 +56,36 @@ public class Note extends BaseEntity {
      */
     private String studySubject;
     
+    /**
+     * 核心概念（富文本）
+     */
+    private String coreConcept;
+    
+    /**
+     * 机制原理（富文本）
+     */
+    private String mechanism;
+    
+    /**
+     * 应用案例（富文本）
+     */
+    private String applicationCase;
+    
+    /**
+     * 延伸/对比（富文本）
+     */
+    private String extension;
+    
+    /**
+     * 常见误区（富文本）
+     */
+    private String commonMistake;
+    
+    /**
+     * 思考理解（富文本）
+     */
+    private String reflection;
+    
     // ===== 背诵笔记字段 =====
     /**
      * 学科项目
@@ -98,6 +128,21 @@ public class Note extends BaseEntity {
      */
     private String exerciseDifficulty;
     
+    /**
+     * 题目描述（富文本）
+     */
+    private String questionDescription;
+    
+    /**
+     * 分析理解（富文本）
+     */
+    private String analysis;
+    
+    /**
+     * 参考答案（富文本）
+     */
+    private String referenceAnswer;
+    
     // ===== 实战笔记字段 =====
     /**
      * 技术栈标签（逗号分隔）
@@ -108,6 +153,21 @@ public class Note extends BaseEntity {
      * 项目类型（逗号分隔）
      */
     private String projectType;
+    
+    /**
+     * 需求描述（富文本）
+     */
+    private String requirementDescription;
+    
+    /**
+     * 设计思路（富文本）
+     */
+    private String designThinking;
+    
+    /**
+     * 参考设计（富文本）
+     */
+    private String referenceDesign;
     
     // ===== 碎片笔记字段 =====
     /**

@@ -1163,66 +1163,278 @@
                       ></textarea>
                     </div>
                     
-                    <!-- 内容编辑器 -->
-                    <div>
+                    <!-- 核心概念 -->
+                    <div class="mb-4">
                       <label class="block text-sm font-medium text-emerald-800 mb-2">
-                        <i class="fas fa-file-alt text-emerald-600 mr-1"></i>
-                        内容
+                        <i class="fas fa-lightbulb text-emerald-600 mr-1"></i>
+                        核心概念
                       </label>
                       <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <!-- 工具栏 -->
                         <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
                           <!-- 基础格式 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 标题 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 列表 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 对齐 -->
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 高亮和代码 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 表格和媒体 -->
-                          <button type="button" @click="insertTable" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertImage" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadImage" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <button type="button" @click="insertStudyTable(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 链接 -->
-                          <button type="button" @click="setLink" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="editor?.chain().focus().unsetLink().run()" :disabled="!editor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <button type="button" @click="setStudyLink(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="coreConceptEditor?.chain().focus().unsetLink().run()" :disabled="!coreConceptEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 撤销重做 -->
-                          <button type="button" @click="editor?.chain().focus().undo().run()" :disabled="!editor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="editor?.chain().focus().redo().run()" :disabled="!editor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <button type="button" @click="undoStudy(coreConceptEditor)" :disabled="!coreConceptEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(coreConceptEditor)" :disabled="!coreConceptEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(editor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                          <button type="button" @click="importMarkdown(coreConceptEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
                         </div>
-                        <div class="p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-                          <EditorContent :editor="editor" />
+                        <EditorContent :editor="coreConceptEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 机制原理 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-emerald-800 mb-2">
+                        <i class="fas fa-cogs text-emerald-600 mr-1"></i>
+                        机制原理
+                      </label>
+                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertStudyTable(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setStudyLink(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="mechanismEditor?.chain().focus().unsetLink().run()" :disabled="!mechanismEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoStudy(mechanismEditor)" :disabled="!mechanismEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(mechanismEditor)" :disabled="!mechanismEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(mechanismEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
                         </div>
+                        <EditorContent :editor="mechanismEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 应用案例 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-emerald-800 mb-2">
+                        <i class="fas fa-tasks text-emerald-600 mr-1"></i>
+                        应用案例
+                      </label>
+                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertStudyTable(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setStudyLink(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="applicationCaseEditor?.chain().focus().unsetLink().run()" :disabled="!applicationCaseEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoStudy(applicationCaseEditor)" :disabled="!applicationCaseEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(applicationCaseEditor)" :disabled="!applicationCaseEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(applicationCaseEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="applicationCaseEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 延伸/对比 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-emerald-800 mb-2">
+                        <i class="fas fa-project-diagram text-emerald-600 mr-1"></i>
+                        延伸/对比
+                      </label>
+                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertStudyTable(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setStudyLink(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="extensionEditor?.chain().focus().unsetLink().run()" :disabled="!extensionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoStudy(extensionEditor)" :disabled="!extensionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(extensionEditor)" :disabled="!extensionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(extensionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="extensionEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 常见误区 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-emerald-800 mb-2">
+                        <i class="fas fa-exclamation-triangle text-emerald-600 mr-1"></i>
+                        常见误区
+                      </label>
+                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertStudyTable(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setStudyLink(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="commonMistakeEditor?.chain().focus().unsetLink().run()" :disabled="!commonMistakeEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoStudy(commonMistakeEditor)" :disabled="!commonMistakeEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(commonMistakeEditor)" :disabled="!commonMistakeEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(commonMistakeEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="commonMistakeEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 思考理解 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-emerald-800 mb-2">
+                        <i class="fas fa-brain text-emerald-600 mr-1"></i>
+                        思考理解
+                      </label>
+                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertStudyTable(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertStudyImage(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadStudyImage(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setStudyLink(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="reflectionEditor?.chain().focus().unsetLink().run()" :disabled="!reflectionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoStudy(reflectionEditor)" :disabled="!reflectionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoStudy(reflectionEditor)" :disabled="!reflectionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(reflectionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="reflectionEditor" />
                       </div>
                     </div>
                   </div>
@@ -1641,13 +1853,13 @@
                         <i class="fas fa-heading text-rose-600 mr-1"></i>
                         标题
                       </label>
-                        <input 
+                      <input 
                         v-model="recordForm.title" 
-                          type="text" 
+                        type="text" 
                         placeholder="请输入标题"
                         class="w-full px-4 py-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white shadow-sm form-input"
                       >
-                      </div>
+                    </div>
 
                     <!-- 摘要 -->
                     <div class="mb-4">
@@ -1662,71 +1874,188 @@
                         class="w-full px-4 py-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white shadow-sm form-input"
                       ></textarea>
                     </div>
-                    
-                    <!-- 内容编辑器 -->
-                    <div>
+
+                    <!-- 题目描述 -->
+                    <div class="mb-4">
                       <label class="block text-sm font-medium text-rose-800 mb-2">
-                        <i class="fas fa-file-alt text-rose-600 mr-1"></i>
-                        内容
+                        <i class="fas fa-file-lines text-rose-600 mr-1"></i>
+                        题目描述
                       </label>
                       <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
-                        <!-- 工具栏 -->
                         <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
                           <!-- 基础格式 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 标题 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 列表 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 对齐 -->
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 高亮和代码 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 表格和媒体 -->
-                          <button type="button" @click="insertTable" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertImage" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadImage" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <button type="button" @click="insertExerciseTable(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertExerciseImage(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadExerciseImage(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 链接 -->
-                          <button type="button" @click="setLink" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="editor?.chain().focus().unsetLink().run()" :disabled="!editor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <button type="button" @click="setExerciseLink(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="questionDescriptionEditor?.chain().focus().unsetLink().run()" :disabled="!questionDescriptionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- 撤销重做 -->
-                          <button type="button" @click="editor?.chain().focus().undo().run()" :disabled="!editor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="editor?.chain().focus().redo().run()" :disabled="!editor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <button type="button" @click="undoExercise(questionDescriptionEditor)" :disabled="!questionDescriptionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoExercise(questionDescriptionEditor)" :disabled="!questionDescriptionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
                           
                           <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(editor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                          <button type="button" @click="importMarkdown(questionDescriptionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
                         </div>
-                        <div class="p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-                          <EditorContent :editor="editor" />
-                        </div>
+                        <EditorContent :editor="questionDescriptionEditor" />
                       </div>
                     </div>
+
+                    <!-- 分析理解 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-rose-800 mb-2">
+                        <i class="fas fa-lightbulb text-rose-600 mr-1"></i>
+                        分析理解
+                      </label>
+                      <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <!-- 基础格式 -->
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 标题 -->
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 列表 -->
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 对齐 -->
+                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 高亮和代码 -->
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 表格和媒体 -->
+                          <button type="button" @click="insertExerciseTable(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertExerciseImage(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadExerciseImage(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 链接 -->
+                          <button type="button" @click="setExerciseLink(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="analysisEditor?.chain().focus().unsetLink().run()" :disabled="!analysisEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 撤销重做 -->
+                          <button type="button" @click="undoExercise(analysisEditor)" :disabled="!analysisEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoExercise(analysisEditor)" :disabled="!analysisEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- Markdown -->
+                          <button type="button" @click="importMarkdown(analysisEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="analysisEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 参考答案 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-rose-800 mb-2">
+                        <i class="fas fa-check-circle text-rose-600 mr-1"></i>
+                        参考答案
+                      </label>
+                      <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <!-- 基础格式 -->
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 标题 -->
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 列表 -->
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 对齐 -->
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 高亮和代码 -->
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 表格和媒体 -->
+                          <button type="button" @click="insertExerciseTable(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertExerciseImage(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadExerciseImage(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 链接 -->
+                          <button type="button" @click="setExerciseLink(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="referenceAnswerEditor?.chain().focus().unsetLink().run()" :disabled="!referenceAnswerEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- 撤销重做 -->
+                          <button type="button" @click="undoExercise(referenceAnswerEditor)" :disabled="!referenceAnswerEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoExercise(referenceAnswerEditor)" :disabled="!referenceAnswerEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          
+                          <!-- Markdown -->
+                          <button type="button" @click="importMarkdown(referenceAnswerEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="referenceAnswerEditor" />
+                      </div>
                     </div>
                   </div>
+                </div>
 
                 <!-- 实战笔记 -->
                 <div v-if="recordForm.type === 'practical'" class="space-y-3 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl p-6 border border-cyan-200 shadow-sm">
@@ -1892,66 +2221,132 @@
                       ></textarea>
                     </div>
 
-                    <!-- 内容编辑器 -->
-                    <div>
+                    <!-- 需求描述 -->
+                    <div class="mb-4">
                       <label class="block text-sm font-medium text-cyan-800 mb-2">
-                        <i class="fas fa-file-alt text-cyan-600 mr-1"></i>
-                        内容
+                        <i class="fas fa-clipboard-list text-cyan-600 mr-1"></i>
+                        需求描述
                       </label>
                       <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
-                        <!-- 工具栏 -->
                         <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertTable" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertImage" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadImage" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <button type="button" @click="insertPracticalTable(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertPracticalImage(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadPracticalImage(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setLink" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="editor?.chain().focus().unsetLink().run()" :disabled="!editor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <button type="button" @click="setPracticalLink(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().unsetLink().run()" :disabled="!requirementDescriptionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="editor?.chain().focus().undo().run()" :disabled="!editor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="editor?.chain().focus().redo().run()" :disabled="!editor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <button type="button" @click="undoPractical(requirementDescriptionEditor)" :disabled="!requirementDescriptionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoPractical(requirementDescriptionEditor)" :disabled="!requirementDescriptionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
                           <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(editor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                          <button type="button" @click="importMarkdown(requirementDescriptionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
                         </div>
-                        <div class="p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-                          <EditorContent :editor="editor" />
+                        <EditorContent :editor="requirementDescriptionEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 设计思路 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-cyan-800 mb-2">
+                        <i class="fas fa-lightbulb text-cyan-600 mr-1"></i>
+                        设计思路
+                      </label>
+                      <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertPracticalTable(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertPracticalImage(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadPracticalImage(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setPracticalLink(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="designThinkingEditor?.chain().focus().unsetLink().run()" :disabled="!designThinkingEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoPractical(designThinkingEditor)" :disabled="!designThinkingEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoPractical(designThinkingEditor)" :disabled="!designThinkingEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(designThinkingEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
                         </div>
+                        <EditorContent :editor="designThinkingEditor" />
+                      </div>
+                    </div>
+
+                    <!-- 参考设计 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-cyan-800 mb-2">
+                        <i class="fas fa-book-open text-cyan-600 mr-1"></i>
+                        参考设计
+                      </label>
+                      <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="insertPracticalTable(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
+                          <button type="button" @click="insertPracticalImage(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
+                          <button type="button" @click="uploadPracticalImage(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="setPracticalLink(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
+                          <button type="button" @click="referenceDesignEditor?.chain().focus().unsetLink().run()" :disabled="!referenceDesignEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="undoPractical(referenceDesignEditor)" :disabled="!referenceDesignEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
+                          <button type="button" @click="redoPractical(referenceDesignEditor)" :disabled="!referenceDesignEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
+                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                          <button type="button" @click="importMarkdown(referenceDesignEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
+                        </div>
+                        <EditorContent :editor="referenceDesignEditor" />
                       </div>
                     </div>
                   </div>
@@ -2675,6 +3070,12 @@ const recordForm = reactive({
   course: [] as string[],
   studySubject: [] as string[],
   bookSubject: [] as string[],
+  coreConcept: '',          // 核心概念（富文本）
+  mechanism: '',            // 机制原理（富文本）
+  applicationCase: '',      // 应用案例（富文本）
+  extension: '',            // 延伸/对比（富文本）
+  commonMistake: '',        // 常见误区（富文本）
+  reflection: '',           // 思考理解（富文本）
 
   // 背诵笔记字段
   project: '',
@@ -2686,10 +3087,16 @@ const recordForm = reactive({
   exerciseSubject: '',                 // 学科类型 - 单标签
   exerciseKnowledge: [] as string[],   // 知识点类型 - 多标签
   exerciseDifficulty: '',
+  questionDescription: '',             // 题目描述（富文本）
+  analysis: '',                        // 分析理解（富文本）
+  referenceAnswer: '',                 // 参考答案（富文本）
   // 实战笔记字段
   projectDomain: '',                   // 项目领域
   techTags: [] as string[],
   projectType: [] as string[],
+  requirementDescription: '',          // 需求描述（富文本）
+  designThinking: '',                  // 设计思路（富文本）
+  referenceDesign: '',                 // 参考设计（富文本）
   // 碎片笔记字段
   fragmentCategory: [] as string[],
   fragmentTheme: [] as string[],
@@ -3705,6 +4112,202 @@ const cueEditor = useEditor({
   },
 })
 
+// 刷题笔记编辑器
+const exerciseEditorExtensions = [
+  StarterKit.configure({
+    heading: { levels: [1, 2, 3] },
+    bulletList: { keepMarks: true, keepAttributes: false },
+    orderedList: { keepMarks: true, keepAttributes: false },
+  }),
+  Table.configure({
+    resizable: true,
+    HTMLAttributes: { class: 'border-collapse border border-gray-300 w-full' },
+  }),
+  TableRow,
+  TableCell,
+  TableHeader,
+  Image,
+  Underline,
+  Strike,
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  CodeBlock,
+  Highlight.configure({ multicolor: false }),
+  Link.configure({
+    openOnClick: false,
+    HTMLAttributes: { class: 'text-blue-600 underline cursor-pointer' },
+  }),
+]
+
+const questionDescriptionEditor = useEditor({
+  content: '',
+  extensions: [
+    ...exerciseEditorExtensions,
+    Placeholder.configure({ placeholder: '输入题目描述...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.questionDescription = editor.getHTML()
+  },
+})
+
+const analysisEditor = useEditor({
+  content: '',
+  extensions: [
+    ...exerciseEditorExtensions,
+    Placeholder.configure({ placeholder: '输入对题目的分析理解...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.analysis = editor.getHTML()
+  },
+})
+
+const referenceAnswerEditor = useEditor({
+  content: '',
+  extensions: [
+    ...exerciseEditorExtensions,
+    Placeholder.configure({ placeholder: '输入参考答案...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.referenceAnswer = editor.getHTML()
+  },
+})
+
+// 求学笔记编辑器
+const studyEditorExtensions = [
+  StarterKit.configure({
+    heading: { levels: [1, 2, 3] },
+    bulletList: { keepMarks: true, keepAttributes: false },
+    orderedList: { keepMarks: true, keepAttributes: false },
+  }),
+  Table.configure({
+    resizable: true,
+    HTMLAttributes: { class: 'border-collapse border border-gray-300 w-full' },
+  }),
+  TableRow,
+  TableCell,
+  TableHeader,
+  Image,
+  Underline,
+  Strike,
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  CodeBlock,
+  Highlight.configure({ multicolor: false }),
+  Link.configure({
+    openOnClick: false,
+    HTMLAttributes: { class: 'text-blue-600 underline cursor-pointer' },
+  }),
+]
+
+const coreConceptEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入核心概念...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.coreConcept = editor.getHTML()
+  },
+})
+
+const mechanismEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入机制原理...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.mechanism = editor.getHTML()
+  },
+})
+
+const applicationCaseEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入应用案例...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.applicationCase = editor.getHTML()
+  },
+})
+
+const extensionEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入延伸/对比内容...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.extension = editor.getHTML()
+  },
+})
+
+const commonMistakeEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入常见误区...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.commonMistake = editor.getHTML()
+  },
+})
+
+const reflectionEditor = useEditor({
+  content: '',
+  extensions: [
+    ...studyEditorExtensions,
+    Placeholder.configure({ placeholder: '输入思考理解...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.reflection = editor.getHTML()
+  },
+})
+
 // 插入图片
 const insertImage = () => {
   const url = prompt('请输入图片URL:')
@@ -3965,7 +4568,229 @@ const redoMemorization = (editorInstance: any) => {
   editorInstance?.chain().focus().redo().run()
 }
 
+// ===== 刷题笔记编辑器辅助函数 =====
+// 链接功能
+const setExerciseLink = (editorInstance: any) => {
+  const url = prompt('请输入链接URL:')
+  if (url) {
+    editorInstance?.chain().focus().setLink({ href: url }).run()
+  }
+}
 
+// 插入表格功能
+const insertExerciseTable = (editorInstance: any) => {
+  editorInstance?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+}
+
+// 插入图片功能
+const insertExerciseImage = (editorInstance: any) => {
+  const url = prompt('请输入图片URL:')
+  if (url) {
+    editorInstance?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+// 上传图片功能
+const uploadExerciseImage = (editorInstance: any) => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const url = e.target?.result as string
+        editorInstance?.chain().focus().setImage({ src: url }).run()
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+  input.click()
+}
+
+// 撤销重做功能
+const undoExercise = (editorInstance: any) => {
+  editorInstance?.chain().focus().undo().run()
+}
+
+const redoExercise = (editorInstance: any) => {
+  editorInstance?.chain().focus().redo().run()
+}
+
+// ===== 求学笔记编辑器辅助函数 =====
+// 链接功能
+const setStudyLink = (editorInstance: any) => {
+  const url = prompt('请输入链接URL:')
+  if (url) {
+    editorInstance?.chain().focus().setLink({ href: url }).run()
+  }
+}
+
+// 插入表格功能
+const insertStudyTable = (editorInstance: any) => {
+  editorInstance?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+}
+
+// 插入图片功能
+const insertStudyImage = (editorInstance: any) => {
+  const url = prompt('请输入图片URL:')
+  if (url) {
+    editorInstance?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+// 上传图片功能
+const uploadStudyImage = (editorInstance: any) => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const url = e.target?.result as string
+        editorInstance?.chain().focus().setImage({ src: url }).run()
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+  input.click()
+}
+
+// 撤销重做功能
+const undoStudy = (editorInstance: any) => {
+  editorInstance?.chain().focus().undo().run()
+}
+
+const redoStudy = (editorInstance: any) => {
+  editorInstance?.chain().focus().redo().run()
+}
+
+// 实战笔记编辑器
+const practicalEditorExtensions = [
+  StarterKit.configure({
+    heading: { levels: [1, 2, 3] },
+    bulletList: { keepMarks: true, keepAttributes: false },
+    orderedList: { keepMarks: true, keepAttributes: false },
+  }),
+  Table.configure({
+    resizable: true,
+    HTMLAttributes: { class: 'border-collapse border border-gray-300 w-full' },
+  }),
+  TableRow,
+  TableCell,
+  TableHeader,
+  Image,
+  Underline,
+  Strike,
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  CodeBlock,
+  Highlight.configure({ multicolor: false }),
+  Link.configure({
+    openOnClick: false,
+    HTMLAttributes: { class: 'text-blue-600 underline cursor-pointer' },
+  }),
+]
+
+const requirementDescriptionEditor = useEditor({
+  content: '',
+  extensions: [
+    ...practicalEditorExtensions,
+    Placeholder.configure({ placeholder: '输入需求描述...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.requirementDescription = editor.getHTML()
+  },
+})
+
+const designThinkingEditor = useEditor({
+  content: '',
+  extensions: [
+    ...practicalEditorExtensions,
+    Placeholder.configure({ placeholder: '输入设计思路...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.designThinking = editor.getHTML()
+  },
+})
+
+const referenceDesignEditor = useEditor({
+  content: '',
+  extensions: [
+    ...practicalEditorExtensions,
+    Placeholder.configure({ placeholder: '输入参考设计...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[200px] max-h-[400px] overflow-y-auto p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.referenceDesign = editor.getHTML()
+  },
+})
+
+// ===== 实战笔记编辑器辅助函数 =====
+// 链接功能
+const setPracticalLink = (editorInstance: any) => {
+  const url = prompt('请输入链接URL:')
+  if (url) {
+    editorInstance?.chain().focus().setLink({ href: url }).run()
+  }
+}
+
+// 插入表格功能
+const insertPracticalTable = (editorInstance: any) => {
+  editorInstance?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+}
+
+// 插入图片功能
+const insertPracticalImage = (editorInstance: any) => {
+  const url = prompt('请输入图片URL:')
+  if (url) {
+    editorInstance?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+// 上传图片功能
+const uploadPracticalImage = (editorInstance: any) => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const url = e.target?.result as string
+        editorInstance?.chain().focus().setImage({ src: url }).run()
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+  input.click()
+}
+
+// 撤销重做功能
+const undoPractical = (editorInstance: any) => {
+  editorInstance?.chain().focus().undo().run()
+}
+
+const redoPractical = (editorInstance: any) => {
+  editorInstance?.chain().focus().redo().run()
+}
 
 // 提交记录
 const submitRecord = async () => {

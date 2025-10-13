@@ -2180,115 +2180,6 @@
       </div>
     </Transition>
 
-    <!-- 项目经验界面 -->
-    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">项目经验</h3>
-        <p class="text-gray-600 mt-1">已完成项目的任务和心得，为当前项目提供经验参考</p>
-      </div>
-
-      <!-- 选中的项目单独展示区域 -->
-      <transition name="project-lift" mode="out-in">
-        <div v-if="selectedExperienceProject" :key="selectedExperienceProject.id" class="mb-8">
-          <div class="rounded-2xl border-2 shadow-xl" :class="getProjectColorClasses(selectedExperienceProject.id)">
-            <div class="flex items-center justify-between px-6 py-5">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" :class="getProjectIconClasses(selectedExperienceProject.id)">
-                  <i class="fa-solid fa-box-archive text-white text-xl"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-xl font-bold text-gray-900 truncate">{{ selectedExperienceProject.name }}</h3>
-                  <p class="text-sm text-gray-500 mt-1 truncate">{{ selectedExperienceProject.description }}</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 flex-shrink-0">
-                <span class="px-3 py-1 rounded-full text-sm font-medium" :class="getProjectStatusClasses(selectedExperienceProject.id)">已完成</span>
-                <button @click="deselectExperienceProject" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                  <i class="fa-solid fa-times text-xl"></i>
-                </button>
-              </div>
-            </div>
-            
-            <!-- 任务列表 -->
-            <div class="px-6 pb-6">
-              <h4 class="text-md font-semibold text-gray-800 mb-3">项目任务</h4>
-              <div v-if="getProjectTasks(selectedExperienceProject.id).length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div v-for="task in getProjectTasks(selectedExperienceProject.id)" :key="task.id" class="bg-white/90 border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200" :class="getProjectBorderClasses(selectedExperienceProject.id)">
-                  <div class="flex items-start justify-between mb-2">
-                    <div class="font-medium text-gray-900 text-sm flex-1 min-w-0 mr-2">{{ task.name }}</div>
-                    <span class="px-2 py-1 rounded-full text-xs font-medium flex-shrink-0" :class="task.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
-                      {{ task.status === 'completed' ? '已完成' : '已停止' }}
-                    </span>
-                  </div>
-                  <div class="text-xs text-gray-500 mb-2 line-clamp-2">{{ task.description }}</div>
-                  <div class="text-xs text-gray-400">创建：{{ task.createTime }}</div>
-                  <div class="text-xs text-gray-400">截止：{{ task.deadline }}</div>
-                </div>
-              </div>
-              <div v-else class="text-gray-400 text-sm">暂无任务</div>
-            </div>
-
-            <!-- 心得列表 -->
-            <div class="px-6 pb-6">
-              <h4 class="text-md font-semibold text-gray-800 mb-3">项目心得</h4>
-              <div v-if="getProjectRecords(selectedExperienceProject.id).length > 0" class="space-y-3">
-                <div 
-                  v-for="record in getProjectRecords(selectedExperienceProject.id)" 
-                  :key="record.id" 
-                  class="bg-white/90 border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group" 
-                  :class="getProjectRecordBorderClasses(selectedExperienceProject.id)"
-                  @click="showRecordDetail(record)"
-                >
-                  <div class="flex items-start justify-between mb-2">
-                    <div class="font-medium text-gray-900 flex-1">{{ record.title }}</div>
-                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-gray-600 transition-colors duration-200 text-sm"></i>
-                  </div>
-                  <div class="text-xs text-gray-500 mb-2 line-clamp-2">{{ record.summary }}</div>
-                  <div class="text-xs text-gray-400 mb-2">更新时间：{{ record.updateTime }}</div>
-                  <div class="flex flex-wrap gap-1">
-                    <span v-for="tag in record.tags" :key="tag" class="px-2 py-0.5 rounded-full text-xs" :class="getProjectTagClasses(selectedExperienceProject.id)">{{ tag }}</span>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-gray-400 text-sm">暂无心得</div>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- 项目网格 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <transition-group name="grid-item" tag="div" class="contents">
-          <div 
-            v-for="project in visibleExperienceProjects" 
-            :key="project.id" 
-            class="rounded-xl border shadow-lg hover:shadow-xl transition-all duration-500 cursor-pointer group transform hover:scale-105"
-            :class="getProjectColorClasses(project.id)"
-            @click="selectExperienceProject(project)"
-          >
-            <div class="p-4 h-full flex flex-col">
-              <div class="flex items-start gap-3 mb-3">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" :class="getProjectIconClasses(project.id)">
-                  <i class="fa-solid fa-box-archive text-white text-sm"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-sm font-bold text-gray-900 group-hover:text-gray-800 transition-colors duration-200 truncate">{{ project.name }}</h3>
-                  <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ project.description }}</p>
-                </div>
-              </div>
-              
-              <div class="flex items-center justify-between mt-auto">
-                <span class="px-2 py-1 rounded-full text-xs font-medium" :class="getProjectStatusClasses(project.id)">已完成</span>
-                <div class="text-xs text-gray-400">
-                  {{ getProjectTasks(project.id).length }} 任务 · {{ getProjectRecords(project.id).length }} 心得
-                </div>
-              </div>
-            </div>
-          </div>
-        </transition-group>
-      </div>
-    </div>
-
     <!-- 心得详情模态框 -->
     <transition name="modal" appear>
       <div v-if="selectedRecord" class="fixed inset-0 z-50 overflow-y-auto">
@@ -3164,21 +3055,8 @@ const addEditSuggestedTag = (tag: string) => {
   }
 }
 
-// 项目经验相关
-const selectedExperienceProject = ref<any>(null)
+// 项目心得详情相关
 const selectedRecord = ref<any>(null)
-
-// 获取已完成的项目
-const completedProjects = computed(() => {
-  return projects.value.filter(project => project.status === 'completed')
-})
-
-const visibleExperienceProjects = computed(() => {
-  if (selectedExperienceProject.value) {
-    return completedProjects.value.filter(project => project.id !== selectedExperienceProject.value.id)
-  }
-  return completedProjects.value
-})
 
 // 获取项目任务
 const getProjectTasks = (projectId: number) => {
@@ -3288,16 +3166,6 @@ const getProjectRecordBorderClasses = (projectId: number) => {
 const getProjectTagClasses = (projectId: number) => {
   const theme = getProjectTheme(projectId)
   return theme.tag
-}
-
-// 选择项目经验
-const selectExperienceProject = (project: any) => {
-  selectedExperienceProject.value = project
-}
-
-// 取消选择项目经验
-const deselectExperienceProject = () => {
-  selectedExperienceProject.value = null
 }
 
 // 显示记录详情

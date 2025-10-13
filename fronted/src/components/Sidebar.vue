@@ -12,7 +12,7 @@
       </div>
 
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        <!-- 主仪表盘 - 顶级分组 -->
+        <!-- 主仪表盘 -->
         <div class="space-y-1">
           <button 
             @click="toggleGroup('main')" 
@@ -27,42 +27,42 @@
             <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.main }"></i>
           </button>
           
-          <div v-show="expandedGroups.main" class="space-y-1">
-            <!-- 驾驶舱 -->
-            <div class="pl-4 space-y-1">
-              <button 
-                @click="toggleGroup('overview')" 
-                class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
-              >
-                <div class="flex items-center">
-                  <div class="w-6 flex justify-center">
-                    <i class="fa-solid fa-chart-line"></i>
-                  </div>
-                  <span class="ml-3">驾驶舱</span>
-                </div>
-                <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.overview }"></i>
-              </button>
-              
-              <div v-show="expandedGroups.overview" class="pl-8 space-y-1">
-                <!-- 总仪表盘 -->
-                <router-link to="/overview/data" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
-                  <div class="w-6 flex justify-center">
-                    <i class="fa-solid fa-chart-bar"></i>
-                  </div>
-                  <span class="ml-3">总仪表盘</span>
-                </router-link>
-                
-                <!-- 时光轨迹 -->
-                <router-link to="/overview/timeline" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
-                  <div class="w-6 flex justify-center">
-                    <i class="fa-solid fa-history"></i>
-                  </div>
-                  <span class="ml-3">时光轨迹</span>
-                </router-link>
+          <div v-show="expandedGroups.main" class="pl-8 space-y-1">
+            <!-- 总仪表盘 -->
+            <router-link to="/overview/data" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-chart-bar"></i>
               </div>
-            </div>
+              <span class="ml-3">总仪表盘</span>
+            </router-link>
+            
+            <!-- 时光轨迹 -->
+            <router-link to="/overview/timeline" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-history"></i>
+              </div>
+              <span class="ml-3">时光轨迹</span>
+            </router-link>
+          </div>
+        </div>
 
-            <!-- 素材组 -->
+        <!-- 知识积累 -->
+        <div class="space-y-1">
+          <button 
+            @click="toggleGroup('knowledge')" 
+            class="w-full flex items-center justify-between p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors"
+          >
+            <div class="flex items-center">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-warehouse"></i>
+              </div>
+              <span class="ml-3">储备积累</span>
+            </div>
+            <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.knowledge }"></i>
+          </button>
+          
+          <div v-show="expandedGroups.knowledge" class="space-y-1">
+            <!-- 素材积累 -->
             <div class="pl-4 space-y-1">
               <button 
                 @click="toggleGroup('materials')" 
@@ -70,14 +70,14 @@
               >
                 <div class="flex items-center">
                   <div class="w-6 flex justify-center">
-                    <i class="fa-solid fa-chart-pie"></i>
+                    <i class="fa-solid fa-layer-group"></i>
                   </div>
-                  <span class="ml-3">素材组</span>
+                  <span class="ml-3">素材积累</span>
                 </div>
                 <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.materials }"></i>
               </button>
               
-              <!-- 素材组子菜单 -->
+              <!-- 素材积累子菜单 -->
               <div v-show="expandedGroups.materials" class="pl-8 space-y-1">
                 <router-link 
                   v-for="item in materialsConfig" 
@@ -93,7 +93,7 @@
               </div>
             </div>
 
-            <!-- 行动组 -->
+            <!-- 经验积累 -->
             <div class="pl-4 space-y-1">
               <button 
                 @click="toggleGroup('actions')" 
@@ -101,14 +101,14 @@
               >
                 <div class="flex items-center">
                   <div class="w-6 flex justify-center">
-                    <i class="fa-solid fa-briefcase"></i>
+                    <i class="fa-solid fa-compass"></i>
                   </div>
-                  <span class="ml-3">行动组</span>
+                  <span class="ml-3">经验积累</span>
                 </div>
                 <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.actions }"></i>
               </button>
               
-              <!-- 行动组子菜单 -->
+              <!-- 经验积累子菜单 -->
               <div v-show="expandedGroups.actions" class="pl-8 space-y-1">
                 <router-link to="/actions/defense-projects" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
                   <div class="w-6 flex justify-center">
@@ -283,7 +283,7 @@ const isAdmin = computed(() => {
 const isOpen = ref(false)
 const expandedGroups = ref({
   main: true, // 默认展开主仪表盘
-  overview: true, // 默认展开驾驶舱
+  knowledge: false, // 知识积累
   materials: false,
   actions: false,
   headquarters: false,
