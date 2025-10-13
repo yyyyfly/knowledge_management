@@ -1395,6 +1395,72 @@
                     </div>
                     
                     <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 高亮 -->
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().toggleHighlight().run()"
+                      :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }"
+                      class="p-2 rounded hover:bg-gray-200"
+                      title="高亮"
+                    >
+                      <i class="fas fa-highlighter"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 链接 -->
+                    <button 
+                      type="button"
+                      @click="setLink"
+                      class="p-2 rounded hover:bg-gray-200"
+                      title="插入链接"
+                    >
+                      <i class="fas fa-link"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().unsetLink().run()"
+                      :disabled="!editor?.isActive('link')"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="取消链接"
+                    >
+                      <i class="fas fa-unlink"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 撤销重做 -->
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().undo().run()"
+                      :disabled="!editor?.can().undo()"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="撤销"
+                    >
+                      <i class="fas fa-undo"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().redo().run()"
+                      :disabled="!editor?.can().redo()"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="重做"
+                    >
+                      <i class="fas fa-redo"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- Markdown -->
+                    <button 
+                      type="button"
+                      @click="importMarkdown"
+                      class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold"
+                      title="导入Markdown"
+                    >
+                      <i class="fab fa-markdown"></i>
+                    </button>
                   </div>
                   
                   <!-- 编辑器内容区域 -->
@@ -1765,6 +1831,72 @@
                     </div>
                     
                     <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 高亮 -->
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().toggleHighlight().run()"
+                      :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }"
+                      class="p-2 rounded hover:bg-gray-200"
+                      title="高亮"
+                    >
+                      <i class="fas fa-highlighter"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 链接 -->
+                    <button 
+                      type="button"
+                      @click="setLink"
+                      class="p-2 rounded hover:bg-gray-200"
+                      title="插入链接"
+                    >
+                      <i class="fas fa-link"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().unsetLink().run()"
+                      :disabled="!editor?.isActive('link')"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="取消链接"
+                    >
+                      <i class="fas fa-unlink"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- 撤销重做 -->
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().undo().run()"
+                      :disabled="!editor?.can().undo()"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="撤销"
+                    >
+                      <i class="fas fa-undo"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="editor?.chain().focus().redo().run()"
+                      :disabled="!editor?.can().redo()"
+                      class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="重做"
+                    >
+                      <i class="fas fa-redo"></i>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-gray-300"></div>
+                    
+                    <!-- Markdown -->
+                    <button 
+                      type="button"
+                      @click="importMarkdown"
+                      class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold"
+                      title="导入Markdown"
+                    >
+                      <i class="fab fa-markdown"></i>
+                    </button>
                   </div>
                   
                   <!-- 编辑器内容区域 -->
@@ -2247,6 +2379,8 @@ import Strike from '@tiptap/extension-strike'
 import TextAlign from '@tiptap/extension-text-align'
 import CodeBlock from '@tiptap/extension-code-block'
 import Placeholder from '@tiptap/extension-placeholder'
+import Highlight from '@tiptap/extension-highlight'
+import Link from '@tiptap/extension-link'
 import request from '@/api/request'
 import { getAllNotes, type Note } from '@/services/noteService'
 
@@ -2372,6 +2506,15 @@ const editor = useEditor({
     CodeBlock.configure({
       HTMLAttributes: {
         class: 'bg-gray-100 p-4 rounded-lg font-mono text-sm',
+      },
+    }),
+    Highlight.configure({
+      multicolor: false,
+    }),
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-blue-600 underline cursor-pointer',
       },
     }),
     Placeholder.configure({
@@ -2848,6 +2991,23 @@ const uploadImage = () => {
     }
   }
   input.click()
+}
+
+// 设置链接
+const setLink = () => {
+  const url = window.prompt('请输入链接地址:')
+  if (url) {
+    editor.value?.chain().focus().setLink({ href: url }).run()
+  }
+}
+
+// 导入Markdown
+const importMarkdown = () => {
+  const markdown = window.prompt('请粘贴Markdown内容:')
+  if (markdown) {
+    // 简单的Markdown转换（实际项目中可以使用markdown-it等库）
+    editor.value?.commands.setContent(markdown)
+  }
 }
 
 // 选择图片
