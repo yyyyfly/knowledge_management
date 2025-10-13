@@ -64,9 +64,9 @@
             <span class="bg-red-200 text-red-700 px-3 py-1 rounded-full text-sm font-medium">已攻克</span>
           </div>
           <div class="space-y-4">
-            <div v-for="honor in defenseHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-red-100 group">
+            <div v-for="honor in displayedDefenseHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-red-100 group">
               <div class="flex items-center">
-                <i :class="`fa ${honor.icon} text-warning mr-3 text-lg`"></i>
+                <i class="fa-solid fa-trophy text-gray-600 mr-3 text-lg"></i>
                 <div>
                   <span class="text-gray-900 font-medium">{{ honor.title }}</span>
                   <p class="text-xs text-gray-500">{{ honor.description }}</p>
@@ -86,6 +86,15 @@
             <div v-if="defenseHonors.length === 0" class="text-center py-4 text-gray-500">
               <p class="text-sm">暂无战争行动荣誉战绩</p>
             </div>
+            <!-- 展开/折叠按钮 -->
+            <button 
+              v-if="defenseHonors.length > 3"
+              @click="toggleDefenseHonors"
+              class="w-full py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>{{ isDefenseHonorsCollapsed ? '展开全部' : '收起' }}</span>
+              <i :class="`fas fa-chevron-${isDefenseHonorsCollapsed ? 'down' : 'up'} text-xs`"></i>
+            </button>
           </div>
         </div>
 
@@ -99,9 +108,9 @@
             <span class="bg-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">已完成</span>
           </div>
           <div class="space-y-4">
-            <div v-for="honor in constructionHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-blue-100 group">
+            <div v-for="honor in displayedConstructionHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-blue-100 group">
               <div class="flex items-center">
-                <i :class="`fa ${honor.icon} text-warning mr-3 text-lg`"></i>
+                <i class="fa-solid fa-trophy text-gray-600 mr-3 text-lg"></i>
                 <div>
                   <span class="text-gray-900 font-medium">{{ honor.title }}</span>
                   <p class="text-xs text-gray-500">{{ honor.description }}</p>
@@ -121,6 +130,15 @@
             <div v-if="constructionHonors.length === 0" class="text-center py-4 text-gray-500">
               <p class="text-sm">暂无工程建设荣誉战绩</p>
             </div>
+            <!-- 展开/折叠按钮 -->
+            <button 
+              v-if="constructionHonors.length > 3"
+              @click="toggleConstructionHonors"
+              class="w-full py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>{{ isConstructionHonorsCollapsed ? '展开全部' : '收起' }}</span>
+              <i :class="`fas fa-chevron-${isConstructionHonorsCollapsed ? 'down' : 'up'} text-xs`"></i>
+            </button>
           </div>
         </div>
 
@@ -134,9 +152,9 @@
             <span class="bg-green-200 text-green-700 px-3 py-1 rounded-full text-sm font-medium">已达成</span>
           </div>
           <div class="space-y-4">
-            <div v-for="honor in diplomaticHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-green-100 group">
+            <div v-for="honor in displayedDiplomaticHonors" :key="honor.id" class="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-green-100 group">
               <div class="flex items-center">
-                <i :class="`fa ${honor.icon} text-warning mr-3 text-lg`"></i>
+                <i class="fa-solid fa-trophy text-gray-600 mr-3 text-lg"></i>
                 <div>
                   <span class="text-gray-900 font-medium">{{ honor.title }}</span>
                   <p class="text-xs text-gray-500">{{ honor.description }}</p>
@@ -155,6 +173,93 @@
                 </div>
             <div v-if="diplomaticHonors.length === 0" class="text-center py-4 text-gray-500">
               <p class="text-sm">暂无外交行动荣誉战绩</p>
+            </div>
+            <!-- 展开/折叠按钮 -->
+            <button 
+              v-if="diplomaticHonors.length > 3"
+              @click="toggleDiplomaticHonors"
+              class="w-full py-2 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>{{ isDiplomaticHonorsCollapsed ? '展开全部' : '收起' }}</span>
+              <i :class="`fas fa-chevron-${isDiplomaticHonorsCollapsed ? 'down' : 'up'} text-xs`"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 打卡记录 -->
+    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+          <i class="fa-solid fa-calendar-days text-gray-900 mr-3"></i>
+          打卡记录
+        </h3>
+        <p class="text-gray-600 text-sm mt-1">习惯养成与目标追踪</p>
+      </div>
+
+      <!-- 空状态 -->
+      <div v-if="activeCheckinItems.length === 0" class="text-center py-12 text-gray-500">
+        <i class="fas fa-check-circle text-6xl mb-4 text-gray-300"></i>
+        <p class="text-lg font-medium mb-2">暂无打卡项目</p>
+        <p class="text-sm">前往"系统决策"创建打卡项目开始你的习惯养成之旅</p>
+        <button 
+          @click="$router.push('/system-decisions')"
+          class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          去创建
+        </button>
+      </div>
+
+      <!-- 打卡项目网格 -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="item in activeCheckinItems" :key="item.id" 
+          class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-5 border border-purple-200 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-check text-white text-lg"></i>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-900">{{ item.title }}</h4>
+                <span :class="getFrequencyBadgeClass(item.frequency)" class="text-xs px-2 py-0.5 rounded-full">
+                  {{ getFrequencyLabel(item.frequency) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 打卡状态提醒 -->
+          <div v-if="!checkinStatusMap[item.id!]" class="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-exclamation-circle text-yellow-600"></i>
+              <span class="text-sm text-yellow-700 font-medium">本周期还未打卡</span>
+            </div>
+          </div>
+          <div v-else class="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-check-circle text-green-600"></i>
+              <span class="text-sm text-green-700 font-medium">本周期已打卡</span>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <!-- 最长连续打卡 -->
+            <div class="flex items-center justify-between bg-white/70 rounded-lg p-3">
+              <div class="flex items-center space-x-2">
+                <i class="fas fa-fire text-orange-500"></i>
+                <span class="text-sm text-gray-600">最长连续</span>
+              </div>
+              <span class="text-lg font-bold text-orange-600">{{ getMaxStreak(item.id!) }} 次</span>
+            </div>
+            
+            <!-- 累计打卡 -->
+            <div class="flex items-center justify-between bg-white/70 rounded-lg p-3">
+              <div class="flex items-center space-x-2">
+                <i class="fas fa-chart-line text-green-500"></i>
+                <span class="text-sm text-gray-600">累计打卡</span>
+              </div>
+              <span class="text-lg font-bold text-green-600">{{ getTotalCheckins(item.id!) }} 次</span>
             </div>
           </div>
         </div>
@@ -861,6 +966,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
 // 使用API请求
 import request from '@/api/request'
+import { getCheckinItemList, getCheckinRecords, checkCheckinStatus, type CheckinItem, type CheckinRecord } from '@/api/checkin'
 
 const router = useRouter()
 
@@ -885,6 +991,184 @@ const countdownEvents = ref<any[]>([])
 const currentTime = ref(Date.now())
 let timeUpdateTimer: number | null = null
 
+// 荣誉战绩折叠状态
+const isDefenseHonorsCollapsed = ref(true)
+const isConstructionHonorsCollapsed = ref(true)
+const isDiplomaticHonorsCollapsed = ref(true)
+
+// ========== 打卡记录相关 ==========
+const checkinItems = ref<CheckinItem[]>([])
+const checkinRecordsMap = ref<Record<number, CheckinRecord[]>>({})
+const checkinStatusMap = ref<Record<number, boolean>>({})
+
+// 只显示启用状态的打卡项目
+const activeCheckinItems = computed(() => {
+  return checkinItems.value.filter(item => item.status === 'active')
+})
+
+// 加载打卡项目
+const loadCheckinItems = async () => {
+  try {
+    const response = await getCheckinItemList()
+    if (response.code === 200) {
+      checkinItems.value = response.data || []
+      // 加载每个项目的打卡记录和状态
+      for (const item of checkinItems.value) {
+        if (item.id) {
+          await loadCheckinRecords(item.id)
+          await loadCheckinStatus(item.id, item.frequency)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('加载打卡项目失败:', error)
+  }
+}
+
+// 加载打卡记录
+const loadCheckinRecords = async (itemId: number) => {
+  try {
+    const response = await getCheckinRecords(itemId)
+    if (response.code === 200) {
+      checkinRecordsMap.value[itemId] = response.data || []
+    }
+  } catch (error) {
+    console.error('加载打卡记录失败:', error)
+  }
+}
+
+// 加载打卡状态
+const loadCheckinStatus = async (itemId: number, frequency: string) => {
+  try {
+    const response = await checkCheckinStatus(itemId, frequency)
+    if (response.code === 200 && response.data) {
+      checkinStatusMap.value[itemId] = response.data.isCheckedIn || false
+    }
+  } catch (error) {
+    console.error('加载打卡状态失败:', error)
+    checkinStatusMap.value[itemId] = false
+  }
+}
+
+// 获取累计打卡次数
+const getTotalCheckins = (itemId: number): number => {
+  return checkinRecordsMap.value[itemId]?.length || 0
+}
+
+// 获取最长连续打卡次数
+const getMaxStreak = (itemId: number): number => {
+  const records = checkinRecordsMap.value[itemId]
+  if (!records || records.length === 0) return 0
+  
+  // 按时间排序
+  const sortedRecords = [...records].sort((a, b) => {
+    return new Date(a.checkinTime!).getTime() - new Date(b.checkinTime!).getTime()
+  })
+  
+  let maxStreak = 1
+  let currentStreak = 1
+  
+  for (let i = 1; i < sortedRecords.length; i++) {
+    const prevCycleKey = sortedRecords[i - 1].cycleKey!
+    const currCycleKey = sortedRecords[i].cycleKey!
+    
+    // 判断是否连续（根据周期标识判断）
+    if (isConsecutiveCycle(prevCycleKey, currCycleKey)) {
+      currentStreak++
+      maxStreak = Math.max(maxStreak, currentStreak)
+    } else {
+      currentStreak = 1
+    }
+  }
+  
+  return maxStreak
+}
+
+// 判断两个周期是否连续
+const isConsecutiveCycle = (prev: string, curr: string): boolean => {
+  // 日：2025-10-11 -> 2025-10-12
+  if (prev.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const prevDate = new Date(prev)
+    const currDate = new Date(curr)
+    const diffDays = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24)
+    return diffDays === 1
+  }
+  
+  // 周：2025-W41 -> 2025-W42
+  if (prev.match(/^\d{4}-W\d{2}$/)) {
+    const prevWeek = parseInt(prev.split('-W')[1])
+    const currWeek = parseInt(curr.split('-W')[1])
+    const prevYear = parseInt(prev.split('-')[0])
+    const currYear = parseInt(curr.split('-')[0])
+    
+    if (prevYear === currYear) {
+      return currWeek === prevWeek + 1
+    } else if (currYear === prevYear + 1) {
+      return prevWeek >= 52 && currWeek === 1
+    }
+    return false
+  }
+  
+  // 月：2025-10 -> 2025-11
+  if (prev.match(/^\d{4}-\d{2}$/)) {
+    const [prevYear, prevMonth] = prev.split('-').map(Number)
+    const [currYear, currMonth] = curr.split('-').map(Number)
+    
+    if (prevYear === currYear) {
+      return currMonth === prevMonth + 1
+    } else if (currYear === prevYear + 1) {
+      return prevMonth === 12 && currMonth === 1
+    }
+    return false
+  }
+  
+  // 季：2025-Q4 -> 2026-Q1
+  if (prev.match(/^\d{4}-Q\d$/)) {
+    const prevQuarter = parseInt(prev.split('-Q')[1])
+    const currQuarter = parseInt(curr.split('-Q')[1])
+    const prevYear = parseInt(prev.split('-')[0])
+    const currYear = parseInt(curr.split('-')[0])
+    
+    if (prevYear === currYear) {
+      return currQuarter === prevQuarter + 1
+    } else if (currYear === prevYear + 1) {
+      return prevQuarter === 4 && currQuarter === 1
+    }
+    return false
+  }
+  
+  // 年：2025 -> 2026
+  if (prev.match(/^\d{4}$/)) {
+    return parseInt(curr) === parseInt(prev) + 1
+  }
+  
+  return false
+}
+
+// 获取频率标签
+const getFrequencyLabel = (frequency: string): string => {
+  const map: Record<string, string> = {
+    'daily': '每日',
+    'weekly': '每周',
+    'monthly': '每月',
+    'quarterly': '每季',
+    'yearly': '每年'
+  }
+  return map[frequency] || frequency
+}
+
+// 获取频率徽章样式
+const getFrequencyBadgeClass = (frequency: string): string => {
+  const map: Record<string, string> = {
+    'daily': 'bg-blue-200 text-blue-700',
+    'weekly': 'bg-green-200 text-green-700',
+    'monthly': 'bg-purple-200 text-purple-700',
+    'quarterly': 'bg-orange-200 text-orange-700',
+    'yearly': 'bg-red-200 text-red-700'
+  }
+  return map[frequency] || 'bg-gray-200 text-gray-700'
+}
+
 // 计算各类项目数量
 const defenseProjects = computed(() => allProjects.value.filter(p => p.category === 'defense'))
 const constructionProjects = computed(() => allProjects.value.filter(p => p.category === 'construction'))
@@ -899,6 +1183,23 @@ const constructionHonors = computed(() =>
 )
 const diplomaticHonors = computed(() => 
   allHonors.value.filter(h => h.category === 'diplomatic')
+)
+
+// 显示的荣誉列表（折叠时只显示前3个）
+const displayedDefenseHonors = computed(() => 
+  isDefenseHonorsCollapsed.value && defenseHonors.value.length > 3 
+    ? defenseHonors.value.slice(0, 3) 
+    : defenseHonors.value
+)
+const displayedConstructionHonors = computed(() => 
+  isConstructionHonorsCollapsed.value && constructionHonors.value.length > 3 
+    ? constructionHonors.value.slice(0, 3) 
+    : constructionHonors.value
+)
+const displayedDiplomaticHonors = computed(() => 
+  isDiplomaticHonorsCollapsed.value && diplomaticHonors.value.length > 3 
+    ? diplomaticHonors.value.slice(0, 3) 
+    : diplomaticHonors.value
 )
 
 // 战争行动项目状态统计
@@ -994,6 +1295,9 @@ const loadData = async () => {
     if (projectRes.code === 200) {
       allProjects.value = projectRes.data || []
     }
+
+    // 加载打卡数据
+    await loadCheckinItems()
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {
@@ -1023,6 +1327,17 @@ const expandedCategories = ref<{ [key: string]: boolean }>({
 // 切换分类折叠状态
 const toggleCategory = (category: string) => {
   expandedCategories.value[category] = !expandedCategories.value[category]
+}
+
+// 切换荣誉战绩折叠状态
+const toggleDefenseHonors = () => {
+  isDefenseHonorsCollapsed.value = !isDefenseHonorsCollapsed.value
+}
+const toggleConstructionHonors = () => {
+  isConstructionHonorsCollapsed.value = !isConstructionHonorsCollapsed.value
+}
+const toggleDiplomaticHonors = () => {
+  isDiplomaticHonorsCollapsed.value = !isDiplomaticHonorsCollapsed.value
 }
 
 // 计算紧急任务（已过期或5天内到期且未完成）

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.CheckinItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.CheckinItem">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="frequency" property="frequency"/>
+        <result column="username" property="username"/>
+        <result column="status" property="status"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.knowledge.entity.CheckinItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_checkin_item (
+            title, description, frequency, username, status,
+            rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+        ) VALUES (
+            #{title}, #{description}, #{frequency}, #{username}, #{status},
+            #{recCreator}, NOW(), #{recRevisor}, NOW(), 0
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_item
+        WHERE id = #{id} AND arch_flag = 0
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_item
+        WHERE username = #{userId} AND arch_flag = 0
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <select id="selectByUserIdAndStatus" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_item
+        WHERE username = #{userId} AND status = #{status} AND arch_flag = 0
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <update id="update" parameterType="com.knowledge.entity.CheckinItem">
+        UPDATE km_checkin_item
+        SET title = #{title},
+            description = #{description},
+            frequency = #{frequency},
+            status = #{status},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE km_checkin_item
+        SET arch_flag = 1,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

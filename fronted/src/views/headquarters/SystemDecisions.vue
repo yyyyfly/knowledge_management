@@ -561,6 +561,77 @@
       </Transition>
     </div>
 
+    <!-- 打卡管理界面 -->
+    <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
+      <button 
+        @click="toggleCheckinSection"
+        class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 transition-all flex items-center justify-between text-white"
+      >
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-check-circle text-xl"></i>
+          <h3 class="text-xl font-semibold">打卡管理</h3>
+        </div>
+        <i :class="isCheckinSectionExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-xl transition-transform"></i>
+      </button>
+      
+      <Transition name="collapse">
+        <div v-if="isCheckinSectionExpanded" class="p-6 max-h-[70vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <button 
+              @click="openCreateCheckinModal"
+              class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+            >
+              <i class="fas fa-plus"></i>
+              <span>添加打卡项目</span>
+            </button>
+          </div>
+
+          <!-- 打卡项目列表 -->
+          <div v-if="checkinItems.length === 0" class="text-center py-12 text-gray-500 flex-1 overflow-y-auto">
+            <i class="fas fa-check-circle text-5xl mb-4"></i>
+            <p class="text-lg">暂无打卡项目</p>
+            <p class="text-sm">点击上方按钮创建打卡项目</p>
+          </div>
+
+          <div v-else class="space-y-4 flex-1 overflow-y-auto">
+            <div v-for="item in checkinItems" :key="item.id" 
+              class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h4 class="text-lg font-medium text-gray-900">{{ item.title }}</h4>
+                    <span :class="getFrequencyClass(item.frequency)" class="px-2 py-1 rounded-full text-xs font-medium">
+                      {{ getFrequencyText(item.frequency) }}
+                    </span>
+                    <span :class="item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'" class="px-2 py-1 rounded-full text-xs font-medium">
+                      {{ item.status === 'active' ? '启用' : '停用' }}
+                    </span>
+                  </div>
+                  <p v-if="item.description" class="text-gray-600 mb-2">{{ item.description }}</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <button 
+                    @click="editCheckinItem(item)"
+                    class="text-indigo-600 hover:text-indigo-800 transition-colors"
+                    title="编辑"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    @click="deleteCheckinItem(item.id)"
+                    class="text-red-600 hover:text-red-800 transition-colors"
+                    title="删除"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </div>
+
     <!-- 添加/编辑日期弹窗 -->
     <Transition name="modal-fade">
       <div v-if="showCreateEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -917,18 +988,133 @@
         </Transition>
       </div>
     </Transition>
+
+    <!-- 添加/编辑打卡项目弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showCheckinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-xl font-semibold text-gray-900">{{ currentCheckinItem ? '编辑打卡项目' : '添加打卡项目' }}</h3>
+              <button 
+                @click="closeCheckinModal"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <form @submit.prevent="submitCheckinItem" class="space-y-6">
+              <!-- 项目名称 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">项目名称 *</label>
+                <input 
+                  v-model="checkinForm.title" 
+                  type="text" 
+                  required
+                  placeholder="例如：早起打卡、运动打卡等"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                >
+              </div>
+
+              <!-- 项目描述 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">项目描述</label>
+                <textarea 
+                  v-model="checkinForm.description" 
+                  rows="3"
+                  placeholder="简单描述一下这个打卡项目..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                ></textarea>
+              </div>
+
+              <!-- 打卡频率 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">打卡频率 *</label>
+                <div class="grid grid-cols-5 gap-2">
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="checkinForm.frequency === 'daily' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-300'">
+                    <input type="radio" v-model="checkinForm.frequency" value="daily" class="hidden">
+                    <span class="text-sm font-medium" :class="checkinForm.frequency === 'daily' ? 'text-blue-700' : 'text-gray-700'">日</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="checkinForm.frequency === 'weekly' ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-300'">
+                    <input type="radio" v-model="checkinForm.frequency" value="weekly" class="hidden">
+                    <span class="text-sm font-medium" :class="checkinForm.frequency === 'weekly' ? 'text-green-700' : 'text-gray-700'">周</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="checkinForm.frequency === 'monthly' ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-300'">
+                    <input type="radio" v-model="checkinForm.frequency" value="monthly" class="hidden">
+                    <span class="text-sm font-medium" :class="checkinForm.frequency === 'monthly' ? 'text-purple-700' : 'text-gray-700'">月</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="checkinForm.frequency === 'quarterly' ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-300'">
+                    <input type="radio" v-model="checkinForm.frequency" value="quarterly" class="hidden">
+                    <span class="text-sm font-medium" :class="checkinForm.frequency === 'quarterly' ? 'text-orange-700' : 'text-gray-700'">季</span>
+                  </label>
+                  <label class="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all"
+                    :class="checkinForm.frequency === 'yearly' ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-red-300'">
+                    <input type="radio" v-model="checkinForm.frequency" value="yearly" class="hidden">
+                    <span class="text-sm font-medium" :class="checkinForm.frequency === 'yearly' ? 'text-red-700' : 'text-gray-700'">年</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 状态 -->
+              <div v-if="currentCheckinItem">
+                <label class="block text-sm font-medium text-gray-700 mb-2">状态</label>
+                <select 
+                  v-model="checkinForm.status"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="active">启用</option>
+                  <option value="inactive">停用</option>
+                </select>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div class="flex justify-end space-x-4">
+                <button 
+                  type="button" 
+                  @click="closeCheckinModal"
+                  class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  取消
+                </button>
+                <button 
+                  type="submit" 
+                  class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                >
+                  {{ currentCheckinItem ? '保存修改' : '添加项目' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import request from '@/api/request'
+import { getAllHonors, createHonor, type Honor } from '@/api/honor'
+import { 
+  getCheckinItemList, 
+  createCheckinItem, 
+  updateCheckinItem, 
+  deleteCheckinItem as deleteCheckinItemAPI,
+  type CheckinItem 
+} from '@/api/checkin'
 
 // 系统决策仪表板 - 专注于项目管理和决策制定
 
 // 响应式数据
 const projects = ref<any[]>([])
 const tasks = ref<any[]>([])
+const honors = ref<Honor[]>([]) // 荣誉战绩列表
+const checkinItems = ref<CheckinItem[]>([]) // 打卡项目列表
 
 // 加载数据
 const loadData = async () => {
@@ -943,6 +1129,18 @@ const loadData = async () => {
     const taskRes = await request.get('/task/list')
     if (taskRes.code === 200) {
       tasks.value = taskRes.data || []
+    }
+
+    // 加载荣誉战绩
+    const honorsRes = await getAllHonors()
+    if (honorsRes.code === 200) {
+      honors.value = honorsRes.data || []
+    }
+
+    // 加载打卡项目
+    const checkinRes = await getCheckinItemList()
+    if (checkinRes.code === 200) {
+      checkinItems.value = checkinRes.data || []
     }
   } catch (error) {
     console.error('加载数据失败:', error)
@@ -970,6 +1168,124 @@ const taskFilterStatus = ref('')
 const projectSearchQuery = ref('')
 const projectFilterStatus = ref('')
 const projectFilterCategory = ref('')
+
+// ========== 打卡管理相关 ==========
+
+// 打卡管理折叠状态
+const isCheckinSectionExpanded = ref(false)
+
+// 切换打卡管理折叠状态
+const toggleCheckinSection = () => {
+  isCheckinSectionExpanded.value = !isCheckinSectionExpanded.value
+}
+
+// 打卡项目表单
+const showCheckinModal = ref(false)
+const currentCheckinItem = ref<CheckinItem | null>(null)
+const checkinForm = reactive({
+  title: '',
+  description: '',
+  frequency: 'daily' as 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly',
+  status: 'active'
+})
+
+// 打开创建打卡项目弹窗
+const openCreateCheckinModal = () => {
+  currentCheckinItem.value = null
+  checkinForm.title = ''
+  checkinForm.description = ''
+  checkinForm.frequency = 'daily'
+  checkinForm.status = 'active'
+  showCheckinModal.value = true
+}
+
+// 编辑打卡项目
+const editCheckinItem = (item: CheckinItem) => {
+  currentCheckinItem.value = item
+  checkinForm.title = item.title
+  checkinForm.description = item.description || ''
+  checkinForm.frequency = item.frequency
+  checkinForm.status = item.status || 'active'
+  showCheckinModal.value = true
+}
+
+// 关闭打卡项目弹窗
+const closeCheckinModal = () => {
+  showCheckinModal.value = false
+  currentCheckinItem.value = null
+}
+
+// 提交打卡项目
+const submitCheckinItem = async () => {
+  try {
+    if (currentCheckinItem.value) {
+      // 更新
+      const response = await updateCheckinItem(currentCheckinItem.value.id!, checkinForm as CheckinItem)
+      if (response.code === 200) {
+        await loadData()
+        closeCheckinModal()
+        alert('打卡项目已更新！')
+      } else {
+        alert('更新失败：' + (response.message || '未知错误'))
+      }
+    } else {
+      // 创建
+      const response = await createCheckinItem(checkinForm as CheckinItem)
+      if (response.code === 200) {
+        await loadData()
+        closeCheckinModal()
+        alert('打卡项目已创建！')
+      } else {
+        alert('创建失败：' + (response.message || '未知错误'))
+      }
+    }
+  } catch (error) {
+    console.error('保存打卡项目失败:', error)
+    alert('保存失败，请稍后重试')
+  }
+}
+
+// 删除打卡项目
+const deleteCheckinItem = async (id: number) => {
+  if (!confirm('确定要删除这个打卡项目吗？此操作不可撤销。')) return
+  
+  try {
+    const response = await deleteCheckinItemAPI(id)
+    if (response.code === 200) {
+      await loadData()
+      alert('打卡项目已删除！')
+    } else {
+      alert('删除失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('删除打卡项目失败:', error)
+    alert('删除失败，请稍后重试')
+  }
+}
+
+// 获取频率文本
+const getFrequencyText = (frequency: string) => {
+  const map: Record<string, string> = {
+    'daily': '每日',
+    'weekly': '每周',
+    'monthly': '每月',
+    'quarterly': '每季',
+    'yearly': '每年'
+  }
+  return map[frequency] || frequency
+}
+
+// 获取频率样式
+const getFrequencyClass = (frequency: string) => {
+  const map: Record<string, string> = {
+    'daily': 'bg-blue-100 text-blue-700',
+    'weekly': 'bg-green-100 text-green-700',
+    'monthly': 'bg-purple-100 text-purple-700',
+    'quarterly': 'bg-orange-100 text-orange-700',
+    'yearly': 'bg-red-100 text-red-700'
+  }
+  return map[frequency] || 'bg-gray-100 text-gray-700'
+}
 
 // ========== 日历事件相关 ==========
 
@@ -1733,13 +2049,43 @@ const filteredProjects = computed(() => {
   return filtered
 })
 
+// 检查项目是否已加入荣誉战绩
+const isProjectInHonors = (projectId: number): boolean => {
+  return honors.value.some(honor => honor.projectId === projectId)
+}
+
+// 格式化日期为 yyyy-MM-dd HH:mm:ss 格式
+const formatDateTimeForBackend = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
 // 将项目加入荣誉战绩
-const addProjectToHonors = (project: any) => {
+const addProjectToHonors = async (project: any) => {
   if (confirm(`确定要将项目「${project.name}」加入荣誉战绩吗？`)) {
     try {
-      const newHonor = addHonorFromProject(project.id, project.name, project.description, project.category)
-      alert('项目已成功加入荣誉战绩！')
-      console.log('新增荣誉战绩：', newHonor)
+      const newHonor: Honor = {
+        title: project.name,
+        description: project.description || '',
+        category: project.category,
+        achievedTime: formatDateTimeForBackend(new Date()), // 格式化为后端期望的格式
+        projectId: project.id,
+        icon: 'fa-solid fa-trophy'
+      }
+      
+      const response = await createHonor(newHonor)
+      if (response.code === 200) {
+        // 重新加载荣誉战绩列表
+        await loadData()
+        alert('项目已成功加入荣誉战绩！')
+      } else {
+        alert('加入荣誉战绩失败：' + (response.message || '未知错误'))
+      }
     } catch (error) {
       alert('加入荣誉战绩失败，请重试')
       console.error('加入荣誉战绩失败：', error)

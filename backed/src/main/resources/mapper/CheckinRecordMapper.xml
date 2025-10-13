@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.CheckinRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.CheckinRecord">
+        <id column="id" property="id"/>
+        <result column="checkin_item_id" property="checkinItemId"/>
+        <result column="username" property="username"/>
+        <result column="checkin_time" property="checkinTime"/>
+        <result column="cycle_key" property="cycleKey"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.knowledge.entity.CheckinRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_checkin_record (
+            checkin_item_id, username, checkin_time, cycle_key,
+            rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+        ) VALUES (
+            #{checkinItemId}, #{username}, #{checkinTime}, #{cycleKey},
+            #{recCreator}, NOW(), #{recRevisor}, NOW(), 0
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_record
+        WHERE id = #{id} AND arch_flag = 0
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_record
+        WHERE username = #{userId} AND arch_flag = 0
+        ORDER BY checkin_time DESC
+    </select>
+
+    <select id="selectByItemIdAndCycleKey" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_record
+        WHERE checkin_item_id = #{checkinItemId}
+          AND username = #{userId}
+          AND cycle_key = #{cycleKey}
+          AND arch_flag = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByCheckinItemId" resultMap="BaseResultMap">
+        SELECT * FROM km_checkin_record
+        WHERE checkin_item_id = #{checkinItemId} AND arch_flag = 0
+        ORDER BY checkin_time DESC
+    </select>
+
+    <update id="deleteById">
+        UPDATE km_checkin_record
+        SET arch_flag = 1,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByCycleKey">
+        DELETE FROM km_checkin_record
+        WHERE checkin_item_id = #{checkinItemId}
+          AND username = #{userId}
+          AND cycle_key = #{cycleKey}
+          AND arch_flag = 0
+    </delete>
+
+</mapper>
+

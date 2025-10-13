@@ -12,7 +12,7 @@
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- 任务执行 -->
         <div 
           @click="openOperation('taskExecution')"
@@ -52,6 +52,20 @@
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">项目心得</h4>
             <p class="text-gray-600">记录项目执行过程中的心得体会、技术收获和执行总结</p>
+          </div>
+        </div>
+
+        <!-- 打卡操作 -->
+        <div 
+          @click="openOperation('checkinOperation')"
+          class="p-6 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 cursor-pointer transition-all duration-200"
+        >
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-check-circle text-2xl text-purple-600"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">打卡操作</h4>
+            <p class="text-gray-600">每日打卡、习惯养成和目标追踪</p>
           </div>
         </div>
       </div>
@@ -748,6 +762,63 @@
               <i class="fas fa-exclamation-triangle text-4xl mb-4 text-orange-400"></i>
               <p class="text-lg font-medium mb-2">暂无问题记录</p>
               <p class="text-sm">项目很顺利！也可以点击上方按钮记录遇到的问题</p>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- 打卡操作 -->
+      <template v-else-if="currentOperation === 'checkinOperation'">
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-8 max-h-[80vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <h3 class="text-xl font-semibold text-gray-900">打卡操作</h3>
+            <button 
+              @click="closeOperation()"
+              class="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <!-- 打卡项目列表 -->
+          <div v-if="activeCheckinItems.length === 0" class="text-center py-12 text-gray-500 flex-1">
+            <i class="fas fa-check-circle text-6xl mb-4"></i>
+            <p class="text-lg font-medium mb-2">暂无打卡项目</p>
+            <p class="text-sm">请先在"系统决策"中创建打卡项目</p>
+          </div>
+
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 overflow-y-auto">
+            <div v-for="item in activeCheckinItems" :key="item.id" 
+              class="p-4 border-2 rounded-lg transition-all"
+              :class="checkinStatus[item.id!] ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-purple-400'">
+              <div class="flex flex-col h-full">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-lg font-medium text-gray-900">{{ item.title }}</h4>
+                  <span :class="getFrequencyClassForCheckin(item.frequency)" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ getFrequencyTextForCheckin(item.frequency) }}
+                  </span>
+                </div>
+                <p v-if="item.description" class="text-gray-600 text-sm mb-4 flex-1">{{ item.description }}</p>
+                
+                <div class="mt-auto">
+                  <button 
+                    v-if="!checkinStatus[item.id!]"
+                    @click="handleCheckin(item.id!)"
+                    class="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <i class="fas fa-check"></i>
+                    <span>打卡</span>
+                  </button>
+                  <button 
+                    v-else
+                    @click="handleCancelCheckin(item.id!)"
+                    class="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <i class="fas fa-check-double"></i>
+                    <span>已打卡 - 点击取消</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2157,6 +2228,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onActivated, onBeforeUnmount } from 'vue'
+import { 
+  getCheckinItemList, 
+  checkin as checkinAPI, 
+  cancelCheckin as cancelCheckinAPI, 
+  checkCheckinStatus,
+  type CheckinItem 
+} from '@/api/checkin'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
@@ -2204,6 +2282,23 @@ const loadData = async () => {
     console.log('【项目执行】加载笔记数据:', notes.value.length, '个')
   } catch (error) {
     console.error('【项目执行】加载数据失败:', error)
+  }
+}
+
+// 加载项目心得数据
+const loadProjectInsights = async () => {
+  try {
+    const response = await request.get('/project/insight/list')
+    if (response.code === 200) {
+      // 处理tags字段：从逗号分隔的字符串转换为数组
+      projectRecords.value = (response.data || []).map((item: any) => ({
+        ...item,
+        tags: item.tags ? item.tags.split(',').filter((t: string) => t.trim()) : []
+      }))
+      console.log('【项目执行】加载项目心得数据:', projectRecords.value.length, '个')
+    }
+  } catch (error) {
+    console.error('【项目执行】加载项目心得失败:', error)
   }
 }
 
@@ -2630,26 +2725,32 @@ const addExecutionRecord = async (task: any) => {
 }
 
 // 提交项目记录
-const submitProjectRecord = () => {
+const submitProjectRecord = async () => {
   if (!projectForm.projectId || !projectForm.title || !projectForm.summary) {
     alert('请填写完整信息')
     return
   }
 
-  const newRecord = {
-    id: Date.now(),
-    projectId: parseInt(projectForm.projectId),
-    title: projectForm.title,
-    summary: projectForm.summary,
-    content: projectForm.content,
-    tags: projectForm.tags,
-    updateTime: new Date().toLocaleString()
+  try {
+    const response = await request.post('/project/insight', {
+      projectId: parseInt(projectForm.projectId),
+      title: projectForm.title,
+      summary: projectForm.summary,
+      content: projectForm.content,
+      tags: projectForm.tags.join(',') // 转换为逗号分隔的字符串
+    })
+
+    if (response.code === 200) {
+      await loadProjectInsights() // 重新加载列表
+      closeCreateRecord()
+      alert('项目心得保存成功！')
+    } else {
+      alert('保存失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('保存项目心得失败:', error)
+    alert('保存失败，请稍后重试')
   }
-
-  projectRecords.value.unshift(newRecord)
-
-  closeCreateRecord()
-  alert('项目心得保存成功！')
 }
 
 // 关闭创建记录表单
@@ -2824,40 +2925,50 @@ const editProjectRecord = (record: any) => {
 }
 
 // 删除项目记录
-const deleteProjectRecord = (id: number) => {
-  if (confirm('确定要删除这条项目心得吗？此操作不可撤销。')) {
-    const index = projectRecords.value.findIndex(record => record.id === id)
-    if (index !== -1) {
-      projectRecords.value.splice(index, 1)
+const deleteProjectRecord = async (id: number) => {
+  if (!confirm('确定要删除这条项目心得吗？此操作不可撤销。')) return
+
+  try {
+    const response = await request.delete(`/project/insight/${id}`)
+    if (response.code === 200) {
+      await loadProjectInsights() // 重新加载列表
       alert('项目心得已删除！')
+    } else {
+      alert('删除失败：' + (response.message || '未知错误'))
     }
+  } catch (error) {
+    console.error('删除项目心得失败:', error)
+    alert('删除失败，请稍后重试')
   }
 }
 
 // 提交编辑记录
-const submitEditRecord = () => {
+const submitEditRecord = async () => {
   if (!editForm.projectId || !editForm.title || !editForm.summary) {
     alert('请填写完整信息')
     return
   }
 
-  const updatedRecord = {
-    id: editForm.id,
-    projectId: parseInt(editForm.projectId),
-    title: editForm.title,
-    summary: editForm.summary,
-    content: editForm.content,
-    tags: editForm.tags,
-    updateTime: new Date().toLocaleString()
-  }
+  try {
+    const response = await request.put(`/project/insight/${editForm.id}`, {
+      projectId: parseInt(editForm.projectId),
+      title: editForm.title,
+      summary: editForm.summary,
+      content: editForm.content,
+      tags: editForm.tags.join(',') // 转换为逗号分隔的字符串
+    })
 
-  const index = projectRecords.value.findIndex(record => record.id === updatedRecord.id)
-  if (index !== -1) {
-    projectRecords.value.splice(index, 1, updatedRecord)
-    alert('项目心得已更新！')
+    if (response.code === 200) {
+      await loadProjectInsights() // 重新加载列表
+      closeEditRecord()
+      alert('项目心得已更新！')
+    } else {
+      alert('更新失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('更新项目心得失败:', error)
+    alert('更新失败，请稍后重试')
   }
-
-  closeEditRecord()
 }
 
 // 关闭编辑记录弹窗
@@ -3172,7 +3283,106 @@ const toggleTimeGroupCollapse = (timeGroupKey: string) => {
 // 操作视图控制
 const currentOperation = ref('')
 
-const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueManagement') => {
+// ========== 打卡操作相关 ==========
+
+// 打卡项目列表
+const checkinItems = ref<CheckinItem[]>([])
+const checkinStatus = ref<Record<number, boolean>>({})
+
+// 激活的打卡项目（状态为active）
+const activeCheckinItems = computed(() => {
+  return checkinItems.value.filter(item => item.status === 'active')
+})
+
+// 加载打卡项目
+const loadCheckinItems = async () => {
+  try {
+    const response = await getCheckinItemList()
+    if (response.code === 200) {
+      checkinItems.value = response.data || []
+      // 加载每个项目的打卡状态
+      await loadCheckinStatuses()
+    }
+  } catch (error) {
+    console.error('加载打卡项目失败:', error)
+  }
+}
+
+// 加载所有打卡状态
+const loadCheckinStatuses = async () => {
+  for (const item of checkinItems.value) {
+    if (item.id) {
+      try {
+        const response = await checkCheckinStatus(item.id, item.frequency)
+        if (response.code === 200 && response.data) {
+          checkinStatus.value[item.id] = response.data.isCheckedIn || false
+        }
+      } catch (error) {
+        console.error('加载打卡状态失败:', error)
+      }
+    }
+  }
+}
+
+// 打卡
+const handleCheckin = async (itemId: number) => {
+  try {
+    const response = await checkinAPI(itemId)
+    if (response.code === 200) {
+      checkinStatus.value[itemId] = true
+      alert('打卡成功！')
+    } else {
+      alert('打卡失败：' + (response.message || '未知错误'))
+    }
+  } catch (error: any) {
+    console.error('打卡失败:', error)
+    alert('打卡失败：' + (error.message || '请稍后重试'))
+  }
+}
+
+// 取消打卡
+const handleCancelCheckin = async (itemId: number) => {
+  if (!confirm('确定要取消本周期的打卡吗？')) return
+  
+  try {
+    const response = await cancelCheckinAPI(itemId)
+    if (response.code === 200) {
+      checkinStatus.value[itemId] = false
+      alert('已取消打卡！')
+    } else {
+      alert('取消打卡失败：' + (response.message || '未知错误'))
+    }
+  } catch (error: any) {
+    console.error('取消打卡失败:', error)
+    alert('取消打卡失败：' + (error.message || '请稍后重试'))
+  }
+}
+
+// 获取频率文本（用于打卡）
+const getFrequencyTextForCheckin = (frequency: string) => {
+  const map: Record<string, string> = {
+    'daily': '每日',
+    'weekly': '每周',
+    'monthly': '每月',
+    'quarterly': '每季',
+    'yearly': '每年'
+  }
+  return map[frequency] || frequency
+}
+
+// 获取频率样式（用于打卡）
+const getFrequencyClassForCheckin = (frequency: string) => {
+  const map: Record<string, string> = {
+    'daily': 'bg-blue-100 text-blue-700',
+    'weekly': 'bg-green-100 text-green-700',
+    'monthly': 'bg-purple-100 text-purple-700',
+    'quarterly': 'bg-orange-100 text-orange-700',
+    'yearly': 'bg-red-100 text-red-700'
+  }
+  return map[frequency] || 'bg-gray-100 text-gray-700'
+}
+
+const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueManagement' | 'checkinOperation') => {
   // 关闭所有相关视图（为未来扩展预留）
   currentOperation.value = ''
   setTimeout(() => {
@@ -3180,6 +3390,10 @@ const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueMana
     // 如果打开问题管理，加载问题列表
     if (operation === 'issueManagement') {
       loadIssues()
+    }
+    // 如果打开打卡操作，加载打卡项目
+    if (operation === 'checkinOperation') {
+      loadCheckinItems()
     }
   }, 0)
 }
@@ -3195,6 +3409,7 @@ const showImageResizer = ref(false)
 onMounted(() => {
   // 加载数据
   loadData()
+  loadProjectInsights()
   
   // 点击外部关闭表格菜单
   document.addEventListener('click', (event) => {
@@ -3208,6 +3423,7 @@ onMounted(() => {
 onActivated(() => {
   // 页面激活时重新加载数据
   loadData()
+  loadProjectInsights()
 })
 
 // ========== 问题管理相关 ==========

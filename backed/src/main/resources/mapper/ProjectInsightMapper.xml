@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectInsightMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectInsight">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="content" property="content"/>
+        <result column="tags" property="tags"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <!-- 插入项目心得 -->
+    <insert id="insert" parameterType="com.knowledge.entity.ProjectInsight" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_project_insight (
+            project_id, title, summary, content, tags,
+            rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+        ) VALUES (
+            #{projectId}, #{title}, #{summary}, #{content}, #{tags},
+            #{recCreator}, NOW(), #{recRevisor}, NOW(), 1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_project_insight
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有项目心得 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_project_insight
+        WHERE rec_creator = #{username} AND arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据项目ID查询 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT * FROM km_project_insight
+        WHERE project_id = #{projectId}
+          AND rec_creator = #{username}
+          AND arch_flag = 1
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 更新项目心得 -->
+    <update id="update" parameterType="com.knowledge.entity.ProjectInsight">
+        UPDATE km_project_insight
+        SET
+            project_id = #{projectId},
+            title = #{title},
+            summary = #{summary},
+            content = #{content},
+            tags = #{tags},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id} AND arch_flag = 1
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="delete">
+        UPDATE km_project_insight
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id} AND arch_flag = 1
+    </update>
+
+</mapper>
+
+
