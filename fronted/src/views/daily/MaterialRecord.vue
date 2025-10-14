@@ -4803,9 +4803,10 @@ const submitRecord = async () => {
   
   // 检查编辑器是否有实际内容（不是空的HTML标签）
   let hasContent = false
+  let contentFieldName = '内容'
   
   if (recordForm.type === 'memorization') {
-    // 对于背诵笔记，检查三个专用编辑器的内容
+    // 背诵笔记：检查三个专用编辑器的内容
     const originalTextContent = originalTextEditor.value?.getHTML() || ''
     const explanationContent = explanationEditor.value?.getHTML() || ''
     const cueContent = cueEditor.value?.getHTML() || ''
@@ -4815,10 +4816,57 @@ const submitRecord = async () => {
     const hasCue = cueContent && cueContent.trim() !== '' && cueContent !== '<p></p>' && cueContent !== '<p><br></p>'
     
     hasContent = hasOriginalText || hasExplanation || hasCue
+    contentFieldName = '背诵内容（原文/解释/提示词至少填一项）'
     console.log('背诵笔记内容检查:', { hasOriginalText, hasExplanation, hasCue, hasContent })
+  } else if (recordForm.type === 'exercise') {
+    // 刷题笔记：检查三个专用编辑器的内容
+    const questionContent = questionDescriptionEditor.value?.getHTML() || ''
+    const analysisContent = analysisEditor.value?.getHTML() || ''
+    const answerContent = referenceAnswerEditor.value?.getHTML() || ''
+    
+    const hasQuestion = questionContent && questionContent.trim() !== '' && questionContent !== '<p></p>' && questionContent !== '<p><br></p>'
+    const hasAnalysis = analysisContent && analysisContent.trim() !== '' && analysisContent !== '<p></p>' && analysisContent !== '<p><br></p>'
+    const hasAnswer = answerContent && answerContent.trim() !== '' && answerContent !== '<p></p>' && answerContent !== '<p><br></p>'
+    
+    hasContent = hasQuestion || hasAnalysis || hasAnswer
+    contentFieldName = '题目内容（题目描述/分析理解/参考答案至少填一项）'
+    console.log('刷题笔记内容检查:', { hasQuestion, hasAnalysis, hasAnswer, hasContent })
+  } else if (recordForm.type === 'practical') {
+    // 实战笔记：检查三个专用编辑器的内容
+    const requirementContent = requirementDescriptionEditor.value?.getHTML() || ''
+    const designContent = designThinkingEditor.value?.getHTML() || ''
+    const referenceContent = referenceDesignEditor.value?.getHTML() || ''
+    
+    const hasRequirement = requirementContent && requirementContent.trim() !== '' && requirementContent !== '<p></p>' && requirementContent !== '<p><br></p>'
+    const hasDesign = designContent && designContent.trim() !== '' && designContent !== '<p></p>' && designContent !== '<p><br></p>'
+    const hasReference = referenceContent && referenceContent.trim() !== '' && referenceContent !== '<p></p>' && referenceContent !== '<p><br></p>'
+    
+    hasContent = hasRequirement || hasDesign || hasReference
+    contentFieldName = '项目内容（需求描述/设计思路/参考设计至少填一项）'
+    console.log('实战笔记内容检查:', { hasRequirement, hasDesign, hasReference, hasContent })
+  } else if (recordForm.type === 'study') {
+    // 求学笔记：检查六个专用编辑器的内容
+    const coreConceptContent = coreConceptEditor.value?.getHTML() || ''
+    const mechanismContent = mechanismEditor.value?.getHTML() || ''
+    const applicationContent = applicationCaseEditor.value?.getHTML() || ''
+    const extensionContent = extensionEditor.value?.getHTML() || ''
+    const mistakeContent = commonMistakeEditor.value?.getHTML() || ''
+    const reflectionContent = reflectionEditor.value?.getHTML() || ''
+    
+    const hasCoreConcept = coreConceptContent && coreConceptContent.trim() !== '' && coreConceptContent !== '<p></p>' && coreConceptContent !== '<p><br></p>'
+    const hasMechanism = mechanismContent && mechanismContent.trim() !== '' && mechanismContent !== '<p></p>' && mechanismContent !== '<p><br></p>'
+    const hasApplication = applicationContent && applicationContent.trim() !== '' && applicationContent !== '<p></p>' && applicationContent !== '<p><br></p>'
+    const hasExtension = extensionContent && extensionContent.trim() !== '' && extensionContent !== '<p></p>' && extensionContent !== '<p><br></p>'
+    const hasMistake = mistakeContent && mistakeContent.trim() !== '' && mistakeContent !== '<p></p>' && mistakeContent !== '<p><br></p>'
+    const hasReflection = reflectionContent && reflectionContent.trim() !== '' && reflectionContent !== '<p></p>' && reflectionContent !== '<p><br></p>'
+    
+    hasContent = hasCoreConcept || hasMechanism || hasApplication || hasExtension || hasMistake || hasReflection
+    contentFieldName = '学习内容（核心概念/机制原理/应用案例/延伸对比/常见误区/思考理解至少填一项）'
+    console.log('求学笔记内容检查:', { hasCoreConcept, hasMechanism, hasApplication, hasExtension, hasMistake, hasReflection, hasContent })
   } else {
-    // 对于其他笔记类型，检查通用编辑器
+    // 框架笔记、碎片笔记：检查通用编辑器
     hasContent = editorContent && editorContent.trim() !== '' && editorContent !== '<p></p>' && editorContent !== '<p><br></p>'
+    contentFieldName = '内容'
   }
   
   console.log('是否有内容:', hasContent)
@@ -4831,7 +4879,7 @@ const submitRecord = async () => {
   if (!recordForm.title || !hasContent || !recordForm.type) {
     let missingFields = []
     if (!recordForm.title) missingFields.push('标题')
-    if (!hasContent) missingFields.push(recordForm.type === 'memorization' ? '背诵内容' : '内容')
+    if (!hasContent) missingFields.push(contentFieldName)
     if (!recordForm.type) missingFields.push('类型')
     
     alert(`请填写完整信息，缺少：${missingFields.join('、')}`)
@@ -4839,7 +4887,16 @@ const submitRecord = async () => {
   }
 
   // 准备提交的数据
-      const finalContent = recordForm.type === 'memorization' ? recordForm.originalText : editorContent
+  // 对于有专用富文本编辑器的笔记类型，content字段设置为空字符串
+  let finalContent = ''
+  if (recordForm.type === 'memorization' || recordForm.type === 'exercise' || 
+      recordForm.type === 'practical' || recordForm.type === 'study') {
+    // 这些类型有专用编辑器，content字段可以为空
+    finalContent = ''
+  } else {
+    // 框架笔记、碎片笔记使用通用编辑器
+    finalContent = editorContent
+  }
       
   const noteData: any = {
         type: recordForm.type,
@@ -4855,6 +4912,12 @@ const submitRecord = async () => {
       } else if (recordForm.type === 'study') {
     noteData.studySubject = recordForm.studySubject.join(',')
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+    noteData.coreConcept = recordForm.coreConcept
+    noteData.mechanism = recordForm.mechanism
+    noteData.applicationCase = recordForm.applicationCase
+    noteData.extension = recordForm.extension
+    noteData.commonMistake = recordForm.commonMistake
+    noteData.reflection = recordForm.reflection
              } else if (recordForm.type === 'memorization') {
     noteData.project = recordForm.project
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
@@ -4866,9 +4929,15 @@ const submitRecord = async () => {
     noteData.exerciseSubject = recordForm.exerciseSubject
     noteData.exerciseKnowledge = recordForm.exerciseKnowledge.join(',')
     noteData.exerciseDifficulty = recordForm.exerciseDifficulty
+    noteData.questionDescription = recordForm.questionDescription
+    noteData.analysis = recordForm.analysis
+    noteData.referenceAnswer = recordForm.referenceAnswer
       } else if (recordForm.type === 'practical') {
     noteData.techTags = recordForm.techTags.join(',')
     noteData.projectType = recordForm.projectType.join(',')
+    noteData.requirementDescription = recordForm.requirementDescription
+    noteData.designThinking = recordForm.designThinking
+    noteData.referenceDesign = recordForm.referenceDesign
       } else if (recordForm.type === 'fragment') {
     noteData.fragmentCategory = recordForm.fragmentCategory.join(',')
     noteData.fragmentTheme = recordForm.fragmentTheme.join(',')

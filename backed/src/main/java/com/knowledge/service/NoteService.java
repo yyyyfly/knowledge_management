@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -72,6 +74,34 @@ public class NoteService {
     @Transactional(rollbackFor = Exception.class)
     public boolean delete(Long id) {
         return noteMapper.deleteById(id) > 0;
+    }
+    
+    /**
+     * 根据类型获取推荐巩固的笔记（限5条）
+     */
+    public List<Note> getByTypeRecommended(String type, String recCreator) {
+        return noteMapper.selectByTypeRecommended(type, recCreator);
+    }
+    
+    /**
+     * 完成巩固
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void completeReview(Long id, String recCreator) {
+        Note note = noteMapper.selectById(id, recCreator);
+        if (note != null) {
+            // 更新巩固次数
+            if (note.getReviewCount() == null) {
+                note.setReviewCount(1);
+            } else {
+                note.setReviewCount(note.getReviewCount() + 1);
+            }
+            // 更新最后巩固时间
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            note.setLastReviewTime(LocalDateTime.now().format(formatter));
+            // 只更新巩固相关信息，不更新其他字段
+            noteMapper.updateReviewInfo(note);
+        }
     }
 }
 

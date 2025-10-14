@@ -90,6 +90,26 @@ export const deleteNote = (id: number) => {
   })
 }
 
+/**
+ * 根据类型获取推荐巩固的笔记（限5条）
+ */
+export const getRecommendedNotes = (type: string) => {
+  return request({
+    url: `/note/type/${type}/recommended`,
+    method: 'get'
+  })
+}
+
+/**
+ * 完成巩固
+ */
+export const completeReview = (id: number) => {
+  return request({
+    url: `/note/${id}/review`,
+    method: 'post'
+  })
+}
+
 
 
 

@@ -13,174 +13,6 @@
       </div>
     </div>
 
-    <!-- 核心数据展示 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <!-- 项目模板数 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">项目模板</p>
-            <p class="text-3xl font-bold text-gray-900">{{ projectTemplates.length }}</p>
-            <p class="text-xs text-green-600 font-medium mt-1">
-              <i class="fas fa-arrow-up text-xs mr-1"></i>+{{ Math.floor(projectTemplates.length * 0.2) }} 本月
-            </p>
-          </div>
-          <div class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
-            <i class="fas fa-layer-group text-white text-2xl"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- 实战笔记数 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">实战笔记</p>
-            <p class="text-3xl font-bold text-gray-900">{{ practicalNotes.length }}</p>
-            <p class="text-xs text-green-600 font-medium mt-1">
-              <i class="fas fa-arrow-up text-xs mr-1"></i>+{{ thisMonthNotes.length }} 本月
-            </p>
-          </div>
-          <div class="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
-            <i class="fas fa-code text-white text-2xl"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- 技术栈数量 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 mb-1">使用技术</p>
-            <p class="text-3xl font-bold text-gray-900">{{ techStackStats.length }}</p>
-            <p class="text-xs text-blue-600 font-medium mt-1">
-              <i class="fas fa-tools text-xs mr-1"></i>{{ projectTemplates.length }} 个项目模板
-            </p>
-          </div>
-          <div class="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
-            <i class="fas fa-cogs text-white text-2xl"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- 阅读笔记入口 -->
-      <div 
-        @click="showNotesList = true"
-        class="group relative cursor-pointer bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-6 hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
-      >
-        <!-- 背景装饰 -->
-        <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-200 to-transparent rounded-full -translate-y-10 translate-x-10 opacity-60"></div>
-        
-        <div class="relative z-10">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p class="text-lg font-bold text-gray-900">阅读笔记</p>
-              <p class="text-sm text-gray-600">浏览所有实战记录</p>
-            </div>
-            <div class="p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
-              <i class="fas fa-book-open text-white text-xl"></i>
-            </div>
-          </div>
-
-          <!-- 快捷信息 -->
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-600">{{ practicalNotes.length }} 条记录</span>
-            <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-sm group-hover:shadow-md transition-shadow">
-              立即查看 <i class="fas fa-arrow-right ml-1"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 实战概览仪表盘 -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- 项目领域分布 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-          <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
-          项目领域分布
-        </h3>
-        <div class="space-y-3">
-          <div v-for="(domain, index) in domainStats.slice(0, 5)" :key="domain.name" 
-               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
-                {{ index + 1 }}
-              </div>
-              <span class="text-sm font-medium text-gray-900">{{ domain.name }}</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-16 bg-gray-200 rounded-full h-2">
-                <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" 
-                     :style="{ width: (domain.count / Math.max(...domainStats.map(d => d.count)) * 100) + '%' }"></div>
-              </div>
-              <span class="text-xs text-gray-600 font-medium w-8 text-right">{{ domain.count }}</span>
-            </div>
-          </div>
-          <div v-if="domainStats.length === 0" class="text-center py-4 text-gray-500 text-sm">
-            暂无领域数据
-          </div>
-        </div>
-      </div>
-
-      <!-- 笔记技术栈统计 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-          <i class="fas fa-code text-purple-600 mr-2"></i>
-          技术栈统计
-        </h3>
-        <div class="space-y-3">
-          <div v-for="(tech, index) in techStackStats.slice(0, 5)" :key="tech.name" 
-               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">
-                {{ index + 1 }}
-              </div>
-              <span class="text-sm font-medium text-gray-900">{{ tech.name }}</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div class="w-16 bg-gray-200 rounded-full h-2">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full" 
-                     :style="{ width: (tech.count / Math.max(...techStackStats.map(t => t.count)) * 100) + '%' }"></div>
-              </div>
-              <span class="text-xs text-gray-600 font-medium w-8 text-right">{{ tech.count }}</span>
-            </div>
-          </div>
-          <div v-if="techStackStats.length === 0" class="text-center py-4 text-gray-500 text-sm">
-            暂无技术栈数据
-          </div>
-        </div>
-      </div>
-
-      <!-- 最近活动 -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-          <i class="fas fa-clock text-green-600 mr-2"></i>
-          最近活动
-        </h3>
-        <div class="space-y-3">
-          <div v-for="note in getRecentNotes().slice(0, 4)" :key="note.id" 
-               class="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer group"
-               @click="viewRecentNoteDetail(note)">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h4 class="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">{{ note.title }}</h4>
-                <p class="text-xs text-gray-600 mt-1 line-clamp-1">{{ note.content }}</p>
-                <div class="flex items-center mt-2 space-x-2">
-                  <span v-if="note.template" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                    {{ note.template }}
-                  </span>
-                  <span class="text-xs text-gray-500">{{ note.time }}</span>
-                </div>
-              </div>
-              <div class="w-2 h-2 bg-green-500 rounded-full ml-3 mt-2 flex-shrink-0"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 项目模板管理区域 -->
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
       <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
@@ -194,28 +26,6 @@
             <i class="fas fa-plus"></i>
             <span class="font-medium">创建模板</span>
           </button>
-        </div>
-      </div>
-
-      <!-- 模板统计 -->
-      <div class="p-6 bg-gray-50 border-b border-gray-100">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="text-center">
-            <div class="text-2xl font-bold text-blue-600">{{ projectTemplates.length }}</div>
-            <div class="text-sm text-gray-600">总模板数</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-green-600">{{ totalFunctionalRequirements }}</div>
-            <div class="text-sm text-gray-600">功能需求</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-purple-600">{{ totalNonFunctionalRequirements }}</div>
-            <div class="text-sm text-gray-600">非功能性需求</div>
-          </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-orange-600">{{ practicalNotes.length }}</div>
-            <div class="text-sm text-gray-600">实战笔记</div>
-          </div>
         </div>
       </div>
 
@@ -260,8 +70,8 @@
                 <div class="text-xs text-gray-600">功能需求</div>
               </div>
               <div class="text-center p-3 bg-green-50 rounded-lg">
-                <div class="text-lg font-bold text-green-600">{{ getImplementationCount(template.id) }}</div>
-                <div class="text-xs text-gray-600">实战笔记</div>
+                <div class="text-lg font-bold text-green-600">{{ template.commonFeatures.length }}</div>
+                <div class="text-xs text-gray-600">非功能性需求</div>
               </div>
             </div>
 
@@ -298,6 +108,37 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- 推荐巩固区 -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">推荐巩固（{{ recommendedNotes.length }}/5）</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div v-for="note in recommendedNotes" :key="note.id"
+             @click="viewNoteDetail(note)"
+             class="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-orange-400 hover:shadow-lg cursor-pointer transition-all">
+          <h3 class="font-bold text-gray-900 mb-2 line-clamp-2">{{ note.title }}</h3>
+          <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ note.summary || '暂无摘要' }}</p>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-500">巩固 {{ note.reviewCount || 0 }} 次</span>
+            <span class="text-gray-500">{{ formatLastReviewTime(note.lastReviewTime) }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 空状态 -->
+      <div v-if="recommendedNotes.length === 0" class="text-center py-12">
+        <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+        <p class="text-gray-600">太棒了！暂时没有需要巩固的笔记</p>
+      </div>
+    </div>
+
+    <!-- 手动复习区 -->
+    <div @click="showNotesList = true"
+         class="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl p-8 hover:shadow-lg cursor-pointer transition-all text-center">
+      <i class="fas fa-search text-4xl text-orange-600 mb-4"></i>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">搜索所有笔记</h3>
+      <p class="text-gray-600">手动选择想要复习的笔记内容</p>
     </div>
 
     <!-- 新增/编辑模板弹窗 -->
@@ -446,7 +287,7 @@
           
           <div class="p-6 space-y-6">
             <!-- 需求概览 -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 gap-4">
               <div class="text-center p-4 bg-blue-50 rounded-xl">
                 <div class="text-2xl font-bold text-blue-600">{{ selectedTemplateDetail?.requirements?.length || 0 }}</div>
                 <div class="text-sm text-gray-600">功能需求</div>
@@ -454,14 +295,6 @@
               <div class="text-center p-4 bg-green-50 rounded-xl">
                 <div class="text-2xl font-bold text-green-600">{{ selectedTemplateDetail?.commonFeatures?.length || 0 }}</div>
                 <div class="text-sm text-gray-600">非功能性需求</div>
-              </div>
-              <div class="text-center p-4 bg-purple-50 rounded-xl">
-                <div class="text-2xl font-bold text-purple-600">{{ selectedTemplateDetail ? getTemplateNotes(selectedTemplateDetail.id).length : 0 }}</div>
-                <div class="text-sm text-gray-600">实战笔记</div>
-              </div>
-              <div class="text-center p-4 bg-orange-50 rounded-xl">
-                <div class="text-2xl font-bold text-orange-600">{{ selectedTemplateDetail ? getTemplateTechStacks(selectedTemplateDetail.id).length : 0 }}</div>
-                <div class="text-sm text-gray-600">技术栈</div>
               </div>
             </div>
 
@@ -494,8 +327,6 @@
                 </div>
               </div>
             </div>
-
-
           </div>
         </div>
       </div>
@@ -514,7 +345,7 @@
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-white">实战笔记列表</h3>
-                  <p class="text-orange-100">{{ practicalNotes.length }} 条实战记录 · 持续学习成长</p>
+                  <p class="text-orange-100">{{ practicalNotes.length }} 条实战记录</p>
                 </div>
               </div>
               <button @click="showNotesList = false" class="text-white/80 hover:text-white transition-colors">
@@ -525,23 +356,10 @@
           
           <!-- 搜索和筛选 -->
           <div class="p-6 border-b border-gray-200 bg-gray-50">
-            <div class="flex flex-col md:flex-row gap-4">
-              <div class="flex-1">
-                <div class="relative">
-                  <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                  <input v-model="searchQuery" type="text" placeholder="搜索笔记标题、内容或技术栈..."
-                         class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all">
-                </div>
-              </div>
-              <div class="flex space-x-3">
-                <select v-model="selectedTemplate" 
-                        class="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white">
-                  <option :value="null">全部模板</option>
-                  <option v-for="template in projectTemplates" :key="template.id" :value="template">
-                    {{ template.name }}
-                  </option>
-                </select>
-              </div>
+            <div class="relative">
+              <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input v-model="searchQuery" type="text" placeholder="搜索笔记标题、内容或技术栈..."
+                     class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all">
             </div>
           </div>
           
@@ -560,9 +378,15 @@
                   <p class="text-sm text-gray-600 line-clamp-2">{{ note.summary }}</p>
                 </div>
 
+                <!-- 巩固信息 -->
+                <div class="flex items-center justify-between text-xs mb-4 p-2 bg-gray-50 rounded-lg">
+                  <span class="text-gray-500">巩固 {{ note.reviewCount || 0 }} 次</span>
+                  <span class="text-gray-500">{{ formatLastReviewTime(note.lastReviewTime) }}</span>
+                </div>
+
                 <!-- 技术栈标签 -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                  <span v-for="tech in note.techStack?.slice(0, 3)" :key="tech" 
+                  <span v-for="tech in (note.techStack || []).slice(0, 3)" :key="tech" 
                         class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium">
                     {{ tech }}
                   </span>
@@ -575,12 +399,7 @@
                 <!-- 底部信息 -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                   <span class="text-xs text-gray-500">{{ formatDate(note.createTime) }}</span>
-                  <div class="flex items-center space-x-2">
-                    <span v-if="note.projectName" class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium">
-                      {{ note.projectName }}
-                    </span>
-                    <i class="fas fa-arrow-right text-orange-500 group-hover:translate-x-1 transition-transform"></i>
-                  </div>
+                  <i class="fas fa-arrow-right text-orange-500 group-hover:translate-x-1 transition-transform"></i>
                 </div>
               </div>
               
@@ -590,7 +409,7 @@
                   <i class="fas fa-search text-3xl text-gray-400"></i>
                 </div>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">未找到匹配的笔记</h3>
-                <p class="text-gray-600">请尝试调整搜索条件或筛选器</p>
+                <p class="text-gray-600">请尝试调整搜索条件</p>
               </div>
             </div>
           </div>
@@ -608,9 +427,6 @@
               <div>
                 <h3 class="text-2xl font-bold text-white">{{ selectedNote?.title }}</h3>
                 <div class="flex items-center mt-2 space-x-3">
-                  <span v-if="selectedNote?.projectName" class="px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
-                    {{ selectedNote.projectName }}
-                  </span>
                   <span class="text-orange-100 text-sm">{{ formatDate(selectedNote?.createTime || '') }}</span>
                 </div>
               </div>
@@ -621,6 +437,20 @@
           </div>
           
           <div v-if="selectedNote" class="p-6 space-y-6">
+            <!-- 巩固历史 -->
+            <div class="bg-orange-50 rounded-xl p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-sm text-gray-600">巩固历史：</span>
+                  <span class="text-lg font-bold text-orange-600 ml-2">已巩固 {{ selectedNote.reviewCount || 0 }} 次</span>
+                </div>
+                <span v-if="selectedNote.lastReviewTime" class="text-sm text-gray-600">
+                  上次巩固：{{ formatLastReviewTime(selectedNote.lastReviewTime) }}
+                </span>
+                <span v-else class="text-sm text-gray-600">尚未巩固</span>
+              </div>
+            </div>
+            
             <!-- 摘要 -->
             <div class="bg-orange-50 rounded-xl p-6">
               <h4 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
@@ -630,13 +460,25 @@
               <p class="text-gray-700">{{ selectedNote.summary }}</p>
             </div>
             
+            <!-- Tab切换 -->
+            <div class="flex space-x-2 mb-2 flex-wrap">
+              <button v-for="tab in tabs" :key="tab.value" @click="activeTab = tab.value"
+                :class="[ 'px-4 py-2 rounded-t-lg font-medium transition', activeTab === tab.value ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ]">
+                {{ tab.label }}
+              </button>
+            </div>
+            
             <!-- 详细内容 -->
             <div class="bg-white border border-gray-200 rounded-xl p-6">
               <h4 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
                 <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
                 详细内容
               </h4>
-              <div class="text-gray-700 prose prose-sm max-w-none" v-html="selectedNote.content"></div>
+              <div class="text-gray-700 prose prose-sm max-w-none">
+                <div v-if="activeTab === 'requirement'" v-html="selectedNote.requirementDescription || '暂无内容'"></div>
+                <div v-else-if="activeTab === 'design'" v-html="selectedNote.designThinking || '暂无内容'"></div>
+                <div v-else-if="activeTab === 'reference'" v-html="selectedNote.referenceDesign || '暂无内容'"></div>
+              </div>
             </div>
             
             <!-- 技术栈信息 -->
@@ -652,6 +494,20 @@
                 </span>
               </div>
             </div>
+
+            <!-- 完成巩固按钮 -->
+            <div class="flex gap-4">
+              <button @click="handleCompleteReview" 
+                      class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+                <i class="fas fa-check-circle mr-2"></i>
+                完成巩固
+              </button>
+              <button @click="showNoteDetail = false" 
+                      class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-xl font-medium transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                关闭
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -663,6 +519,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onActivated } from 'vue'
 import { getAllNotes } from '@/services/noteService'
+import { getRecommendedNotes, completeReview } from '@/api/note'
 import { getAllProjectTemplates, createProjectTemplate, updateProjectTemplate, deleteProjectTemplate } from '@/api/projectTemplate'
 import type { ProjectTemplate as ApiProjectTemplate } from '@/api/projectTemplate'
 
@@ -673,15 +530,18 @@ type Note = {
   content?: string
   type: string
   tags?: string[]
-  // 实战笔记特定字段
   techStack?: string[]
   projectName?: string
   projectType?: string
-  // 标准字段
   materialIds?: string
   recCreator?: string
   recCreateTime?: string
   createTime?: string
+  reviewCount?: number
+  lastReviewTime?: string
+  requirementDescription?: string
+  designThinking?: string
+  referenceDesign?: string
 }
 
 export interface ProjectRequirement {
@@ -701,6 +561,7 @@ export interface ProjectTemplate {
 
 // 响应式笔记数据
 const allNotesData = ref<Note[]>([])
+const recommendedNotes = ref<Note[]>([])
 
 // 响应式的项目模板数据
 const projectTemplates = ref<ProjectTemplate[]>([])
@@ -708,13 +569,15 @@ const projectTemplates = ref<ProjectTemplate[]>([])
 // 加载笔记数据和项目模板
 const loadData = async () => {
   try {
-    // 加载笔记
+    // 加载所有笔记
     allNotesData.value = await getAllNotes()
+    
+    // 加载推荐巩固笔记
+    await loadRecommendedNotes()
     
     // 加载项目模板
     const response = await getAllProjectTemplates()
     if (response.code === 200 && response.data) {
-      // 将后端的 JSON 字符串转换为前端对象
       projectTemplates.value = response.data.map((item: ApiProjectTemplate) => ({
         id: item.id || 0,
         domain: item.domain,
@@ -726,6 +589,21 @@ const loadData = async () => {
     }
   } catch (error) {
     console.error('加载数据失败:', error)
+  }
+}
+
+// 加载推荐巩固笔记
+const loadRecommendedNotes = async () => {
+  try {
+    const response = await getRecommendedNotes('practical')
+    if (response.code === 200 && response.data) {
+      recommendedNotes.value = response.data.map((note: any) => ({
+        ...note,
+        techStack: note.techTags ? note.techTags.split(',').filter((t: string) => t) : []
+      }))
+    }
+  } catch (error) {
+    console.error('加载推荐笔记失败:', error)
   }
 }
 
@@ -745,7 +623,14 @@ const showNotesList = ref(false)
 const showNoteDetail = ref(false)
 const selectedNote = ref<Note | null>(null)
 const searchQuery = ref('')
-const selectedTemplate = ref<ProjectTemplate | null>(null)
+
+// Tab切换
+const tabs = [
+  { label: '需求描述', value: 'requirement' },
+  { label: '设计思路', value: 'design' },
+  { label: '参考设计', value: 'reference' }
+]
+const activeTab = ref('requirement')
 
 // 表单数据
 const formData = ref({
@@ -756,80 +641,6 @@ const formData = ref({
   requirements: [] as ProjectRequirement[],
   commonFeatures: [] as ProjectRequirement[]
 })
-
-// 获取模板相关的实战笔记
-const getTemplateNotes = (templateId: number) => {
-  const template = projectTemplates.value.find(t => t.id === templateId)
-  if (!template) return []
-  
-  return allNotesData.value.filter(note => 
-    note.type === 'practical' && 
-    (note.projectName === template.name || 
-     (note.title && note.title.includes(template.name)))
-  )
-}
-
-// 获取模板相关的所有技术栈
-const getTemplateTechStacks = (templateId: number) => {
-  const notes = getTemplateNotes(templateId)
-  const techStacks = new Set<string>()
-  notes.forEach(note => {
-    if (note.techStack && Array.isArray(note.techStack)) {
-      note.techStack.forEach(tech => techStacks.add(tech))
-    }
-  })
-  return Array.from(techStacks)
-}
-
-// 项目领域分布统计
-const domainStats = computed(() => {
-  const domainCount: { [key: string]: number } = {}
-  projectTemplates.value.forEach(template => {
-    const domain = template.domain || '未分类'
-    domainCount[domain] = (domainCount[domain] || 0) + 1
-  })
-  return Object.entries(domainCount)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-})
-
-// 笔记技术栈统计
-const techStackStats = computed(() => {
-  const techCount: { [key: string]: number } = {}
-  allNotesData.value
-    .filter(n => n.type === 'practical')
-    .forEach(note => {
-      if (note.techStack && Array.isArray(note.techStack)) {
-        note.techStack.forEach(tech => {
-          techCount[tech] = (techCount[tech] || 0) + 1
-        })
-      }
-    })
-  return Object.entries(techCount)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-})
-
-// 获取最近笔记
-const getRecentNotes = () => {
-  const practicalNotes = allNotesData.value.filter(n => n.type === 'practical')
-  return practicalNotes
-    .sort((a, b) => new Date(b.createTime || b.recCreateTime || '').getTime() - new Date(a.createTime || a.recCreateTime || '').getTime())
-    .slice(0, 6)
-    .map(note => ({
-      id: note.id,
-      title: note.title,
-      content: note.summary || '',
-      time: formatDate(note.createTime || note.recCreateTime || ''),
-      techStack: note.techStack || [],
-      template: note.projectName || ''
-    }))
-}
-
-// 获取模板的实战笔记数量
-const getImplementationCount = (templateId: number) => {
-  return getTemplateNotes(templateId).length
-}
 
 // 打开新增模态框
 const openAddModal = () => {
@@ -896,7 +707,6 @@ const removeFeature = (index: number) => {
 // 保存模板
 const saveTemplate = async () => {
   try {
-    // 将前端对象转换为后端格式
     const templateData: ApiProjectTemplate = {
       id: isEditing.value ? formData.value.id : undefined,
       domain: formData.value.domain,
@@ -914,7 +724,6 @@ const saveTemplate = async () => {
     }
     
     if (response.code === 200) {
-      // 重新加载项目模板列表
       const listResponse = await getAllProjectTemplates()
       if (listResponse.code === 200 && listResponse.data) {
         projectTemplates.value = listResponse.data.map((item: ApiProjectTemplate) => ({
@@ -940,7 +749,6 @@ const deleteTemplate = async (id: number) => {
     try {
       const response = await deleteProjectTemplate(id)
       if (response.code === 200) {
-        // 重新加载项目模板列表
         const listResponse = await getAllProjectTemplates()
         if (listResponse.code === 200 && listResponse.data) {
           projectTemplates.value = listResponse.data.map((item: ApiProjectTemplate) => ({
@@ -970,43 +778,17 @@ function closeDetail() {
   selectedTemplateDetail.value = null
 }
 
-const totalFunctionalRequirements = computed(() => {
-  return projectTemplates.value.reduce((sum, tpl) => sum + (tpl.requirements?.length || 0), 0)
-})
-
-const totalNonFunctionalRequirements = computed(() => {
-  return projectTemplates.value.reduce((sum, tpl) => sum + (tpl.commonFeatures?.length || 0), 0)
-})
-
-// 获取本月新增笔记
-const thisMonthNotes = computed(() => {
-  const now = new Date()
-  const practicalNotes = allNotesData.value.filter(n => n.type === 'practical')
-  return practicalNotes.filter(n => {
-    const noteDate = new Date(n.recCreateTime || n.createTime || '')
-    return noteDate.getMonth() === now.getMonth() && noteDate.getFullYear() === now.getFullYear()
-  })
-})
-
 // 获取过滤后的笔记列表
-const filteredNotes = computed(() => {
-  const practicalNotes = allNotesData.value.filter(n => n.type === 'practical')
-  let notes = practicalNotes.slice()
+const practicalNotes = computed(() => allNotesData.value.filter(n => n.type === 'practical'))
 
-  if (selectedTemplate.value) {
-    const selectedTemplateName = selectedTemplate.value.name
-    notes = notes.filter(n => 
-      n.title.includes(selectedTemplateName) || 
-      (n.summary && n.summary.includes(selectedTemplateName))
-    )
-  }
+const filteredNotes = computed(() => {
+  let notes = practicalNotes.value.slice()
 
   if (searchQuery.value) {
     notes = notes.filter(n => 
       n.title.includes(searchQuery.value) || 
       (n.summary && n.summary.includes(searchQuery.value)) ||
-      (n.content && n.content.includes(searchQuery.value)) ||
-      (n.techStack && n.techStack.some(tech => tech.includes(searchQuery.value)))
+      (n.content && n.content.includes(searchQuery.value))
     )
   }
 
@@ -1017,15 +799,39 @@ const filteredNotes = computed(() => {
 const viewNoteDetail = (note: any) => {
   selectedNote.value = note
   showNoteDetail.value = true
+  activeTab.value = 'requirement'
 }
 
-// 查看最近笔记详情
-const viewRecentNoteDetail = (recentNote: any) => {
-  const originalNote = allNotesData.value.find(n => n.id === recentNote.id)
-  if (originalNote) {
-    selectedNote.value = originalNote
-    showNoteDetail.value = true
+// 完成巩固
+const handleCompleteReview = async () => {
+  if (!selectedNote.value) return
+  
+  try {
+    await completeReview(selectedNote.value.id)
+    // 重新加载推荐列表和所有笔记
+    await loadRecommendedNotes()
+    await loadData()
+    showNoteDetail.value = false
+    selectedNote.value = null
+  } catch (error) {
+    console.error('完成巩固失败:', error)
+    alert('操作失败，请重试')
   }
+}
+
+// 格式化最后巩固时间
+const formatLastReviewTime = (lastReviewTime: string | undefined) => {
+  if (!lastReviewTime) return '未巩固'
+  
+  const now = new Date()
+  const reviewTime = new Date(lastReviewTime)
+  const diffDays = Math.floor((now.getTime() - reviewTime.getTime()) / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) return '今天'
+  if (diffDays === 1) return '昨天'
+  if (diffDays < 7) return `${diffDays}天前`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
+  return `${Math.floor(diffDays / 30)}个月前`
 }
 
 // 格式化日期
@@ -1033,9 +839,6 @@ const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString()
 }
-
-// 添加practicalNotes计算属性
-const practicalNotes = computed(() => allNotesData.value.filter(n => n.type === 'practical'))
 </script>
 
 <style scoped>
@@ -1048,21 +851,6 @@ const practicalNotes = computed(() => allNotesData.value.filter(n => n.type === 
 .modal-fade-enter-from,
 .modal-fade-leave-to {
   opacity: 0;
-}
-
-.modal-slide-enter-active,
-.modal-slide-leave-active {
-  transition: all 0.3s ease;
-}
-
-.modal-slide-enter-from {
-  opacity: 0;
-  transform: scale(0.9) translateY(-20px);
-}
-
-.modal-slide-leave-to {
-  opacity: 0;
-  transform: scale(0.9) translateY(-20px);
 }
 
 .line-clamp-1 {
@@ -1078,23 +866,4 @@ const practicalNotes = computed(() => allNotesData.value.filter(n => n.type === 
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* 自定义渐变背景 */
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-}
-
-/* 卡片阴影效果 */
-.shadow-card {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* 悬停动画 */
-.hover\:scale-\[1\.02\]:hover {
-  transform: scale(1.02);
-}
-
-.group:hover .group-hover\:translate-x-1 {
-  transform: translateX(0.25rem);
-}
-</style> 
+</style>

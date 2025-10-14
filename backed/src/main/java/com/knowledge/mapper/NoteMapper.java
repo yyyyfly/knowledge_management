@@ -36,6 +36,11 @@ public interface NoteMapper {
     List<Note> search(@Param("keyword") String keyword, @Param("recCreator") String recCreator);
     
     /**
+     * 根据类型查询推荐巩固的笔记（限5条）
+     */
+    List<Note> selectByTypeRecommended(@Param("type") String type, @Param("recCreator") String recCreator);
+    
+    /**
      * 插入笔记
      */
     int insert(Note note);
@@ -44,6 +49,11 @@ public interface NoteMapper {
      * 更新笔记
      */
     int update(Note note);
+    
+    /**
+     * 只更新巩固相关信息
+     */
+    int updateReviewInfo(Note note);
     
     /**
      * 删除笔记

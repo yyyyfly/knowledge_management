@@ -184,6 +184,17 @@ public class Note extends BaseEntity {
      * 重要程度:low-一般,medium-重要,high-非常重要
      */
     private String importance;
+    
+    // ===== 巩固复习字段 =====
+    /**
+     * 巩固次数
+     */
+    private Integer reviewCount;
+    
+    /**
+     * 最后巩固时间
+     */
+    private String lastReviewTime;
 }
 
 

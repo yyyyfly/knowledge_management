@@ -96,5 +96,25 @@ public class NoteController {
         }
         return Result.error("删除失败");
     }
+    
+    /**
+     * 根据类型获取推荐巩固的笔记（限5条）
+     */
+    @GetMapping("/type/{type}/recommended")
+    public Result<List<Note>> getRecommended(@PathVariable String type) {
+        String currentUser = com.knowledge.util.UserContext.getCurrentUser();
+        List<Note> list = noteService.getByTypeRecommended(type, currentUser);
+        return Result.success(list);
+    }
+    
+    /**
+     * 完成巩固
+     */
+    @PostMapping("/{id}/review")
+    public Result<String> completeReview(@PathVariable Long id) {
+        String currentUser = com.knowledge.util.UserContext.getCurrentUser();
+        noteService.completeReview(id, currentUser);
+        return Result.success("巩固完成");
+    }
 }
 
