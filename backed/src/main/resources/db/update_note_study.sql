@@ -9,3 +9,5 @@ ADD COLUMN `extension` TEXT COMMENT '延伸/对比（富文本）' AFTER `applic
 ADD COLUMN `common_mistake` TEXT COMMENT '常见误区（富文本）' AFTER `extension`,
 ADD COLUMN `reflection` TEXT COMMENT '思考理解（富文本）' AFTER `common_mistake`;
 
+
+

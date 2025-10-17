@@ -9,6 +9,182 @@
       <p class="text-gray-600">管理项目结构、任务分配和问题处理，为项目执行提供决策支持</p>
     </div>
 
+    <!-- 天气信息界面 -->
+    <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
+      <button 
+        @click="toggleWeatherSection"
+        class="w-full px-6 py-4 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 transition-all flex items-center justify-between text-white"
+      >
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-cloud-sun text-xl"></i>
+          <h3 class="text-xl font-semibold">天气信息</h3>
+          <span v-if="currentWeather.city" class="text-sm bg-white/20 px-2 py-1 rounded-full">{{ currentWeather.city }}</span>
+        </div>
+        <i :class="isWeatherSectionExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="text-xl transition-transform"></i>
+      </button>
+      
+      <Transition name="collapse">
+        <div v-if="isWeatherSectionExpanded" class="p-6">
+          <!-- 城市选择 -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+              <label class="text-sm font-medium text-gray-700">选择城市：</label>
+              <select 
+                v-model="selectedCity" 
+                @change="loadWeather"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white"
+              >
+                <option value="Shanghai">上海</option>
+                <option value="Beijing">北京</option>
+                <option value="Guangzhou">广州</option>
+                <option value="Shenzhen">深圳</option>
+                <option value="Hangzhou">杭州</option>
+                <option value="Chengdu">成都</option>
+                <option value="Wuhan">武汉</option>
+                <option value="Nanjing">南京</option>
+              </select>
+            </div>
+            <button 
+              @click="loadWeather"
+              class="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 flex items-center space-x-2"
+            >
+              <i class="fas fa-sync-alt"></i>
+              <span>刷新</span>
+            </button>
+          </div>
+
+          <!-- 天气信息加载中 -->
+          <div v-if="weatherLoading" class="text-center py-8">
+            <i class="fas fa-spinner fa-spin text-3xl text-sky-600 mb-2"></i>
+            <p class="text-gray-600">正在获取天气信息...</p>
+          </div>
+
+          <!-- 天气信息错误 -->
+          <div v-else-if="weatherError" class="text-center py-8">
+            <i class="fas fa-exclamation-circle text-3xl text-red-500 mb-2"></i>
+            <p class="text-red-600">{{ weatherError }}</p>
+            <button 
+              @click="loadWeather"
+              class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700"
+            >
+              重新加载
+            </button>
+          </div>
+
+          <!-- 天气信息展示 -->
+          <div v-else-if="currentWeather.temp" class="space-y-4">
+            <!-- 当前天气概览 -->
+            <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl p-6 border border-sky-200">
+              <div class="flex items-start justify-between">
+                <!-- 左侧：温度和天气状况 -->
+                <div class="flex items-center space-x-6">
+                  <div class="text-center">
+                    <div class="text-5xl font-bold text-gray-900">{{ currentWeather.temp }}°</div>
+                    <div class="text-sm text-gray-600 mt-1">{{ currentWeather.feelsLike }}° 体感</div>
+                  </div>
+                  <div class="border-l border-sky-300 pl-6">
+                    <div class="text-2xl font-semibold text-gray-800 mb-2">{{ currentWeather.condition }}</div>
+                    <div class="space-y-1 text-sm text-gray-600">
+                      <div><i class="fas fa-temperature-high text-red-500 mr-2"></i>最高: {{ currentWeather.maxTemp }}°</div>
+                      <div><i class="fas fa-temperature-low text-blue-500 mr-2"></i>最低: {{ currentWeather.minTemp }}°</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- 右侧：天气图标 -->
+                <div class="text-6xl">{{ currentWeather.emoji }}</div>
+              </div>
+            </div>
+
+            <!-- 详细信息 -->
+            <div class="grid grid-cols-4 gap-4">
+              <div class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center space-x-2 text-gray-600 mb-2">
+                  <i class="fas fa-wind text-sky-600"></i>
+                  <span class="text-sm">风速</span>
+                </div>
+                <div class="text-lg font-semibold text-gray-900">{{ currentWeather.windSpeed }}</div>
+              </div>
+              
+              <div class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center space-x-2 text-gray-600 mb-2">
+                  <i class="fas fa-tint text-blue-600"></i>
+                  <span class="text-sm">湿度</span>
+                </div>
+                <div class="text-lg font-semibold text-gray-900">{{ currentWeather.humidity }}%</div>
+              </div>
+              
+              <div class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center space-x-2 text-gray-600 mb-2">
+                  <i class="fas fa-eye text-purple-600"></i>
+                  <span class="text-sm">能见度</span>
+                </div>
+                <div class="text-lg font-semibold text-gray-900">{{ currentWeather.visibility }}</div>
+              </div>
+              
+              <div class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="flex items-center space-x-2 text-gray-600 mb-2">
+                  <i class="fas fa-compress-arrows-alt text-orange-600"></i>
+                  <span class="text-sm">气压</span>
+                </div>
+                <div class="text-lg font-semibold text-gray-900">{{ currentWeather.pressure }}</div>
+              </div>
+            </div>
+
+            <!-- 更新时间 -->
+            <div class="text-center text-xs text-gray-500 pt-2">
+              <i class="fas fa-clock mr-1"></i>
+              更新时间：{{ currentWeather.updateTime }}
+            </div>
+
+            <!-- 未来天气预报 -->
+            <div v-if="forecastWeather.length > 0" class="mt-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-calendar-week text-sky-600 mr-2"></i>
+                未来预报
+                <span class="ml-2 text-sm text-gray-500">({{ forecastWeather.length }}天)</span>
+              </h4>
+              <div class="grid gap-4" :class="{
+                'grid-cols-2': forecastWeather.length === 2,
+                'grid-cols-3': forecastWeather.length === 3
+              }">
+                <div 
+                  v-for="(forecast, index) in forecastWeather" 
+                  :key="index"
+                  class="bg-white rounded-xl p-4 border border-gray-200 hover:border-sky-300 hover:shadow-md transition-all"
+                >
+                  <!-- 日期和星期 -->
+                  <div class="text-center mb-3">
+                    <div class="text-sm text-gray-500">{{ forecast.date }}</div>
+                    <div class="text-base font-semibold text-gray-800">{{ forecast.dayOfWeek }}</div>
+                  </div>
+                  
+                  <!-- 天气图标和状况 -->
+                  <div class="text-center mb-3">
+                    <div class="text-4xl mb-2">{{ forecast.emoji }}</div>
+                    <div class="text-sm text-gray-700">{{ forecast.condition }}</div>
+                  </div>
+                  
+                  <!-- 温度范围 -->
+                  <div class="flex items-center justify-center space-x-2 text-sm">
+                    <div class="flex items-center text-red-600">
+                      <i class="fas fa-temperature-high mr-1"></i>
+                      <span class="font-semibold">{{ forecast.maxTemp }}°</span>
+                    </div>
+                    <span class="text-gray-400">/</span>
+                    <div class="flex items-center text-blue-600">
+                      <i class="fas fa-temperature-low mr-1"></i>
+                      <span class="font-semibold">{{ forecast.minTemp }}°</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </div>
+
     <!-- 日历管理界面 -->
     <div class="bg-white rounded-xl shadow-soft mb-6 overflow-hidden">
       <button 
@@ -1116,6 +1292,36 @@ const tasks = ref<any[]>([])
 const honors = ref<Honor[]>([]) // 荣誉战绩列表
 const checkinItems = ref<CheckinItem[]>([]) // 打卡项目列表
 
+// ========== 天气信息相关 ==========
+const isWeatherSectionExpanded = ref(true) // 天气卡片折叠状态
+const selectedCity = ref('Shanghai') // 默认选择上海
+const weatherLoading = ref(false) // 天气加载状态
+const weatherError = ref('') // 天气错误信息
+const currentWeather = ref({
+  city: '',
+  temp: '',
+  feelsLike: '',
+  maxTemp: '',
+  minTemp: '',
+  condition: '',
+  emoji: '',
+  windSpeed: '',
+  humidity: '',
+  visibility: '',
+  pressure: '',
+  updateTime: ''
+})
+
+// 未来天气预报（3天）
+const forecastWeather = ref<Array<{
+  date: string
+  dayOfWeek: string
+  maxTemp: string
+  minTemp: string
+  condition: string
+  emoji: string
+}>>([])
+
 // 加载数据
 const loadData = async () => {
   try {
@@ -1168,6 +1374,176 @@ const taskFilterStatus = ref('')
 const projectSearchQuery = ref('')
 const projectFilterStatus = ref('')
 const projectFilterCategory = ref('')
+
+// ========== 天气信息功能 ==========
+
+// 切换天气卡片折叠状态
+const toggleWeatherSection = () => {
+  isWeatherSectionExpanded.value = !isWeatherSectionExpanded.value
+  if (isWeatherSectionExpanded.value && !currentWeather.value.temp) {
+    loadWeather()
+  }
+}
+
+// 获取天气图标emoji
+const getWeatherEmoji = (condition: string): string => {
+  const lowerCondition = condition.toLowerCase()
+  if (lowerCondition.includes('sunny') || lowerCondition.includes('clear')) return '☀️'
+  if (lowerCondition.includes('cloud')) return '☁️'
+  if (lowerCondition.includes('rain') || lowerCondition.includes('shower')) return '🌧️'
+  if (lowerCondition.includes('snow')) return '❄️'
+  if (lowerCondition.includes('thunder') || lowerCondition.includes('storm')) return '⛈️'
+  if (lowerCondition.includes('mist') || lowerCondition.includes('fog')) return '🌫️'
+  if (lowerCondition.includes('overcast')) return '☁️'
+  if (lowerCondition.includes('partly')) return '⛅'
+  return '🌤️'
+}
+
+// 将英文天气状况翻译为中文
+const translateWeatherCondition = (englishCondition: string): string => {
+  const lowerCondition = englishCondition.toLowerCase()
+  
+  // 晴天
+  if (lowerCondition.includes('sunny') || lowerCondition === 'clear') return '晴'
+  if (lowerCondition.includes('clear sky')) return '晴空'
+  
+  // 多云
+  if (lowerCondition === 'partly cloudy') return '多云'
+  if (lowerCondition === 'cloudy') return '阴'
+  if (lowerCondition === 'overcast') return '阴天'
+  if (lowerCondition.includes('partly cloud')) return '局部多云'
+  
+  // 雨
+  if (lowerCondition === 'light rain') return '小雨'
+  if (lowerCondition === 'moderate rain') return '中雨'
+  if (lowerCondition === 'heavy rain') return '大雨'
+  if (lowerCondition.includes('rain shower')) return '阵雨'
+  if (lowerCondition.includes('drizzle')) return '毛毛雨'
+  if (lowerCondition.includes('rain')) return '雨'
+  
+  // 雪
+  if (lowerCondition === 'light snow') return '小雪'
+  if (lowerCondition === 'moderate snow') return '中雪'
+  if (lowerCondition === 'heavy snow') return '大雪'
+  if (lowerCondition.includes('snow shower')) return '阵雪'
+  if (lowerCondition.includes('snow')) return '雪'
+  
+  // 雷暴
+  if (lowerCondition.includes('thunder')) return '雷暴'
+  if (lowerCondition.includes('storm')) return '暴风雨'
+  
+  // 雾霾
+  if (lowerCondition === 'mist') return '薄雾'
+  if (lowerCondition === 'fog') return '雾'
+  if (lowerCondition.includes('haze')) return '霾'
+  
+  // 其他
+  if (lowerCondition.includes('windy')) return '大风'
+  if (lowerCondition.includes('dust')) return '浮尘'
+  if (lowerCondition.includes('sand')) return '沙尘'
+  
+  // 如果没有匹配到，返回原文（可能API已返回中文）
+  return englishCondition
+}
+
+// 加载天气信息
+const loadWeather = async () => {
+  weatherLoading.value = true
+  weatherError.value = ''
+  
+  try {
+    // 使用 wttr.in API（免费，无需密钥）
+    // 格式参数说明：%C-天气状况 %t-温度 %f-体感温度 %w-风速 %h-湿度 %V-能见度 %P-气压
+    const response = await fetch(`https://wttr.in/${selectedCity.value}?format=j1`)
+    
+    if (!response.ok) {
+      throw new Error('获取天气信息失败')
+    }
+    
+    const data = await response.json()
+    
+    // 解析当前天气数据
+    const current = data.current_condition?.[0]
+    const today = data.weather?.[0]
+    
+    if (!current) {
+      throw new Error('天气数据格式错误')
+    }
+    
+    // 获取城市名称（中文）
+    const cityNameMap: Record<string, string> = {
+      'Shanghai': '上海',
+      'Beijing': '北京',
+      'Guangzhou': '广州',
+      'Shenzhen': '深圳',
+      'Hangzhou': '杭州',
+      'Chengdu': '成都',
+      'Wuhan': '武汉',
+      'Nanjing': '南京'
+    }
+    
+    // 获取英文天气描述并翻译为中文
+    const englishCondition = current.weatherDesc?.[0]?.value || ''
+    const chineseCondition = translateWeatherCondition(englishCondition)
+    
+    currentWeather.value = {
+      city: cityNameMap[selectedCity.value] || selectedCity.value,
+      temp: current.temp_C || '',
+      feelsLike: current.FeelsLikeC || '',
+      maxTemp: today?.maxtempC || '',
+      minTemp: today?.mintempC || '',
+      condition: chineseCondition || '未知',
+      emoji: getWeatherEmoji(englishCondition),
+      windSpeed: `${current.windspeedKmph} km/h`,
+      humidity: current.humidity || '0',
+      visibility: `${current.visibility} km`,
+      pressure: `${current.pressure} hPa`,
+      updateTime: new Date().toLocaleString('zh-CN', { 
+        year: 'numeric',
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+    
+    // 解析未来天气预报（跳过今天，显示接下来的几天）
+    const weatherForecast = data.weather || []
+    
+    // 从索引1开始（跳过今天），获取所有可用的未来天数预报
+    const forecastDays = weatherForecast.slice(1)
+    
+    forecastWeather.value = forecastDays.map((day: any) => {
+      const date = new Date(day.date)
+      const dayOfWeekList = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      const dayOfWeek = dayOfWeekList[date.getDay()]
+      
+      // 使用中午时段的天气作为当天代表
+      const forecastCondition = day.hourly?.[4]?.weatherDesc?.[0]?.value || day.hourly?.[0]?.weatherDesc?.[0]?.value || ''
+      
+      return {
+        date: `${date.getMonth() + 1}/${date.getDate()}`,
+        dayOfWeek: dayOfWeek,
+        maxTemp: day.maxtempC || '',
+        minTemp: day.mintempC || '',
+        condition: translateWeatherCondition(forecastCondition),
+        emoji: getWeatherEmoji(forecastCondition)
+      }
+    })
+    
+  } catch (error: any) {
+    console.error('加载天气信息失败:', error)
+    weatherError.value = error.message || '无法获取天气信息，请稍后重试'
+    
+    // 如果 wttr.in 访问失败，可以在这里添加备用 API
+    // 例如使用高德天气 API（需要申请 key）：
+    // const apiKey = 'YOUR_AMAP_KEY'
+    // const response = await fetch(`https://restapi.amap.com/v3/weather/weatherInfo?city=310000&key=${apiKey}`)
+    
+  } finally {
+    weatherLoading.value = false
+  }
+}
 
 // ========== 打卡管理相关 ==========
 
@@ -1696,6 +2072,9 @@ onMounted(async () => {
   await loadDecisionIssues()
   await loadCalendarEvents()
   await loadHolidays()
+  
+  // 加载天气信息（默认上海）
+  loadWeather()
   
   // 加载完成后验证
   setTimeout(() => {

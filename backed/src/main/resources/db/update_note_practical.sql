@@ -6,3 +6,5 @@ ADD COLUMN `requirement_description` TEXT COMMENT '需求描述（富文本）' 
 ADD COLUMN `design_thinking` TEXT COMMENT '设计思路（富文本）' AFTER `requirement_description`,
 ADD COLUMN `reference_design` TEXT COMMENT '参考设计（富文本）' AFTER `design_thinking`;
 
+
+
