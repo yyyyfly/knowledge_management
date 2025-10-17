@@ -10,9 +10,9 @@
           <h1 class="text-3xl font-bold text-gray-900">碎片笔记</h1>
           <p class="text-gray-600">日常思考、灵感闪现、临时记录</p>
         </div>
-      </div>
+            </div>
     </div>
-
+          
     <!-- 推荐巩固区 -->
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">推荐巩固（{{ recommendedNotes.length }}/5）</h2>
@@ -42,13 +42,13 @@
       <i class="fas fa-search text-4xl text-yellow-600 mb-4"></i>
       <h3 class="text-xl font-bold text-gray-900 mb-2">搜索所有笔记</h3>
       <p class="text-gray-600">手动选择想要复习的笔记内容</p>
-  </div>
+    </div>
 
-  <!-- 笔记列表弹窗 -->
-  <Transition name="modal-fade">
-    <div v-if="showNotesList" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Transition name="modal-slide">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+    <!-- 笔记列表弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showNotesList" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
             <!-- 弹窗头部 -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
               <div class="flex items-center space-x-3">
@@ -122,13 +122,13 @@
           </div>
         </Transition>
       </div>
-  </Transition>
+    </Transition>
 
-  <!-- 笔记详情弹窗 -->
-  <Transition name="modal-fade">
-    <div v-if="showNoteDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Transition name="modal-slide">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- 笔记详情弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showNoteDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-xl font-semibold text-gray-900">笔记详情</h3>
               <button 

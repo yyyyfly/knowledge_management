@@ -50,18 +50,32 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- 配置类型1 -->
             <div v-if="getConfigTypes(selectedConfigNoteType).type1" class="border border-gray-200 rounded-lg p-4">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+              <div class="mb-4">
+                <h4 class="font-semibold text-gray-800 flex items-center space-x-2 mb-3">
                   <i class="fas fa-tag text-blue-500"></i>
                   <span>{{ getConfigTypes(selectedConfigNoteType).type1.label }}</span>
                 </h4>
-                <button 
-                  @click="openAddConfigModal(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type1.key)"
-                  class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-1"
-                >
-                  <i class="fas fa-plus"></i>
-                  <span>添加</span>
-                </button>
+                <!-- 搜索/添加输入框 -->
+                <div class="flex items-center space-x-2">
+                  <div class="relative flex-1">
+                    <input 
+                      v-model="configType1Search"
+                      type="text" 
+                      :placeholder="'搜索或新建' + getConfigTypes(selectedConfigNoteType).type1.label + '...'"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
+                    >
+                    <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  </div>
+                  <button 
+                    type="button"
+                    @click="addConfigFromSearch(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type1.key)"
+                    :disabled="!configType1Search.trim()"
+                    class="px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center space-x-1 whitespace-nowrap"
+                  >
+                    <i class="fas fa-plus"></i>
+                    <span>添加</span>
+                  </button>
+                </div>
               </div>
               <div class="space-y-2 max-h-60 overflow-y-auto">
                 <div 
@@ -86,18 +100,32 @@
 
             <!-- 配置类型2 -->
             <div v-if="getConfigTypes(selectedConfigNoteType).type2" class="border border-gray-200 rounded-lg p-4">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="font-semibold text-gray-800 flex items-center space-x-2">
+              <div class="mb-4">
+                <h4 class="font-semibold text-gray-800 flex items-center space-x-2 mb-3">
                   <i class="fas fa-tags text-green-500"></i>
                   <span>{{ getConfigTypes(selectedConfigNoteType).type2.label }}</span>
                 </h4>
-                <button 
-                  @click="openAddConfigModal(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type2.key)"
-                  class="px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-1"
-                >
-                  <i class="fas fa-plus"></i>
-                  <span>添加</span>
-                </button>
+                <!-- 搜索/添加输入框 -->
+                <div class="flex items-center space-x-2">
+                  <div class="relative flex-1">
+                    <input 
+                      v-model="configType2Search"
+                      type="text" 
+                      :placeholder="'搜索或新建' + getConfigTypes(selectedConfigNoteType).type2.label + '...'"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
+                    >
+                    <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  </div>
+                  <button 
+                    type="button"
+                    @click="addConfigFromSearch(selectedConfigNoteType, getConfigTypes(selectedConfigNoteType).type2.key)"
+                    :disabled="!configType2Search.trim()"
+                    class="px-3 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center space-x-1 whitespace-nowrap"
+                  >
+                    <i class="fas fa-plus"></i>
+                    <span>添加</span>
+                  </button>
+                </div>
               </div>
               <div class="space-y-2 max-h-60 overflow-y-auto">
                 <div 
@@ -500,40 +528,47 @@
                       </button>
                     </div>
                     
-                    <!-- 预设分类选择 -->
-                    <div class="mb-3">
-                      <div class="flex flex-wrap gap-2">
-                        <button 
-                          v-for="category in availableFragmentCategories" 
-                          :key="category"
-                          type="button"
-                          @click="selectFragmentCategory(category)"
-                          :class="recordForm.fragmentCategory.includes(category) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                          class="px-3 py-1 text-sm rounded-lg border transition-all"
+                    <!-- 搜索/添加分类 -->
+                  <div class="relative">
+                    <div class="flex items-center space-x-2">
+                      <div class="relative flex-1">
+                        <input 
+                          v-model="fragmentCategorySearch"
+                          type="text" 
+                          placeholder="搜索或新建分类..."
+                          @focus="showFragmentCategoryDropdown = true"
+                          @input="filterFragmentCategories"
+                          @keyup.enter="addFragmentCategoryFromSearch"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
                         >
-                          {{ category }}
-                        </button>
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                       </div>
-                    </div>
-                    
-                    <!-- 自定义分类输入 -->
-                  <div class="flex items-center space-x-2">
-                    <input 
-                        v-model="newFragmentCategory"
-                        type="text" 
-                        placeholder="输入自定义分类名称"
-                        @keyup.enter="addFragmentCategory"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                    >
-                    <button 
-                      type="button"
-                        @click="addFragmentCategory"
-                        :disabled="!newFragmentCategory.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                    >
+                      <button 
+                        type="button"
+                        @click="addFragmentCategoryFromSearch"
+                        :disabled="!fragmentCategorySearch.trim()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
+                      >
                         <i class="fas fa-plus"></i>
                         <span>添加</span>
-                    </button>
+                      </button>
+                    </div>
+                    
+                    <!-- 下拉搜索结果 -->
+                    <div v-if="showFragmentCategoryDropdown && filteredFragmentCategories.length > 0" 
+                         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      <button
+                        v-for="category in filteredFragmentCategories"
+                        :key="category"
+                        type="button"
+                        @click="selectFragmentCategoryFromDropdown(category)"
+                        class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
+                      >
+                        <span>{{ category }}</span>
+                        <i v-if="!recordForm.fragmentCategory.includes(category)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
+                        <i v-else class="fas fa-check text-green-600"></i>
+                      </button>
+                    </div>
                   </div>
                     <div v-if="recordForm.fragmentCategory.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前分类: </span>
@@ -568,40 +603,47 @@
                       </button>
                     </div>
                     
-                    <!-- 预设主题选择 -->
-                    <div class="mb-3">
-                      <div class="flex flex-wrap gap-2">
+                    <!-- 搜索/添加主题 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="fragmentThemeSearch"
+                            type="text" 
+                            placeholder="搜索或新建主题..."
+                            @focus="showFragmentThemeDropdown = true"
+                            @input="filterFragmentThemes"
+                            @keyup.enter="addFragmentThemeFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
-                          v-for="theme in availableFragmentThemes" 
-                          :key="theme"
                           type="button"
-                          @click="selectFragmentTheme(theme)"
-                          :class="recordForm.fragmentTheme.includes(theme) ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                          class="px-3 py-1 text-sm rounded-lg border transition-all"
+                          @click="addFragmentThemeFromSearch"
+                          :disabled="!fragmentThemeSearch.trim()"
+                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ theme }}
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
                         </button>
                       </div>
-                    </div>
-                    
-                    <!-- 自定义主题输入 -->
-                    <div class="flex items-center space-x-2">
-                      <input 
-                        v-model="newFragmentTheme"
-                        type="text" 
-                        placeholder="输入自定义主题名称"
-                        @keyup.enter="addFragmentTheme"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                      >
-                      <button 
-                        type="button"
-                        @click="addFragmentTheme"
-                        :disabled="!newFragmentTheme.trim()"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                      >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                      </button>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showFragmentThemeDropdown && filteredFragmentThemes.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="theme in filteredFragmentThemes"
+                          :key="theme"
+                          type="button"
+                          @click="selectFragmentThemeFromDropdown(theme)"
+                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ theme }}</span>
+                          <i v-if="!recordForm.fragmentTheme.includes(theme)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.fragmentTheme.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前主题: </span>
@@ -764,37 +806,48 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
+                    
+                    <!-- 搜索/添加学科类型 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="frameworkSubjectSearch"
+                            type="text" 
+                            placeholder="搜索或新建学科类型..."
+                            @focus="showFrameworkSubjectDropdown = true"
+                            @input="filterFrameworkSubjects"
+                            @keyup.enter="addFrameworkSubjectFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
-                          v-for="subject in availableFrameworkSubjects" 
-                          :key="subject"
                           type="button"
-                          @click="selectFrameworkSubject(subject)"
-                          :class="recordForm.subjectType.includes(subject) ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-blue-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                          @click="addFrameworkSubjectFromSearch"
+                          :disabled="!frameworkSubjectSearch.trim()"
+                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ subject }}
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
                         </button>
                       </div>
-                    <div class="flex items-center space-x-2">
-                      <input 
-                          v-model="newFrameworkSubject"
-                        type="text" 
-                          placeholder="输入学科类型（如：计算机科学、数学、物理等）"
-                          @keyup.enter="addFrameworkSubject"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                      >
-                          <button 
-                            type="button"
-                          @click="addFrameworkSubject"
-                          :disabled="!newFrameworkSubject.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                          >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                          </button>
-                        </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showFrameworkSubjectDropdown && filteredFrameworkSubjects.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="subject in filteredFrameworkSubjects"
+                          :key="subject"
+                          type="button"
+                          @click="selectFrameworkSubjectFromDropdown(subject)"
+                          class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ subject }}</span>
+                          <i v-if="!recordForm.subjectType.includes(subject)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.subjectType.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前学科: </span>
@@ -830,35 +883,46 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
-                        <button 
-                          v-for="knowledge in availableFrameworkKnowledge" 
-                          :key="knowledge"
-                          type="button"
-                          @click="selectFrameworkKnowledge(knowledge)"
-                          :class="recordForm.knowledgePoint.includes(knowledge) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-green-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
-                        >
-                          {{ knowledge }}
-                        </button>
-                      </div>
+                    
+                    <!-- 搜索/添加知识点 -->
+                    <div class="relative">
                       <div class="flex items-center space-x-2">
-                        <input 
-                          v-model="newFrameworkKnowledge"
-                          type="text" 
-                          placeholder="输入知识点（如：数据结构、算法设计、系统架构等）"
-                          @keyup.enter="addFrameworkKnowledge"
-                          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input"
-                        >
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="frameworkKnowledgeSearch"
+                            type="text" 
+                            placeholder="搜索或新建知识点..."
+                            @focus="showFrameworkKnowledgeDropdown = true"
+                            @input="filterFrameworkKnowledge"
+                            @keyup.enter="addFrameworkKnowledgeFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
                           type="button"
-                          @click="addFrameworkKnowledge"
-                          :disabled="!newFrameworkKnowledge.trim()"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
+                          @click="addFrameworkKnowledgeFromSearch"
+                          :disabled="!frameworkKnowledgeSearch.trim()"
+                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
                           <i class="fas fa-plus"></i>
                           <span>添加</span>
+                        </button>
+                      </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showFrameworkKnowledgeDropdown && filteredFrameworkKnowledge.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="knowledge in filteredFrameworkKnowledge"
+                          :key="knowledge"
+                          type="button"
+                          @click="selectFrameworkKnowledgeFromDropdown(knowledge)"
+                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ knowledge }}</span>
+                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
                         </button>
                       </div>
                     </div>
@@ -1007,37 +1071,48 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
+                    
+                    <!-- 搜索/添加学科 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="studySubjectSearch"
+                            type="text" 
+                            placeholder="搜索或新建学科..."
+                            @focus="showStudySubjectDropdown = true"
+                            @input="filterStudySubjects"
+                            @keyup.enter="addStudySubjectFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
-                          v-for="subject in availableStudySubjects" 
-                          :key="subject"
                           type="button"
-                          @click="selectStudySubject(subject)"
-                          :class="recordForm.studySubject.includes(subject) ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-blue-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                          @click="addStudySubjectFromSearch"
+                          :disabled="!studySubjectSearch.trim()"
+                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ subject }}
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
                         </button>
                       </div>
-                    <div class="flex items-center space-x-2">
-                      <input 
-                          v-model="newStudySubject"
-                        type="text" 
-                          placeholder="输入自定义学科（如：计算机科学、数学、物理等）"
-                          @keyup.enter="addStudySubject"
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
-                      >
-                      <button 
-                        type="button"
-                          @click="addStudySubject"
-                          :disabled="!newStudySubject.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                      >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                      </button>
-                    </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showStudySubjectDropdown && filteredStudySubjects.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="subject in filteredStudySubjects"
+                          :key="subject"
+                          type="button"
+                          @click="selectStudySubjectFromDropdown(subject)"
+                          class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ subject }}</span>
+                          <i v-if="!recordForm.studySubject.includes(subject)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.studySubject.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前学科: </span>
@@ -1073,37 +1148,48 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
+                    
+                    <!-- 搜索/添加知识点 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="studyKnowledgeSearch"
+                            type="text" 
+                            placeholder="搜索或新建知识点..."
+                            @focus="showStudyKnowledgeDropdown = true"
+                            @input="filterStudyKnowledge"
+                            @keyup.enter="addStudyKnowledgeFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
-                          v-for="point in availableStudyKnowledge" 
-                          :key="point"
                           type="button"
-                          @click="selectKnowledgePoint(point)"
-                          :class="recordForm.knowledgePoint.includes(point) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-green-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                          @click="addStudyKnowledgeFromSearch"
+                          :disabled="!studyKnowledgeSearch.trim()"
+                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ point }}
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
                         </button>
                       </div>
-                      <div class="flex items-center space-x-2">
-                      <input 
-                          v-model="newKnowledgePoint"
-                        type="text" 
-                          placeholder="输入知识点（如：算法、数据结构、机器学习等）"
-                          @keyup.enter="addKnowledgePoint"
-                          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input"
-                      >
-                      <button 
-                        type="button"
-                          @click="addKnowledgePoint"
-                          :disabled="!newKnowledgePoint.trim()"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover"
-                      >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                      </button>
-                    </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showStudyKnowledgeDropdown && filteredStudyKnowledge.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="knowledge in filteredStudyKnowledge"
+                          :key="knowledge"
+                          type="button"
+                          @click="selectStudyKnowledgeFromDropdown(knowledge)"
+                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ knowledge }}</span>
+                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前知识点: </span>
@@ -1462,33 +1548,63 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
+                    
+                    <!-- 搜索/选择科目（单选） -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="memorizationSubjectSearch"
+                            type="text" 
+                            placeholder="搜索或新建科目..."
+                            @focus="showMemorizationSubjectDropdown = true"
+                            @input="filterMemorizationSubjects"
+                            @keyup.enter="addMemorizationSubjectFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
                         <button 
-                          v-for="subject in availableMemorizationSubjects" 
-                          :key="subject"
                           type="button"
-                          @click="recordForm.project = subject"
-                          :class="recordForm.project === subject ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-amber-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                          @click="addMemorizationSubjectFromSearch"
+                          :disabled="!memorizationSubjectSearch.trim()"
+                          class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ subject }}
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
                         </button>
                       </div>
-                      <div v-if="recordForm.project" class="mt-2">
-                        <span class="text-sm text-gray-500">当前科目: </span>
-                        <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
-                          <span>{{ recordForm.project }}</span>
-                          <button 
-                            type="button"
-                            @click="recordForm.project = ''"
-                            class="text-amber-500 hover:text-amber-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
+                      
+                      <!-- 下拉搜索结果（单选） -->
+                      <div v-if="showMemorizationSubjectDropdown && filteredMemorizationSubjects.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="subject in filteredMemorizationSubjects"
+                          :key="subject"
+                          type="button"
+                          @click="selectMemorizationSubjectFromDropdown(subject)"
+                          class="w-full text-left px-4 py-2 hover:bg-amber-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ subject }}</span>
+                          <i v-if="recordForm.project !== subject" class="fas fa-check text-amber-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                    
+                    <div v-if="recordForm.project" class="mt-2">
+                      <span class="text-sm text-gray-500">当前科目: </span>
+                      <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
+                        <span>{{ recordForm.project }}</span>
+                        <button 
+                          type="button"
+                          @click="recordForm.project = ''"
+                          class="text-amber-500 hover:text-amber-700"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </span>
+                    </div>
                   </div>
                   
                   <!-- 知识点 -->
@@ -1504,18 +1620,48 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
-                      <button 
-                          v-for="point in availableMemorizationKnowledge" 
-                          :key="point"
-                        type="button"
-                          @click="selectMemorizationKnowledge(point)"
-                          :class="recordForm.knowledgePoint.includes(point) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-orange-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                    
+                    <!-- 搜索/添加知识点 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="memorizationKnowledgeSearch"
+                            type="text" 
+                            placeholder="搜索或新建知识点..."
+                            @focus="showMemorizationKnowledgeDropdown = true"
+                            @input="filterMemorizationKnowledge"
+                            @keyup.enter="addMemorizationKnowledgeFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button 
+                          type="button"
+                          @click="addMemorizationKnowledgeFromSearch"
+                          :disabled="!memorizationKnowledgeSearch.trim()"
+                          class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ point }}
-                      </button>
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
+                        </button>
+                      </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showMemorizationKnowledgeDropdown && filteredMemorizationKnowledge.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="knowledge in filteredMemorizationKnowledge"
+                          :key="knowledge"
+                          type="button"
+                          @click="selectMemorizationKnowledgeFromDropdown(knowledge)"
+                          class="w-full text-left px-4 py-2 hover:bg-orange-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ knowledge }}</span>
+                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-orange-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前知识点: </span>
@@ -1537,7 +1683,6 @@
                         </div>
                       </div>
                     </div>
-                  </div>
                   
                   <!-- 背诵笔记专用内容字段 -->
                   <div class="pt-4 border-t border-amber-200 mt-4">
@@ -1549,7 +1694,7 @@
                 </div>
 
                     <!-- 标题 -->
-                    <div v-if="recordForm.type" class="mb-4">
+                    <div class="mb-4">
                       <label class="block text-sm font-medium text-amber-800 mb-2">
                         <i class="fas fa-heading text-amber-600 mr-1"></i>
                         标题
@@ -1563,7 +1708,7 @@
                   </div>
 
                     <!-- 摘要 -->
-                    <div v-if="recordForm.type" class="mb-6">
+                    <div class="mb-6">
                       <label class="block text-sm font-medium text-amber-800 mb-2">
                         <i class="fas fa-align-left text-amber-600 mr-1"></i>
                         摘要
@@ -2070,43 +2215,73 @@
                   <div>
                     <div class="flex items-center justify-between mb-2">
                       <label class="block text-sm font-medium text-gray-700">项目领域</label>
-                          <button 
-                            type="button"
-                        @click="openConfigManager('practical', 'domain')"
-                        class="text-sm text-cyan-600 hover:text-cyan-800 flex items-center space-x-1"
-                          >
-                        <i class="fas fa-cog"></i>
-                        <span>管理</span>
-                          </button>
-                    </div>
-                        <div class="space-y-2">
-                          <div class="flex flex-wrap gap-2 mb-2">
-                            <button 
-                          v-for="domain in availablePracticalDomains" 
-                          :key="domain"
-                              type="button"
-                          @click="selectPracticalDomain(domain)"
-                          :class="recordForm.projectDomain === domain ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-cyan-100'"
-                              class="px-3 py-1 rounded-full text-sm border transition-colors"
-                            >
-                          {{ domain }}
-                            </button>
-                          </div>
-                      <div v-if="recordForm.projectDomain" class="mt-2">
-                        <span class="text-sm text-gray-500">当前领域: </span>
-                        <span class="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
-                          <span>{{ recordForm.projectDomain }}</span>
                       <button 
                         type="button"
-                            @click="recordForm.projectDomain = ''"
-                            class="text-cyan-500 hover:text-cyan-700"
+                        @click="openConfigManager('practical', 'domain')"
+                        class="text-sm text-cyan-600 hover:text-cyan-800 flex items-center space-x-1"
+                      >
+                        <i class="fas fa-cog"></i>
+                        <span>管理</span>
+                      </button>
+                    </div>
+                    
+                    <!-- 搜索/选择领域（单选） -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="practicalDomainSearch"
+                            type="text" 
+                            placeholder="搜索或新建领域..."
+                            @focus="showPracticalDomainDropdown = true"
+                            @input="filterPracticalDomains"
+                            @keyup.enter="addPracticalDomainFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 form-input pr-8"
                           >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button 
+                          type="button"
+                          @click="addPracticalDomainFromSearch"
+                          :disabled="!practicalDomainSearch.trim()"
+                          class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
+                        >
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
+                        </button>
+                      </div>
+                      
+                      <!-- 下拉搜索结果（单选） -->
+                      <div v-if="showPracticalDomainDropdown && filteredPracticalDomains.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="domain in filteredPracticalDomains"
+                          :key="domain"
+                          type="button"
+                          @click="selectPracticalDomainFromDropdown(domain)"
+                          class="w-full text-left px-4 py-2 hover:bg-cyan-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ domain }}</span>
+                          <i v-if="recordForm.projectDomain !== domain" class="fas fa-check text-cyan-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div v-if="recordForm.projectDomain" class="mt-2">
+                      <span class="text-sm text-gray-500">当前领域: </span>
+                      <span class="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
+                        <span>{{ recordForm.projectDomain }}</span>
+                        <button 
+                          type="button"
+                          @click="recordForm.projectDomain = ''"
+                          class="text-cyan-500 hover:text-cyan-700"
+                        >
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </span>
                     </div>
                   </div>
-                </div>
 
                   <!-- 技术栈 -->
                   <div>
@@ -2121,18 +2296,48 @@
                         <span>管理</span>
                       </button>
                     </div>
-                    <div class="space-y-2">
-                      <div class="flex flex-wrap gap-2 mb-2">
-                      <button 
-                          v-for="tech in availablePracticalTechStacks" 
-                          :key="tech"
-                        type="button"
-                          @click="selectPracticalTech(tech)"
-                          :class="recordForm.techTags.includes(tech) ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-teal-100'"
-                          class="px-3 py-1 rounded-full text-sm border transition-colors"
+                    
+                    <!-- 搜索/添加技术栈 -->
+                    <div class="relative">
+                      <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                          <input 
+                            v-model="practicalTechStackSearch"
+                            type="text" 
+                            placeholder="搜索或新建技术栈..."
+                            @focus="showPracticalTechStackDropdown = true"
+                            @input="filterPracticalTechStacks"
+                            @keyup.enter="addPracticalTechStackFromSearch"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 form-input pr-8"
+                          >
+                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button 
+                          type="button"
+                          @click="addPracticalTechStackFromSearch"
+                          :disabled="!practicalTechStackSearch.trim()"
+                          class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
                         >
-                          {{ tech }}
-                      </button>
+                          <i class="fas fa-plus"></i>
+                          <span>添加</span>
+                        </button>
+                      </div>
+                      
+                      <!-- 下拉搜索结果 -->
+                      <div v-if="showPracticalTechStackDropdown && filteredPracticalTechStacks.length > 0" 
+                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <button
+                          v-for="tech in filteredPracticalTechStacks"
+                          :key="tech"
+                          type="button"
+                          @click="selectPracticalTechStackFromDropdown(tech)"
+                          class="w-full text-left px-4 py-2 hover:bg-teal-50 transition-colors flex items-center justify-between group"
+                        >
+                          <span>{{ tech }}</span>
+                          <i v-if="!recordForm.techTags.includes(tech)" class="fas fa-plus text-teal-600 opacity-0 group-hover:opacity-100"></i>
+                          <i v-else class="fas fa-check text-green-600"></i>
+                        </button>
+                      </div>
                     </div>
                     <div v-if="recordForm.techTags.length > 0" class="mt-2">
                       <span class="text-sm text-gray-500">当前技术栈: </span>
@@ -2151,10 +2356,10 @@
                             <i class="fas fa-times"></i>
                           </button>
                         </span>
-                        </div>
                       </div>
                     </div>
                   </div>
+                  
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">项目模板</label>
                     <div class="space-y-2">
@@ -2354,27 +2559,26 @@
               </div>
                     
               <!-- 所有笔记类型的内容编辑器已整合到各自的颜色容器内 -->
+              
+              <!-- 固定底部按钮栏 -->
+              <div class="flex justify-end items-center gap-4 pt-6 mt-6 border-t border-gray-200">
+                <button type="button" @click="closeModal" class="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium">取消</button>
+                <button 
+                  type="submit" 
+                  :disabled="!recordForm.type"
+                  :class="[
+                    'px-6 py-2 rounded-lg font-medium transition-all duration-200',
+                    recordForm.type 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md transform hover:scale-105' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ]"
+                >
+                  {{ isEditing ? '保存修改' : '保存笔记' }}
+                </button>
+              </div>
 
             </form>
-                  </div>
-          
-          <!-- 固定底部按钮栏 -->
-          <div class="flex justify-end items-center gap-4 p-6 border-t border-gray-200 bg-white sticky bottom-0 z-10">
-            <button type="button" @click="closeModal" class="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium">取消</button>
-            <button 
-              type="button" 
-              @click="submitRecord" 
-              :disabled="!recordForm.type"
-              :class="[
-                'px-6 py-2 rounded-lg font-medium transition-all duration-200',
-                recordForm.type 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md transform hover:scale-105' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              ]"
-            >
-              {{ isEditing ? '保存修改' : '保存笔记' }}
-            </button>
-                </div>
+          </div>
         </div>
       </div>
     </Transition>
@@ -2903,6 +3107,52 @@ const deleteConfigItem = async (id: number) => {
   }
 }
 
+// 从搜索框添加配置
+const addConfigFromSearch = async (noteType: string, configType: string) => {
+  // 确定使用哪个搜索框的值
+  const searchValue = configType === getConfigTypes(noteType).type1.key 
+    ? configType1Search.value 
+    : configType2Search.value
+  
+  const configName = searchValue.trim()
+  
+  if (!configName) {
+    alert('请输入配置名称')
+    return
+  }
+  
+  // 检查是否已存在
+  const existingItems = getConfigItems(noteType, configType)
+  if (existingItems.some(item => item.configName === configName)) {
+    alert('该配置已存在')
+    return
+  }
+  
+  try {
+    const res = await createConfig({
+      noteType,
+      configType,
+      configName
+    })
+    
+    if (res.code === 200) {
+      await loadAllConfigs()
+      // 清空搜索框
+      if (configType === getConfigTypes(noteType).type1.key) {
+        configType1Search.value = ''
+      } else {
+        configType2Search.value = ''
+      }
+      alert('添加成功')
+    } else {
+      alert(res.message || '添加失败')
+    }
+  } catch (error: any) {
+    console.error('添加配置失败:', error)
+    alert(error.message || '添加失败')
+  }
+}
+
 // 通用的配置管理弹窗状态
 const showConfigManagerDialog = ref(false)
 const configManagerDialog = reactive({
@@ -3119,6 +3369,50 @@ const newStudySubject = ref('')
 const newExerciseSource = ref('')
 const newExerciseSubject = ref('')
 const newExerciseKnowledge = ref('')
+
+// 搜索式标签选择相关变量
+const fragmentCategorySearch = ref('')
+const fragmentThemeSearch = ref('')
+const showFragmentCategoryDropdown = ref(false)
+const showFragmentThemeDropdown = ref(false)
+const filteredFragmentCategories = ref<string[]>([])
+const filteredFragmentThemes = ref<string[]>([])
+
+// 框架笔记搜索变量
+const frameworkSubjectSearch = ref('')
+const frameworkKnowledgeSearch = ref('')
+const showFrameworkSubjectDropdown = ref(false)
+const showFrameworkKnowledgeDropdown = ref(false)
+const filteredFrameworkSubjects = ref<string[]>([])
+const filteredFrameworkKnowledge = ref<string[]>([])
+
+// 求学笔记搜索变量
+const studySubjectSearch = ref('')
+const studyKnowledgeSearch = ref('')
+const showStudySubjectDropdown = ref(false)
+const showStudyKnowledgeDropdown = ref(false)
+const filteredStudySubjects = ref<string[]>([])
+const filteredStudyKnowledge = ref<string[]>([])
+
+// 背诵笔记搜索变量
+const memorizationSubjectSearch = ref('')
+const memorizationKnowledgeSearch = ref('')
+const showMemorizationSubjectDropdown = ref(false)
+const showMemorizationKnowledgeDropdown = ref(false)
+const filteredMemorizationSubjects = ref<string[]>([])
+const filteredMemorizationKnowledge = ref<string[]>([])
+
+// 实战笔记搜索变量
+const practicalDomainSearch = ref('')
+const practicalTechStackSearch = ref('')
+const showPracticalDomainDropdown = ref(false)
+const showPracticalTechStackDropdown = ref(false)
+const filteredPracticalDomains = ref<string[]>([])
+const filteredPracticalTechStacks = ref<string[]>([])
+
+// 配置管理搜索变量
+const configType1Search = ref('')
+const configType2Search = ref('')
 
 // 刷题笔记管理弹窗
 const showExerciseSourceManager = ref(false)
@@ -3655,6 +3949,319 @@ const selectFragmentCategory = (category: string) => {
   }
 }
 
+// 搜索式标签选择 - 碎片分类
+const filterFragmentCategories = () => {
+  const search = fragmentCategorySearch.value.toLowerCase().trim()
+  if (search) {
+    filteredFragmentCategories.value = availableFragmentCategories.value.filter(cat => 
+      cat.toLowerCase().includes(search)
+    )
+  } else {
+    filteredFragmentCategories.value = availableFragmentCategories.value
+  }
+}
+
+const addFragmentCategoryFromSearch = () => {
+  const category = fragmentCategorySearch.value.trim()
+  if (category && !recordForm.fragmentCategory.includes(category)) {
+    recordForm.fragmentCategory.push(category)
+    // 如果是新分类，保存到配置中
+    if (!availableFragmentCategories.value.includes(category)) {
+      saveTypeToStorage('fragmentCategory', category)
+    }
+    fragmentCategorySearch.value = ''
+    showFragmentCategoryDropdown.value = false
+  }
+}
+
+const selectFragmentCategoryFromDropdown = (category: string) => {
+  if (!recordForm.fragmentCategory.includes(category)) {
+    recordForm.fragmentCategory.push(category)
+  }
+  fragmentCategorySearch.value = ''
+  showFragmentCategoryDropdown.value = false
+}
+
+// 搜索式标签选择 - 碎片主题
+const filterFragmentThemes = () => {
+  const search = fragmentThemeSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredFragmentThemes.value = availableFragmentThemes.value.filter(theme => 
+      theme.toLowerCase().includes(search)
+    )
+  } else {
+    filteredFragmentThemes.value = availableFragmentThemes.value
+  }
+}
+
+const addFragmentThemeFromSearch = () => {
+  const theme = fragmentThemeSearch.value.trim()
+  if (theme && !recordForm.fragmentTheme.includes(theme)) {
+    recordForm.fragmentTheme.push(theme)
+    // 如果是新主题，保存到配置中
+    if (!availableFragmentThemes.value.includes(theme)) {
+      saveTypeToStorage('fragmentTheme', theme)
+    }
+    fragmentThemeSearch.value = ''
+    showFragmentThemeDropdown.value = false
+  }
+}
+
+const selectFragmentThemeFromDropdown = (theme: string) => {
+  if (!recordForm.fragmentTheme.includes(theme)) {
+    recordForm.fragmentTheme.push(theme)
+  }
+  fragmentThemeSearch.value = ''
+  showFragmentThemeDropdown.value = false
+}
+
+// ========== 框架笔记搜索处理 ==========
+const filterFrameworkSubjects = () => {
+  const search = frameworkSubjectSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredFrameworkSubjects.value = availableFrameworkSubjects.value.filter(subject => 
+      subject.toLowerCase().includes(search)
+    )
+  } else {
+    filteredFrameworkSubjects.value = availableFrameworkSubjects.value
+  }
+}
+
+const addFrameworkSubjectFromSearch = () => {
+  const subject = frameworkSubjectSearch.value.trim()
+  if (subject && !recordForm.subjectType.includes(subject)) {
+    recordForm.subjectType.push(subject)
+    if (!availableFrameworkSubjects.value.includes(subject)) {
+      saveTypeToStorage('frameworkSubject', subject)
+    }
+    frameworkSubjectSearch.value = ''
+    showFrameworkSubjectDropdown.value = false
+  }
+}
+
+const selectFrameworkSubjectFromDropdown = (subject: string) => {
+  if (!recordForm.subjectType.includes(subject)) {
+    recordForm.subjectType.push(subject)
+  }
+  frameworkSubjectSearch.value = ''
+  showFrameworkSubjectDropdown.value = false
+}
+
+const filterFrameworkKnowledge = () => {
+  const search = frameworkKnowledgeSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredFrameworkKnowledge.value = availableFrameworkKnowledge.value.filter(knowledge => 
+      knowledge.toLowerCase().includes(search)
+    )
+  } else {
+    filteredFrameworkKnowledge.value = availableFrameworkKnowledge.value
+  }
+}
+
+const addFrameworkKnowledgeFromSearch = () => {
+  const knowledge = frameworkKnowledgeSearch.value.trim()
+  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+    if (!availableFrameworkKnowledge.value.includes(knowledge)) {
+      saveTypeToStorage('frameworkKnowledge', knowledge)
+    }
+    frameworkKnowledgeSearch.value = ''
+    showFrameworkKnowledgeDropdown.value = false
+  }
+}
+
+const selectFrameworkKnowledgeFromDropdown = (knowledge: string) => {
+  if (!recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+  }
+  frameworkKnowledgeSearch.value = ''
+  showFrameworkKnowledgeDropdown.value = false
+}
+
+// ========== 求学笔记搜索处理 ==========
+const filterStudySubjects = () => {
+  const search = studySubjectSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredStudySubjects.value = availableStudySubjects.value.filter(subject => 
+      subject.toLowerCase().includes(search)
+    )
+  } else {
+    filteredStudySubjects.value = availableStudySubjects.value
+  }
+}
+
+const addStudySubjectFromSearch = () => {
+  const subject = studySubjectSearch.value.trim()
+  if (subject && !recordForm.studySubject.includes(subject)) {
+    recordForm.studySubject.push(subject)
+    if (!availableStudySubjects.value.includes(subject)) {
+      saveTypeToStorage('studySubject', subject)
+    }
+    studySubjectSearch.value = ''
+    showStudySubjectDropdown.value = false
+  }
+}
+
+const selectStudySubjectFromDropdown = (subject: string) => {
+  if (!recordForm.studySubject.includes(subject)) {
+    recordForm.studySubject.push(subject)
+  }
+  studySubjectSearch.value = ''
+  showStudySubjectDropdown.value = false
+}
+
+const filterStudyKnowledge = () => {
+  const search = studyKnowledgeSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredStudyKnowledge.value = availableStudyKnowledge.value.filter(knowledge => 
+      knowledge.toLowerCase().includes(search)
+    )
+  } else {
+    filteredStudyKnowledge.value = availableStudyKnowledge.value
+  }
+}
+
+const addStudyKnowledgeFromSearch = () => {
+  const knowledge = studyKnowledgeSearch.value.trim()
+  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+    if (!availableStudyKnowledge.value.includes(knowledge)) {
+      saveTypeToStorage('studyKnowledge', knowledge)
+    }
+    studyKnowledgeSearch.value = ''
+    showStudyKnowledgeDropdown.value = false
+  }
+}
+
+const selectStudyKnowledgeFromDropdown = (knowledge: string) => {
+  if (!recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+  }
+  studyKnowledgeSearch.value = ''
+  showStudyKnowledgeDropdown.value = false
+}
+
+// ========== 背诵笔记搜索处理 ==========
+const filterMemorizationSubjects = () => {
+  const search = memorizationSubjectSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredMemorizationSubjects.value = availableMemorizationSubjects.value.filter(subject => 
+      subject.toLowerCase().includes(search)
+    )
+  } else {
+    filteredMemorizationSubjects.value = availableMemorizationSubjects.value
+  }
+}
+
+const addMemorizationSubjectFromSearch = () => {
+  const subject = memorizationSubjectSearch.value.trim()
+  if (subject) {
+    recordForm.project = subject
+    if (!availableMemorizationSubjects.value.includes(subject)) {
+      saveTypeToStorage('memorizationSubject', subject)
+    }
+    memorizationSubjectSearch.value = ''
+    showMemorizationSubjectDropdown.value = false
+  }
+}
+
+const selectMemorizationSubjectFromDropdown = (subject: string) => {
+  recordForm.project = subject
+  memorizationSubjectSearch.value = ''
+  showMemorizationSubjectDropdown.value = false
+}
+
+const filterMemorizationKnowledge = () => {
+  const search = memorizationKnowledgeSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredMemorizationKnowledge.value = availableMemorizationKnowledge.value.filter(knowledge => 
+      knowledge.toLowerCase().includes(search)
+    )
+  } else {
+    filteredMemorizationKnowledge.value = availableMemorizationKnowledge.value
+  }
+}
+
+const addMemorizationKnowledgeFromSearch = () => {
+  const knowledge = memorizationKnowledgeSearch.value.trim()
+  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+    if (!availableMemorizationKnowledge.value.includes(knowledge)) {
+      saveTypeToStorage('memorizationKnowledge', knowledge)
+    }
+    memorizationKnowledgeSearch.value = ''
+    showMemorizationKnowledgeDropdown.value = false
+  }
+}
+
+const selectMemorizationKnowledgeFromDropdown = (knowledge: string) => {
+  if (!recordForm.knowledgePoint.includes(knowledge)) {
+    recordForm.knowledgePoint.push(knowledge)
+  }
+  memorizationKnowledgeSearch.value = ''
+  showMemorizationKnowledgeDropdown.value = false
+}
+
+// ========== 实战笔记搜索处理 ==========
+const filterPracticalDomains = () => {
+  const search = practicalDomainSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredPracticalDomains.value = availablePracticalDomains.value.filter(domain => 
+      domain.toLowerCase().includes(search)
+    )
+  } else {
+    filteredPracticalDomains.value = availablePracticalDomains.value
+  }
+}
+
+const addPracticalDomainFromSearch = () => {
+  const domain = practicalDomainSearch.value.trim()
+  if (domain) {
+    recordForm.projectDomain = domain
+    if (!availablePracticalDomains.value.includes(domain)) {
+      saveTypeToStorage('practicalDomain', domain)
+    }
+    practicalDomainSearch.value = ''
+    showPracticalDomainDropdown.value = false
+  }
+}
+
+const selectPracticalDomainFromDropdown = (domain: string) => {
+  recordForm.projectDomain = domain
+  practicalDomainSearch.value = ''
+  showPracticalDomainDropdown.value = false
+}
+
+const filterPracticalTechStacks = () => {
+  const search = practicalTechStackSearch.value.toLowerCase().trim()
+  if (search) {
+    filteredPracticalTechStacks.value = availablePracticalTechStacks.value.filter(tech => 
+      tech.toLowerCase().includes(search)
+    )
+  } else {
+    filteredPracticalTechStacks.value = availablePracticalTechStacks.value
+  }
+}
+
+const addPracticalTechStackFromSearch = () => {
+  const tech = practicalTechStackSearch.value.trim()
+  if (tech && !recordForm.techTags.includes(tech)) {
+    recordForm.techTags.push(tech)
+    if (!availablePracticalTechStacks.value.includes(tech)) {
+      saveTypeToStorage('practicalTechStack', tech)
+    }
+    practicalTechStackSearch.value = ''
+    showPracticalTechStackDropdown.value = false
+  }
+}
+
+const selectPracticalTechStackFromDropdown = (tech: string) => {
+  if (!recordForm.techTags.includes(tech)) {
+    recordForm.techTags.push(tech)
+  }
+  practicalTechStackSearch.value = ''
+  showPracticalTechStackDropdown.value = false
+}
 
 
 // 添加技术栈标签
@@ -5631,19 +6238,6 @@ const removeBookSubject = (subject: string) => {
   recordForm.bookSubject = recordForm.bookSubject.filter(s => s !== subject)
 }
 
-// 切换练习学科类型
-const toggleExerciseSubject = (subject: string) => {
-  if (recordForm.exerciseSubject.includes(subject)) {
-    recordForm.exerciseSubject = recordForm.exerciseSubject.filter(s => s !== subject)
-  } else {
-    recordForm.exerciseSubject.push(subject)
-  }
-}
-
-// 移除练习学科类型
-const removeExerciseSubject = (subject: string) => {
-  recordForm.exerciseSubject = recordForm.exerciseSubject.filter(s => s !== subject)
-}
 
 // 切换碎片分类
 const toggleFragmentCategory = (category: string) => {
