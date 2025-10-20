@@ -83,7 +83,7 @@
                 </div>
                 <div class="min-w-0 flex-1">
                   <h3 class="text-xl font-bold text-gray-900 truncate">{{ selectedProject.name }}</h3>
-                  <p class="text-sm text-gray-500 mt-1 truncate">{{ selectedProject.description }}</p>
+                  <p class="text-sm text-gray-500 mt-1 line-clamp-3" :title="selectedProject.description">{{ selectedProject.description }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3 flex-shrink-0">

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.NoteArchiveMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.NoteArchive">
+        <id column="ID" property="id"/>
+        <result column="ARCHIVE_NAME" property="archiveName"/>
+        <result column="ARCHIVE_TYPE" property="archiveType"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="SOURCE_INFO" property="sourceInfo"/>
+        <result column="NOTE_COUNT" property="noteCount"/>
+        <result column="REC_CREATOR" property="recCreator"/>
+        <result column="REC_CREATE_TIME" property="recCreateTime"/>
+        <result column="REC_REVISOR" property="recRevisor"/>
+        <result column="REC_REVISE_TIME" property="recReviseTime"/>
+        <result column="ARCH_FLAG" property="archFlag"/>
+    </resultMap>
+
+    <resultMap id="DTOResultMap" type="com.knowledge.dto.NoteArchiveDTO">
+        <id column="ID" property="id"/>
+        <result column="ARCHIVE_NAME" property="archiveName"/>
+        <result column="ARCHIVE_TYPE" property="archiveType"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="SOURCE_INFO" property="sourceInfo"/>
+        <result column="NOTE_COUNT" property="noteCount"/>
+        <result column="REC_CREATE_TIME" property="recCreateTime"/>
+        <result column="REC_REVISE_TIME" property="recReviseTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.knowledge.entity.NoteArchive" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO note_archive (
+            ARCHIVE_NAME,
+            ARCHIVE_TYPE,
+            DESCRIPTION,
+            SOURCE_INFO,
+            NOTE_COUNT,
+            REC_CREATOR,
+            REC_CREATE_TIME,
+            ARCH_FLAG
+        ) VALUES (
+            #{archiveName},
+            #{archiveType},
+            #{description},
+            #{sourceInfo},
+            #{noteCount},
+            #{recCreator},
+            NOW(),
+            0
+        )
+    </insert>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM note_archive WHERE ID = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.knowledge.entity.NoteArchive">
+        UPDATE note_archive
+        <set>
+            <if test="archiveName != null and archiveName != ''">
+                ARCHIVE_NAME = #{archiveName},
+            </if>
+            <if test="archiveType != null and archiveType != ''">
+                ARCHIVE_TYPE = #{archiveType},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description},
+            </if>
+            <if test="sourceInfo != null">
+                SOURCE_INFO = #{sourceInfo},
+            </if>
+            <if test="noteCount != null">
+                NOTE_COUNT = #{noteCount},
+            </if>
+            REC_REVISOR = #{recRevisor},
+            REC_REVISE_TIME = NOW()
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <update id="updateNoteCount">
+        UPDATE note_archive
+        SET NOTE_COUNT = #{count},
+            REC_REVISE_TIME = NOW()
+        WHERE ID = #{archiveId}
+    </update>
+
+    <select id="selectById" parameterType="long" resultMap="BaseResultMap">
+        SELECT * FROM note_archive WHERE ID = #{id} AND ARCH_FLAG = 0
+    </select>
+
+    <select id="selectList" resultMap="DTOResultMap">
+        SELECT * FROM note_archive
+        WHERE ARCH_FLAG = 0
+        <if test="archiveName != null and archiveName != ''">
+            AND ARCHIVE_NAME LIKE CONCAT('%', #{archiveName}, '%')
+        </if>
+        <if test="archiveType != null and archiveType != ''">
+            AND ARCHIVE_TYPE = #{archiveType}
+        </if>
+        ORDER BY REC_CREATE_TIME DESC
+    </select>
+
+</mapper>
+

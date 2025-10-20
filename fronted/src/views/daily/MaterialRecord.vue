@@ -155,7 +155,7 @@
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- 新建笔记 -->
         <div 
           type="button"
@@ -185,8 +185,272 @@
             <p class="text-gray-600">查看、编辑、删除已有的笔记记录</p>
           </div>
         </div>
+
+        <!-- 笔记归档整理 -->
+        <div 
+          type="button"
+          @click="showArchiveManager = true"
+          class="p-6 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 cursor-pointer transition-all duration-200 btn-hover"
+        >
+          <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-archive text-2xl text-purple-600"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">【3】笔记归档</h4>
+            <p class="text-gray-600">查看归档列表，整理笔记来源</p>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- 归档管理主界面 -->
+    <Transition name="manage-notes-fade" mode="out-in">
+      <div v-if="showArchiveManager" class="bg-white rounded-xl shadow-soft p-6 mb-8">
+        <!-- 头部 -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-3">
+            <i class="fas fa-archive text-purple-600 text-2xl"></i>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">归档管理</h3>
+              <p class="text-sm text-gray-600">双视角管理：归档→笔记 / 笔记→归档</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="flex bg-gray-100 rounded-lg p-1">
+              <button 
+                @click="archiveViewMode = 'archive'"
+                :class="archiveViewMode === 'archive' ? 'bg-white shadow-sm' : ''"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-all"
+              >
+                <i class="fas fa-folder mr-2"></i>归档视角
+              </button>
+              <button 
+                @click="archiveViewMode = 'note'"
+                :class="archiveViewMode === 'note' ? 'bg-white shadow-sm' : ''"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-all"
+              >
+                <i class="fas fa-file-alt mr-2"></i>笔记视角
+              </button>
+            </div>
+            <button 
+              type="button"
+              @click="closeArchiveManager"
+              class="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 归档视角 -->
+        <div v-if="archiveViewMode === 'archive'" class="space-y-4">
+          <!-- 工具栏 -->
+          <div class="flex items-center space-x-3 pb-4 border-b">
+            <div class="relative flex-1">
+              <input 
+                v-model="archiveViewSearch"
+                type="text" 
+                placeholder="搜索归档名称..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-input pr-10"
+              >
+              <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            <select 
+              v-model="archiveViewTypeFilter"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-select"
+            >
+              <option value="">全部类型</option>
+              <option value="book">书籍</option>
+              <option value="course">课程</option>
+              <option value="material">材料</option>
+              <option value="video">视频</option>
+              <option value="other">其他</option>
+            </select>
+            <button 
+              @click="openCreateArchiveForBatch"
+              class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all flex items-center space-x-2 whitespace-nowrap"
+            >
+              <i class="fas fa-plus"></i>
+              <span>新建归档</span>
+            </button>
+          </div>
+
+          <!-- 归档列表 -->
+          <div class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+            <div 
+              v-for="archive in filteredArchivesInView" 
+              :key="archive.id"
+              class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all"
+            >
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h4 class="text-lg font-semibold text-gray-900">{{ archive.archiveName }}</h4>
+                    <span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-600">
+                      {{ getArchiveTypeLabel(archive.archiveType) }}
+                    </span>
+                    <span class="text-sm text-gray-500">
+                      <i class="fas fa-file-alt mr-1"></i>{{ archive.noteCount || 0 }} 条笔记
+                    </span>
+                  </div>
+                  <p v-if="archive.description" class="text-sm text-gray-600 mb-2">{{ archive.description }}</p>
+                  <p v-if="archive.sourceInfo" class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>{{ archive.sourceInfo }}
+                  </p>
+                </div>
+                <button 
+                  @click="toggleArchiveExpand(archive.id)"
+                  class="text-purple-600 hover:text-purple-700 transition-colors"
+                >
+                  <i :class="expandedArchives.includes(archive.id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                </button>
+              </div>
+
+              <!-- 展开显示笔记列表 -->
+              <Transition name="slide-fade">
+                <div v-if="expandedArchives.includes(archive.id)" class="mt-3 pt-3 border-t border-gray-200">
+                  <div class="flex items-center justify-between mb-3">
+                    <h5 class="text-sm font-semibold text-gray-700">包含的笔记：</h5>
+                    <button 
+                      @click="addNotesToArchive(archive.id)"
+                      class="px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                    >
+                      <i class="fas fa-plus mr-1"></i>添加笔记
+                    </button>
+                  </div>
+                  <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                    <div 
+                      v-for="note in getArchiveNotes(archive.id)" 
+                      :key="note.noteId"
+                      class="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+                    >
+                      <div class="flex-1">
+                        <div class="flex items-center space-x-2">
+                          <span :class="getTypeClass(note.type)" class="px-2 py-0.5 rounded text-xs">
+                            {{ getTypeText(note.type) }}
+                          </span>
+                          <span class="text-sm font-medium text-gray-900">{{ note.title }}</span>
+                        </div>
+                        <p v-if="note.relationNote" class="text-xs text-gray-500 mt-1">
+                          <i class="fas fa-bookmark mr-1"></i>{{ note.relationNote }}
+                        </p>
+                      </div>
+                      <button 
+                        @click="removeNoteFromArchiveAction(note.relationId, archive.id)"
+                        class="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div v-if="getArchiveNotes(archive.id).length === 0" class="text-center py-4 text-gray-400 text-sm">
+                      暂无笔记，点击上方按钮添加
+                    </div>
+                  </div>
+                </div>
+              </Transition>
+            </div>
+
+            <div v-if="filteredArchivesInView.length === 0" class="text-center py-12 text-gray-400">
+              <i class="fas fa-inbox text-5xl mb-3"></i>
+              <p>暂无归档记录</p>
+              <button 
+                @click="openCreateArchiveForBatch"
+                class="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+              >
+                创建第一个归档
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 笔记视角 -->
+        <div v-if="archiveViewMode === 'note'" class="space-y-4">
+          <!-- 工具栏 -->
+          <div class="flex items-center space-x-3 pb-4 border-b">
+            <div class="relative flex-1">
+              <input 
+                v-model="noteViewSearch"
+                type="text" 
+                placeholder="搜索笔记标题或内容..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-input pr-10"
+              >
+              <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            <select 
+              v-model="noteViewTypeFilter"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-select"
+            >
+              <option value="">全部类型</option>
+              <option value="fragment">碎片笔记</option>
+              <option value="framework">框架笔记</option>
+              <option value="study">求学笔记</option>
+              <option value="memorization">背诵笔记</option>
+              <option value="exercise">刷题笔记</option>
+              <option value="practical">实战笔记</option>
+            </select>
+          </div>
+
+          <!-- 笔记列表 -->
+          <div class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+            <div 
+              v-for="note in filteredNotesInView" 
+              :key="note.id"
+              class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-2">
+                    <span :class="getTypeClass(note.type)" class="px-2 py-1 rounded text-xs font-medium">
+                      {{ getTypeText(note.type) }}
+                    </span>
+                    <h4 class="text-lg font-semibold text-gray-900">{{ note.title }}</h4>
+                  </div>
+                  <p v-if="note.summary" class="text-sm text-gray-600 mb-2">{{ note.summary }}</p>
+                  
+                  <!-- 显示归档信息 -->
+                  <div v-if="noteArchiveMap[note.id] && noteArchiveMap[note.id].length > 0" class="flex items-start space-x-2 mt-2">
+                    <i class="fas fa-archive text-purple-500 mt-1"></i>
+                    <div class="flex-1">
+                      <span class="text-xs text-gray-500 mr-2">已归档至：</span>
+                      <div class="flex flex-wrap gap-1">
+                        <span 
+                          v-for="archiveInfo in noteArchiveMap[note.id]" 
+                          :key="archiveInfo.archiveId"
+                          class="inline-flex items-center px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs"
+                        >
+                          <i class="fas fa-folder mr-1"></i>
+                          {{ archiveInfo.archiveName }}
+                          <button 
+                            @click="removeNoteFromArchiveAction(archiveInfo.relationId, archiveInfo.archiveId)"
+                            class="ml-1 text-purple-500 hover:text-purple-700"
+                          >
+                            <i class="fas fa-times text-xs"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-xs text-gray-400 mt-2">
+                    <i class="fas fa-inbox mr-1"></i>未归档
+                  </div>
+                </div>
+                <button 
+                  @click="quickAddNoteToArchive(note.id)"
+                  class="px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors whitespace-nowrap ml-3"
+                >
+                  <i class="fas fa-plus mr-1"></i>添加到归档
+                </button>
+              </div>
+            </div>
+
+            <div v-if="filteredNotesInView.length === 0" class="text-center py-12 text-gray-400">
+              <i class="fas fa-inbox text-5xl mb-3"></i>
+              <p>没有找到符合条件的笔记</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <!-- 管理已有笔记 -->
     <Transition name="manage-notes-fade" mode="out-in">
@@ -407,6 +671,7 @@
     </div>
     </Transition>
 
+
     <!-- 新建/编辑笔记弹窗 -->
     <Transition name="modal">
       <div v-if="showCreateForm" class="fixed inset-0 z-50 flex items-center justify-center">
@@ -529,66 +794,19 @@
                     </div>
                     
                     <!-- 搜索/添加分类 -->
-                  <div class="relative">
-                    <div class="flex items-center space-x-2">
-                      <div class="relative flex-1">
-                        <input 
-                          v-model="fragmentCategorySearch"
-                          type="text" 
-                          placeholder="搜索或新建分类..."
-                          @focus="showFragmentCategoryDropdown = true"
-                          @input="filterFragmentCategories"
-                          @keyup.enter="addFragmentCategoryFromSearch"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
-                        >
-                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                      </div>
-                      <button 
-                        type="button"
-                        @click="addFragmentCategoryFromSearch"
-                        :disabled="!fragmentCategorySearch.trim()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                      >
-                        <i class="fas fa-plus"></i>
-                        <span>添加</span>
-                      </button>
-                    </div>
-                    
-                    <!-- 下拉搜索结果 -->
-                    <div v-if="showFragmentCategoryDropdown && filteredFragmentCategories.length > 0" 
-                         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      <button
-                        v-for="category in filteredFragmentCategories"
-                        :key="category"
-                        type="button"
-                        @click="selectFragmentCategoryFromDropdown(category)"
-                        class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
-                      >
-                        <span>{{ category }}</span>
-                        <i v-if="!recordForm.fragmentCategory.includes(category)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
-                        <i v-else class="fas fa-check text-green-600"></i>
-                      </button>
-                    </div>
-                  </div>
-                    <div v-if="recordForm.fragmentCategory.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前分类: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="category in recordForm.fragmentCategory" 
-                          :key="category"
-                          class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ category }}</span>
-                          <button 
-                            type="button"
-                            @click="removeFragmentCategory(category)"
-                            class="text-blue-500 hover:text-blue-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                </div>
-              </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.fragmentCategory"
+                      :all-options="fragmentCategories"
+                      placeholder="搜索或新建分类..."
+                      color="blue"
+                      @add="handleFragmentCategoryAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.fragmentCategory.length > 0"
+                      :tags="recordForm.fragmentCategory"
+                      color="blue"
+                      @remove="removeFragmentCategory"
+                    />
                   </div>
                   <div>
                     <div class="flex items-center justify-between mb-2">
@@ -604,66 +822,19 @@
                     </div>
                     
                     <!-- 搜索/添加主题 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="fragmentThemeSearch"
-                            type="text" 
-                            placeholder="搜索或新建主题..."
-                            @focus="showFragmentThemeDropdown = true"
-                            @input="filterFragmentThemes"
-                            @keyup.enter="addFragmentThemeFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addFragmentThemeFromSearch"
-                          :disabled="!fragmentThemeSearch.trim()"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showFragmentThemeDropdown && filteredFragmentThemes.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="theme in filteredFragmentThemes"
-                          :key="theme"
-                          type="button"
-                          @click="selectFragmentThemeFromDropdown(theme)"
-                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ theme }}</span>
-                          <i v-if="!recordForm.fragmentTheme.includes(theme)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.fragmentTheme.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前主题: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="theme in recordForm.fragmentTheme" 
-                          :key="theme"
-                          class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ theme }}</span>
-                          <button 
-                            type="button"
-                            @click="removeFragmentTheme(theme)"
-                            class="text-green-500 hover:text-green-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.fragmentTheme"
+                      :all-options="fragmentThemes"
+                      placeholder="搜索或新建主题..."
+                      color="green"
+                      @add="handleFragmentThemeAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.fragmentTheme.length > 0"
+                      :tags="recordForm.fragmentTheme"
+                      color="green"
+                      @remove="removeFragmentTheme"
+                    />
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">重要程度</label>
@@ -726,61 +897,15 @@
                         <i class="fas fa-file-alt text-purple-600 mr-1"></i>
                         内容
                       </label>
-                      <div class="border border-purple-200 rounded-lg overflow-hidden bg-white">
-                        <!-- 工具栏 -->
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertTable" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertImage" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadImage" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setLink" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="editor?.chain().focus().unsetLink().run()" :disabled="!editor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="editor?.chain().focus().undo().run()" :disabled="!editor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="editor?.chain().focus().redo().run()" :disabled="!editor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(editor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <div class="p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-                          <EditorContent :editor="editor" />
-                        </div>
-                      </div>
+                      <RichTextEditor 
+                        :editor="editor"
+                        border-color="purple"
+                        @insert-table="insertTable"
+                        @insert-image="insertImage"
+                        @upload-image="uploadImage"
+                        @set-link="setLink"
+                        @import-markdown="importMarkdown(editor)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -808,66 +933,19 @@
                     </div>
                     
                     <!-- 搜索/添加学科类型 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="frameworkSubjectSearch"
-                            type="text" 
-                            placeholder="搜索或新建学科类型..."
-                            @focus="showFrameworkSubjectDropdown = true"
-                            @input="filterFrameworkSubjects"
-                            @keyup.enter="addFrameworkSubjectFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addFrameworkSubjectFromSearch"
-                          :disabled="!frameworkSubjectSearch.trim()"
-                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showFrameworkSubjectDropdown && filteredFrameworkSubjects.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="subject in filteredFrameworkSubjects"
-                          :key="subject"
-                          type="button"
-                          @click="selectFrameworkSubjectFromDropdown(subject)"
-                          class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ subject }}</span>
-                          <i v-if="!recordForm.subjectType.includes(subject)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.subjectType.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前学科: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="subject in recordForm.subjectType" 
-                          :key="subject"
-                          class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ subject }}</span>
-                          <button 
-                            type="button"
-                            @click="removeFrameworkSubject(subject)"
-                            class="text-blue-500 hover:text-blue-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.subjectType"
+                      :all-options="frameworkSubjects"
+                      placeholder="搜索或新建学科类型..."
+                      color="blue"
+                      @add="handleFrameworkSubjectAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.subjectType.length > 0"
+                      :tags="recordForm.subjectType"
+                      color="blue"
+                      @remove="removeFrameworkSubject"
+                    />
                   </div>
 
                   <!-- 知识点类型 -->
@@ -885,66 +963,19 @@
                     </div>
                     
                     <!-- 搜索/添加知识点 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="frameworkKnowledgeSearch"
-                            type="text" 
-                            placeholder="搜索或新建知识点..."
-                            @focus="showFrameworkKnowledgeDropdown = true"
-                            @input="filterFrameworkKnowledge"
-                            @keyup.enter="addFrameworkKnowledgeFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addFrameworkKnowledgeFromSearch"
-                          :disabled="!frameworkKnowledgeSearch.trim()"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showFrameworkKnowledgeDropdown && filteredFrameworkKnowledge.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="knowledge in filteredFrameworkKnowledge"
-                          :key="knowledge"
-                          type="button"
-                          @click="selectFrameworkKnowledgeFromDropdown(knowledge)"
-                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ knowledge }}</span>
-                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前知识点: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="knowledge in recordForm.knowledgePoint" 
-                          :key="knowledge"
-                          class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ knowledge }}</span>
-                          <button 
-                            type="button"
-                            @click="removeFrameworkKnowledge(knowledge)"
-                            class="text-green-500 hover:text-green-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.knowledgePoint"
+                      :all-options="frameworkKnowledge"
+                      placeholder="搜索或新建知识点..."
+                      color="green"
+                      @add="handleFrameworkKnowledgeAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.knowledgePoint.length > 0"
+                      :tags="recordForm.knowledgePoint"
+                      color="green"
+                      @remove="removeFrameworkKnowledge"
+                    />
                   </div>
                   
                   <!-- 框架笔记内容编辑 -->
@@ -990,61 +1021,15 @@
                         <i class="fas fa-file-alt text-blue-600 mr-1"></i>
                         内容
                       </label>
-                      <div class="border border-blue-200 rounded-lg overflow-hidden bg-white">
-                        <!-- 工具栏 -->
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="editor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="editor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="editor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="editor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': editor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertTable" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertImage" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadImage" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setLink" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="editor?.chain().focus().unsetLink().run()" :disabled="!editor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="editor?.chain().focus().undo().run()" :disabled="!editor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="editor?.chain().focus().redo().run()" :disabled="!editor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(editor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <div class="p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
-                          <EditorContent :editor="editor" />
-                        </div>
-                      </div>
+                      <RichTextEditor 
+                        :editor="editor"
+                        border-color="blue"
+                        @insert-table="insertTable"
+                        @insert-image="insertImage"
+                        @upload-image="uploadImage"
+                        @set-link="setLink"
+                        @import-markdown="importMarkdown(editor)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1073,66 +1058,19 @@
                     </div>
                     
                     <!-- 搜索/添加学科 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="studySubjectSearch"
-                            type="text" 
-                            placeholder="搜索或新建学科..."
-                            @focus="showStudySubjectDropdown = true"
-                            @input="filterStudySubjects"
-                            @keyup.enter="addStudySubjectFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addStudySubjectFromSearch"
-                          :disabled="!studySubjectSearch.trim()"
-                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showStudySubjectDropdown && filteredStudySubjects.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="subject in filteredStudySubjects"
-                          :key="subject"
-                          type="button"
-                          @click="selectStudySubjectFromDropdown(subject)"
-                          class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ subject }}</span>
-                          <i v-if="!recordForm.studySubject.includes(subject)" class="fas fa-plus text-blue-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.studySubject.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前学科: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="subject in recordForm.studySubject" 
-                          :key="subject"
-                          class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ subject }}</span>
-                          <button 
-                            type="button"
-                            @click="removeStudySubject(subject)"
-                            class="text-blue-500 hover:text-blue-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.studySubject"
+                      :all-options="studySubjects"
+                      placeholder="搜索或新建学科..."
+                      color="blue"
+                      @add="handleStudySubjectAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.studySubject.length > 0"
+                      :tags="recordForm.studySubject"
+                      color="blue"
+                      @remove="removeStudySubject"
+                    />
                   </div>
 
                   <!-- 知识点 -->
@@ -1150,66 +1088,19 @@
                     </div>
                     
                     <!-- 搜索/添加知识点 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="studyKnowledgeSearch"
-                            type="text" 
-                            placeholder="搜索或新建知识点..."
-                            @focus="showStudyKnowledgeDropdown = true"
-                            @input="filterStudyKnowledge"
-                            @keyup.enter="addStudyKnowledgeFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addStudyKnowledgeFromSearch"
-                          :disabled="!studyKnowledgeSearch.trim()"
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showStudyKnowledgeDropdown && filteredStudyKnowledge.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="knowledge in filteredStudyKnowledge"
-                          :key="knowledge"
-                          type="button"
-                          @click="selectStudyKnowledgeFromDropdown(knowledge)"
-                          class="w-full text-left px-4 py-2 hover:bg-green-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ knowledge }}</span>
-                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-green-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前知识点: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="point in recordForm.knowledgePoint" 
-                          :key="point"
-                          class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ point }}</span>
-                          <button 
-                            type="button"
-                            @click="removeKnowledgePoint(point)"
-                            class="text-green-500 hover:text-green-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.knowledgePoint"
+                      :all-options="studyKnowledge"
+                      placeholder="搜索或新建知识点..."
+                      color="green"
+                      @add="handleStudyKnowledgeAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.knowledgePoint.length > 0"
+                      :tags="recordForm.knowledgePoint"
+                      color="green"
+                      @remove="removeKnowledgePoint"
+                    />
                   </div>
                   
                   <!-- 求学笔记内容编辑 -->
@@ -1255,58 +1146,15 @@
                         <i class="fas fa-lightbulb text-emerald-600 mr-1"></i>
                         核心概念
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': coreConceptEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertStudyTable(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setStudyLink(coreConceptEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="coreConceptEditor?.chain().focus().unsetLink().run()" :disabled="!coreConceptEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="undoStudy(coreConceptEditor)" :disabled="!coreConceptEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(coreConceptEditor)" :disabled="!coreConceptEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(coreConceptEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="coreConceptEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="coreConceptEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(coreConceptEditor)"
+                        @insert-image="insertStudyImage(coreConceptEditor)"
+                        @upload-image="uploadStudyImage(coreConceptEditor)"
+                        @set-link="setStudyLink(coreConceptEditor)"
+                        @import-markdown="importMarkdown(coreConceptEditor)"
+                      />
                     </div>
 
                     <!-- 机制原理 -->
@@ -1315,41 +1163,15 @@
                         <i class="fas fa-cogs text-emerald-600 mr-1"></i>
                         机制原理
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': mechanismEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertStudyTable(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setStudyLink(mechanismEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="mechanismEditor?.chain().focus().unsetLink().run()" :disabled="!mechanismEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoStudy(mechanismEditor)" :disabled="!mechanismEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(mechanismEditor)" :disabled="!mechanismEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(mechanismEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="mechanismEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="mechanismEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(mechanismEditor)"
+                        @insert-image="insertStudyImage(mechanismEditor)"
+                        @upload-image="uploadStudyImage(mechanismEditor)"
+                        @set-link="setStudyLink(mechanismEditor)"
+                        @import-markdown="importMarkdown(mechanismEditor)"
+                      />
                     </div>
 
                     <!-- 应用案例 -->
@@ -1358,41 +1180,15 @@
                         <i class="fas fa-tasks text-emerald-600 mr-1"></i>
                         应用案例
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': applicationCaseEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertStudyTable(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setStudyLink(applicationCaseEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="applicationCaseEditor?.chain().focus().unsetLink().run()" :disabled="!applicationCaseEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoStudy(applicationCaseEditor)" :disabled="!applicationCaseEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(applicationCaseEditor)" :disabled="!applicationCaseEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(applicationCaseEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="applicationCaseEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="applicationCaseEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(applicationCaseEditor)"
+                        @insert-image="insertStudyImage(applicationCaseEditor)"
+                        @upload-image="uploadStudyImage(applicationCaseEditor)"
+                        @set-link="setStudyLink(applicationCaseEditor)"
+                        @import-markdown="importMarkdown(applicationCaseEditor)"
+                      />
                     </div>
 
                     <!-- 延伸/对比 -->
@@ -1401,41 +1197,15 @@
                         <i class="fas fa-project-diagram text-emerald-600 mr-1"></i>
                         延伸/对比
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': extensionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertStudyTable(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setStudyLink(extensionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="extensionEditor?.chain().focus().unsetLink().run()" :disabled="!extensionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoStudy(extensionEditor)" :disabled="!extensionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(extensionEditor)" :disabled="!extensionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(extensionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="extensionEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="extensionEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(extensionEditor)"
+                        @insert-image="insertStudyImage(extensionEditor)"
+                        @upload-image="uploadStudyImage(extensionEditor)"
+                        @set-link="setStudyLink(extensionEditor)"
+                        @import-markdown="importMarkdown(extensionEditor)"
+                      />
                     </div>
 
                     <!-- 常见误区 -->
@@ -1444,41 +1214,15 @@
                         <i class="fas fa-exclamation-triangle text-emerald-600 mr-1"></i>
                         常见误区
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': commonMistakeEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertStudyTable(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setStudyLink(commonMistakeEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="commonMistakeEditor?.chain().focus().unsetLink().run()" :disabled="!commonMistakeEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoStudy(commonMistakeEditor)" :disabled="!commonMistakeEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(commonMistakeEditor)" :disabled="!commonMistakeEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(commonMistakeEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="commonMistakeEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="commonMistakeEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(commonMistakeEditor)"
+                        @insert-image="insertStudyImage(commonMistakeEditor)"
+                        @upload-image="uploadStudyImage(commonMistakeEditor)"
+                        @set-link="setStudyLink(commonMistakeEditor)"
+                        @import-markdown="importMarkdown(commonMistakeEditor)"
+                      />
                     </div>
 
                     <!-- 思考理解 -->
@@ -1487,41 +1231,15 @@
                         <i class="fas fa-brain text-emerald-600 mr-1"></i>
                         思考理解
                       </label>
-                      <div class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': reflectionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertStudyTable(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertStudyImage(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadStudyImage(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setStudyLink(reflectionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="reflectionEditor?.chain().focus().unsetLink().run()" :disabled="!reflectionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoStudy(reflectionEditor)" :disabled="!reflectionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoStudy(reflectionEditor)" :disabled="!reflectionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(reflectionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="reflectionEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="reflectionEditor"
+                        border-color="emerald"
+                        @insert-table="insertStudyTable(reflectionEditor)"
+                        @insert-image="insertStudyImage(reflectionEditor)"
+                        @upload-image="uploadStudyImage(reflectionEditor)"
+                        @set-link="setStudyLink(reflectionEditor)"
+                        @import-markdown="importMarkdown(reflectionEditor)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1622,66 +1340,19 @@
                     </div>
                     
                     <!-- 搜索/添加知识点 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="memorizationKnowledgeSearch"
-                            type="text" 
-                            placeholder="搜索或新建知识点..."
-                            @focus="showMemorizationKnowledgeDropdown = true"
-                            @input="filterMemorizationKnowledge"
-                            @keyup.enter="addMemorizationKnowledgeFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addMemorizationKnowledgeFromSearch"
-                          :disabled="!memorizationKnowledgeSearch.trim()"
-                          class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showMemorizationKnowledgeDropdown && filteredMemorizationKnowledge.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="knowledge in filteredMemorizationKnowledge"
-                          :key="knowledge"
-                          type="button"
-                          @click="selectMemorizationKnowledgeFromDropdown(knowledge)"
-                          class="w-full text-left px-4 py-2 hover:bg-orange-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ knowledge }}</span>
-                          <i v-if="!recordForm.knowledgePoint.includes(knowledge)" class="fas fa-plus text-orange-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.knowledgePoint.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前知识点: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="point in recordForm.knowledgePoint" 
-                          :key="point"
-                            class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ point }}</span>
-                          <button 
-                            type="button"
-                            @click="removeKnowledgePoint(point)"
-                              class="text-orange-500 hover:text-orange-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                        </div>
-                      </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.knowledgePoint"
+                      :all-options="memorizationKnowledge"
+                      placeholder="搜索或新建知识点..."
+                      color="orange"
+                      @add="handleMemorizationKnowledgeAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.knowledgePoint.length > 0"
+                      :tags="recordForm.knowledgePoint"
+                      color="orange"
+                      @remove="removeKnowledgePoint"
+                    />
                     </div>
                   
                   <!-- 背诵笔记专用内容字段 -->
@@ -1727,58 +1398,15 @@
                         <i class="fas fa-file-text text-yellow-600 mr-1"></i>
                         原文内容
                       </label>
-                      <div class="border border-gray-300 rounded-lg overflow-hidden">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': originalTextEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertMemorizationTable(originalTextEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertMemorizationImage(originalTextEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadMemorizationImage(originalTextEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setMemorizationLink(originalTextEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().unsetLink().run()" :disabled="!originalTextEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="originalTextEditor?.chain().focus().undo().run()" :disabled="!originalTextEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="originalTextEditor?.chain().focus().redo().run()" :disabled="!originalTextEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(originalTextEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                    </div>
-                        <EditorContent :editor="originalTextEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="originalTextEditor"
+                        border-color="gray"
+                        @insert-table="insertMemorizationTable(originalTextEditor)"
+                        @insert-image="insertMemorizationImage(originalTextEditor)"
+                        @upload-image="uploadMemorizationImage(originalTextEditor)"
+                        @set-link="setMemorizationLink(originalTextEditor)"
+                        @import-markdown="importMarkdown(originalTextEditor)"
+                      />
                       <p class="text-xs text-gray-500 mt-1">输入需要背诵的原始文本内容</p>
                     </div>
                     
@@ -1788,58 +1416,15 @@
                         <i class="fas fa-comment-dots text-yellow-600 mr-1"></i>
                         解释说明
                       </label>
-                      <div class="border border-gray-300 rounded-lg overflow-hidden">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': explanationEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertMemorizationTable(explanationEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertMemorizationImage(explanationEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadMemorizationImage(explanationEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setMemorizationLink(explanationEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().unsetLink().run()" :disabled="!explanationEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="explanationEditor?.chain().focus().undo().run()" :disabled="!explanationEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="explanationEditor?.chain().focus().redo().run()" :disabled="!explanationEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(explanationEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="explanationEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="explanationEditor"
+                        border-color="gray"
+                        @insert-table="insertMemorizationTable(explanationEditor)"
+                        @insert-image="insertMemorizationImage(explanationEditor)"
+                        @upload-image="uploadMemorizationImage(explanationEditor)"
+                        @set-link="setMemorizationLink(explanationEditor)"
+                        @import-markdown="importMarkdown(explanationEditor)"
+                      />
                       <p class="text-xs text-gray-500 mt-1">对原文内容的详细解释和理解</p>
                     </div>
                     
@@ -1849,58 +1434,15 @@
                         <i class="fas fa-lightbulb text-yellow-600 mr-1"></i>
                         记忆提示词
                       </label>
-                      <div class="border border-gray-300 rounded-lg overflow-hidden">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="cueEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="cueEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="cueEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="cueEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="cueEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': cueEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertMemorizationTable(cueEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertMemorizationImage(cueEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadMemorizationImage(cueEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setMemorizationLink(cueEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().unsetLink().run()" :disabled="!cueEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="cueEditor?.chain().focus().undo().run()" :disabled="!cueEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="cueEditor?.chain().focus().redo().run()" :disabled="!cueEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(cueEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                      </div>
-                        <EditorContent :editor="cueEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="cueEditor"
+                        border-color="gray"
+                        @insert-table="insertMemorizationTable(cueEditor)"
+                        @insert-image="insertMemorizationImage(cueEditor)"
+                        @upload-image="uploadMemorizationImage(cueEditor)"
+                        @set-link="setMemorizationLink(cueEditor)"
+                        @import-markdown="importMarkdown(cueEditor)"
+                      />
                       <p class="text-xs text-gray-500 mt-1">帮助快速回忆原文的关键词或线索</p>
                     </div>
                   </div>
@@ -2026,58 +1568,15 @@
                         <i class="fas fa-file-lines text-rose-600 mr-1"></i>
                         题目描述
                       </label>
-                      <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': questionDescriptionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertExerciseTable(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertExerciseImage(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadExerciseImage(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setExerciseLink(questionDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="questionDescriptionEditor?.chain().focus().unsetLink().run()" :disabled="!questionDescriptionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="undoExercise(questionDescriptionEditor)" :disabled="!questionDescriptionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoExercise(questionDescriptionEditor)" :disabled="!questionDescriptionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(questionDescriptionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="questionDescriptionEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="questionDescriptionEditor"
+                        border-color="rose"
+                        @insert-table="insertExerciseTable(questionDescriptionEditor)"
+                        @insert-image="insertExerciseImage(questionDescriptionEditor)"
+                        @upload-image="uploadExerciseImage(questionDescriptionEditor)"
+                        @set-link="setExerciseLink(questionDescriptionEditor)"
+                        @import-markdown="importMarkdown(questionDescriptionEditor)"
+                      />
                     </div>
 
                     <!-- 分析理解 -->
@@ -2086,58 +1585,15 @@
                         <i class="fas fa-lightbulb text-rose-600 mr-1"></i>
                         分析理解
                       </label>
-                      <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': analysisEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertExerciseTable(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertExerciseImage(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadExerciseImage(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setExerciseLink(analysisEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="analysisEditor?.chain().focus().unsetLink().run()" :disabled="!analysisEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="undoExercise(analysisEditor)" :disabled="!analysisEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoExercise(analysisEditor)" :disabled="!analysisEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(analysisEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="analysisEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="analysisEditor"
+                        border-color="rose"
+                        @insert-table="insertExerciseTable(analysisEditor)"
+                        @insert-image="insertExerciseImage(analysisEditor)"
+                        @upload-image="uploadExerciseImage(analysisEditor)"
+                        @set-link="setExerciseLink(analysisEditor)"
+                        @import-markdown="importMarkdown(analysisEditor)"
+                      />
                     </div>
 
                     <!-- 参考答案 -->
@@ -2146,58 +1602,15 @@
                         <i class="fas fa-check-circle text-rose-600 mr-1"></i>
                         参考答案
                       </label>
-                      <div class="border border-rose-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <!-- 基础格式 -->
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 标题 -->
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 列表 -->
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 对齐 -->
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 高亮和代码 -->
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': referenceAnswerEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 表格和媒体 -->
-                          <button type="button" @click="insertExerciseTable(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertExerciseImage(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadExerciseImage(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 链接 -->
-                          <button type="button" @click="setExerciseLink(referenceAnswerEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="referenceAnswerEditor?.chain().focus().unsetLink().run()" :disabled="!referenceAnswerEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- 撤销重做 -->
-                          <button type="button" @click="undoExercise(referenceAnswerEditor)" :disabled="!referenceAnswerEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoExercise(referenceAnswerEditor)" :disabled="!referenceAnswerEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          
-                          <!-- Markdown -->
-                          <button type="button" @click="importMarkdown(referenceAnswerEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="referenceAnswerEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="referenceAnswerEditor"
+                        border-color="rose"
+                        @insert-table="insertExerciseTable(referenceAnswerEditor)"
+                        @insert-image="insertExerciseImage(referenceAnswerEditor)"
+                        @upload-image="uploadExerciseImage(referenceAnswerEditor)"
+                        @set-link="setExerciseLink(referenceAnswerEditor)"
+                        @import-markdown="importMarkdown(referenceAnswerEditor)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2298,66 +1711,19 @@
                     </div>
                     
                     <!-- 搜索/添加技术栈 -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="practicalTechStackSearch"
-                            type="text" 
-                            placeholder="搜索或新建技术栈..."
-                            @focus="showPracticalTechStackDropdown = true"
-                            @input="filterPracticalTechStacks"
-                            @keyup.enter="addPracticalTechStackFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addPracticalTechStackFromSearch"
-                          :disabled="!practicalTechStackSearch.trim()"
-                          class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果 -->
-                      <div v-if="showPracticalTechStackDropdown && filteredPracticalTechStacks.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="tech in filteredPracticalTechStacks"
-                          :key="tech"
-                          type="button"
-                          @click="selectPracticalTechStackFromDropdown(tech)"
-                          class="w-full text-left px-4 py-2 hover:bg-teal-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ tech }}</span>
-                          <i v-if="!recordForm.techTags.includes(tech)" class="fas fa-plus text-teal-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div v-if="recordForm.techTags.length > 0" class="mt-2">
-                      <span class="text-sm text-gray-500">当前技术栈: </span>
-                      <div class="flex flex-wrap gap-2 mt-1">
-                        <span 
-                          v-for="tag in recordForm.techTags" 
-                          :key="tag"
-                            class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                        >
-                          <span>{{ tag }}</span>
-                          <button 
-                            type="button"
-                            @click="removeTechTag(tag)"
-                              class="text-teal-500 hover:text-teal-700"
-                          >
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
+                    <TagSearchInput
+                      v-model:selected="recordForm.techTags"
+                      :all-options="practicalTechStacks"
+                      placeholder="搜索或新建技术栈..."
+                      color="teal"
+                      @add="handlePracticalTechStackAdd"
+                    />
+                    <TagDisplay
+                      v-if="recordForm.techTags.length > 0"
+                      :tags="recordForm.techTags"
+                      color="teal"
+                      @remove="removeTechTag"
+                    />
                   </div>
                   
                   <div>
@@ -2432,41 +1798,15 @@
                         <i class="fas fa-clipboard-list text-cyan-600 mr-1"></i>
                         需求描述
                       </label>
-                      <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': requirementDescriptionEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertPracticalTable(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertPracticalImage(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadPracticalImage(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setPracticalLink(requirementDescriptionEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="requirementDescriptionEditor?.chain().focus().unsetLink().run()" :disabled="!requirementDescriptionEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoPractical(requirementDescriptionEditor)" :disabled="!requirementDescriptionEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoPractical(requirementDescriptionEditor)" :disabled="!requirementDescriptionEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(requirementDescriptionEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="requirementDescriptionEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="requirementDescriptionEditor"
+                        border-color="cyan"
+                        @insert-table="insertPracticalTable(requirementDescriptionEditor)"
+                        @insert-image="insertPracticalImage(requirementDescriptionEditor)"
+                        @upload-image="uploadPracticalImage(requirementDescriptionEditor)"
+                        @set-link="setPracticalLink(requirementDescriptionEditor)"
+                        @import-markdown="importMarkdown(requirementDescriptionEditor)"
+                      />
                     </div>
 
                     <!-- 设计思路 -->
@@ -2475,41 +1815,15 @@
                         <i class="fas fa-lightbulb text-cyan-600 mr-1"></i>
                         设计思路
                       </label>
-                      <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': designThinkingEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertPracticalTable(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertPracticalImage(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadPracticalImage(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setPracticalLink(designThinkingEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="designThinkingEditor?.chain().focus().unsetLink().run()" :disabled="!designThinkingEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoPractical(designThinkingEditor)" :disabled="!designThinkingEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoPractical(designThinkingEditor)" :disabled="!designThinkingEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(designThinkingEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="designThinkingEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="designThinkingEditor"
+                        border-color="cyan"
+                        @insert-table="insertPracticalTable(designThinkingEditor)"
+                        @insert-image="insertPracticalImage(designThinkingEditor)"
+                        @upload-image="uploadPracticalImage(designThinkingEditor)"
+                        @set-link="setPracticalLink(designThinkingEditor)"
+                        @import-markdown="importMarkdown(designThinkingEditor)"
+                      />
                     </div>
 
                     <!-- 参考设计 -->
@@ -2518,41 +1832,15 @@
                         <i class="fas fa-book-open text-cyan-600 mr-1"></i>
                         参考设计
                       </label>
-                      <div class="border border-cyan-200 rounded-lg overflow-hidden bg-white">
-                        <div class="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap items-center gap-1">
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleBold().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('bold') }" class="p-2 rounded hover:bg-gray-200" title="粗体"><i class="fas fa-bold"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleItalic().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('italic') }" class="p-2 rounded hover:bg-gray-200" title="斜体"><i class="fas fa-italic"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleUnderline().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('underline') }" class="p-2 rounded hover:bg-gray-200" title="下划线"><i class="fas fa-underline"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleStrike().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('strike') }" class="p-2 rounded hover:bg-gray-200" title="删除线"><i class="fas fa-strikethrough"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 1 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题1">H1</button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 2 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题2">H2</button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('heading', { level: 3 }) }" class="px-2 py-1 rounded hover:bg-gray-200 font-bold text-sm" title="标题3">H3</button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleBulletList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('bulletList') }" class="p-2 rounded hover:bg-gray-200" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleOrderedList().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('orderedList') }" class="p-2 rounded hover:bg-gray-200" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('left').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'left' }) }" class="p-2 rounded hover:bg-gray-200" title="左对齐"><i class="fas fa-align-left"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('center').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'center' }) }" class="p-2 rounded hover:bg-gray-200" title="居中"><i class="fas fa-align-center"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().setTextAlign('right').run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive({ textAlign: 'right' }) }" class="p-2 rounded hover:bg-gray-200" title="右对齐"><i class="fas fa-align-right"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleHighlight().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('highlight') }" class="p-2 rounded hover:bg-gray-200" title="高亮"><i class="fas fa-highlighter"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().toggleCodeBlock().run()" :class="{ 'bg-blue-100 text-blue-600': referenceDesignEditor?.isActive('codeBlock') }" class="p-2 rounded hover:bg-gray-200" title="代码块"><i class="fas fa-code"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="insertPracticalTable(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入表格"><i class="fas fa-table"></i></button>
-                          <button type="button" @click="insertPracticalImage(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入图片"><i class="fas fa-image"></i></button>
-                          <button type="button" @click="uploadPracticalImage(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="上传图片"><i class="fas fa-upload"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="setPracticalLink(referenceDesignEditor)" class="p-2 rounded hover:bg-gray-200" title="插入链接"><i class="fas fa-link"></i></button>
-                          <button type="button" @click="referenceDesignEditor?.chain().focus().unsetLink().run()" :disabled="!referenceDesignEditor?.isActive('link')" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="取消链接"><i class="fas fa-unlink"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="undoPractical(referenceDesignEditor)" :disabled="!referenceDesignEditor?.can().undo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="撤销"><i class="fas fa-undo"></i></button>
-                          <button type="button" @click="redoPractical(referenceDesignEditor)" :disabled="!referenceDesignEditor?.can().redo()" class="p-2 rounded hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed" title="重做"><i class="fas fa-redo"></i></button>
-                          <div class="w-px h-6 bg-gray-300 mx-1"></div>
-                          <button type="button" @click="importMarkdown(referenceDesignEditor)" class="px-2 py-1 rounded hover:bg-gray-200 text-sm font-semibold" title="导入Markdown"><i class="fab fa-markdown"></i></button>
-                        </div>
-                        <EditorContent :editor="referenceDesignEditor" />
-                      </div>
+                      <RichTextEditor 
+                        :editor="referenceDesignEditor"
+                        border-color="cyan"
+                        @insert-table="insertPracticalTable(referenceDesignEditor)"
+                        @insert-image="insertPracticalImage(referenceDesignEditor)"
+                        @upload-image="uploadPracticalImage(referenceDesignEditor)"
+                        @set-link="setPracticalLink(referenceDesignEditor)"
+                        @import-markdown="importMarkdown(referenceDesignEditor)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -2941,6 +2229,174 @@
       </div>
     </div>
   </div>
+
+  <!-- 选择归档弹窗（批量添加笔记） -->
+  <div v-if="showArchiveListForBatch" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showArchiveListForBatch = false">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6">
+        <h3 class="text-2xl font-bold">选择归档</h3>
+        <p class="text-purple-100 text-sm mt-1">将 {{ selectedNoteIdsForBatch.length }} 条笔记添加到归档中</p>
+      </div>
+
+      <!-- 搜索归档 -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <div class="relative flex-1">
+            <input 
+              v-model="batchArchiveSearch"
+              type="text" 
+              placeholder="搜索归档名称..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-input pr-10"
+            >
+            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+          <select 
+            v-model="batchArchiveTypeFilter"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-select"
+          >
+            <option value="">全部类型</option>
+            <option value="book">书籍</option>
+            <option value="course">课程</option>
+            <option value="material">材料</option>
+            <option value="video">视频</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 归档列表 -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="space-y-3">
+          <div 
+            v-for="archive in filteredArchivesForBatch" 
+            :key="archive.id"
+            class="border border-gray-200 rounded-lg p-4 hover:bg-purple-50 cursor-pointer transition-all"
+            @click="addSelectedNotesToArchive(archive.id)"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-2 mb-1">
+                  <span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-600">
+                    {{ getArchiveTypeLabel(archive.archiveType) }}
+                  </span>
+                  <h4 class="font-semibold text-gray-900">{{ archive.archiveName }}</h4>
+                </div>
+                <p v-if="archive.description" class="text-sm text-gray-600 mt-1">{{ archive.description }}</p>
+                <div class="flex items-center space-x-3 text-xs text-gray-500 mt-2">
+                  <span><i class="fas fa-file-alt mr-1"></i>{{ archive.noteCount || 0 }} 条笔记</span>
+                  <span v-if="archive.sourceInfo"><i class="fas fa-info-circle mr-1"></i>{{ archive.sourceInfo }}</span>
+                </div>
+              </div>
+              <i class="fas fa-plus-circle text-purple-500 text-2xl"></i>
+            </div>
+          </div>
+
+          <div v-if="filteredArchivesForBatch.length === 0" class="text-center py-12 text-gray-400">
+            <i class="fas fa-inbox text-5xl mb-3"></i>
+            <p>没有找到符合条件的归档</p>
+            <p class="text-sm mt-2">试试创建一个新归档</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部按钮 -->
+      <div class="p-6 border-t border-gray-200 flex justify-between">
+        <button 
+          @click="openCreateArchiveForBatch"
+          class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all flex items-center space-x-2"
+        >
+          <i class="fas fa-plus"></i>
+          <span>新建归档</span>
+        </button>
+        <button 
+          @click="showArchiveListForBatch = false"
+          class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+        >
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建归档并添加笔记弹窗 -->
+  <div v-if="showCreateArchiveForBatchDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="closeCreateArchiveForBatch">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6">
+        <h3 class="text-2xl font-bold">新建归档并添加笔记</h3>
+        <p class="text-purple-100 text-sm mt-1">将 {{ selectedNoteIdsForBatch.length }} 条笔记添加到新归档</p>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- 归档名称 -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            归档名称<span class="text-red-500">*</span>
+          </label>
+          <input 
+            v-model="batchArchiveForm.archiveName"
+            type="text" 
+            placeholder="例如：《深入理解计算机系统》、前端进阶课程"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-input"
+          >
+        </div>
+
+        <!-- 归档类型 -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">归档类型</label>
+          <select 
+            v-model="batchArchiveForm.archiveType"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-select"
+          >
+            <option value="">请选择</option>
+            <option value="book">书籍</option>
+            <option value="course">课程</option>
+            <option value="material">材料</option>
+            <option value="video">视频</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+
+        <!-- 来源信息 -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">来源信息</label>
+          <input 
+            v-model="batchArchiveForm.sourceInfo"
+            type="text" 
+            placeholder="例如：作者、出版社、链接等"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-input"
+          >
+        </div>
+
+        <!-- 描述 -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">描述</label>
+          <textarea 
+            v-model="batchArchiveForm.description"
+            rows="3"
+            placeholder="简要描述这个归档的内容和用途"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 form-textarea"
+          ></textarea>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="flex justify-end space-x-3 pt-4">
+          <button 
+            @click="closeCreateArchiveForBatch"
+            class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            取消
+          </button>
+          <button 
+            @click="createArchiveAndAddNotes"
+            :disabled="!batchArchiveForm.archiveName.trim()"
+            class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            创建并添加
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -2964,11 +2420,60 @@ import TextStyle from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import request from '@/api/request'
 import { getConfigsByNoteType, createConfig, deleteConfig as deleteConfigAPI, type NoteConfig } from '@/api/noteConfig'
+// 导入归档管理API
+import { 
+  getArchiveList, 
+  getArchiveDetail, 
+  createArchive, 
+  updateArchive, 
+  deleteArchive,
+  addNoteToArchive,
+  removeNoteFromArchive,
+  updateRelationNote,
+  type NoteArchive,
+  type NoteArchiveDetail
+} from '@/api/noteArchive'
+// 导入通用组件
+import RichTextEditor from '@/components/RichTextEditor.vue'
+import TagSearchInput from '@/components/TagSearchInput.vue'
+import TagDisplay from '@/components/TagDisplay.vue'
 
 type Note = any
 
 // 响应式数据
 const allNotes = ref<Note[]>([])
+
+// 归档管理相关状态
+const showArchiveManager = ref(false)  // 显示归档管理主界面
+const archiveViewMode = ref<'archive' | 'note'>('archive')  // 当前视角：归档 or 笔记
+const archives = ref<NoteArchive[]>([])  // 归档列表
+const archiveNotesMap = ref<Record<number, any[]>>({})  // 归档ID → 笔记列表的映射
+const noteArchiveMap = ref<Record<number, any[]>>({})  // 笔记ID → 归档列表的映射
+const expandedArchives = ref<number[]>([])  // 展开的归档ID列表
+
+// 归档视角的搜索和筛选
+const archiveViewSearch = ref('')  // 归档名称搜索
+const archiveViewTypeFilter = ref('')  // 归档类型筛选
+
+// 笔记视角的搜索和筛选
+const noteViewSearch = ref('')  // 笔记搜索
+const noteViewTypeFilter = ref('')  // 笔记类型筛选
+
+// 批量添加到归档相关
+const showArchiveListForBatch = ref(false)  // 显示选择归档弹窗
+const batchArchiveSearch = ref('')  // 归档搜索
+const batchArchiveTypeFilter = ref('')  // 归档类型筛选
+const selectedNoteIdsForBatch = ref<number[]>([])  // 待添加到归档的笔记ID列表
+
+// 新建归档并批量添加
+const showCreateArchiveForBatchDialog = ref(false)
+const batchArchiveForm = reactive({
+  archiveName: '',
+  archiveType: '',
+  description: '',
+  sourceInfo: ''
+})
+
 
 // 配置管理相关
 const showConfigManagement = ref(false)
@@ -3370,45 +2875,15 @@ const newExerciseSource = ref('')
 const newExerciseSubject = ref('')
 const newExerciseKnowledge = ref('')
 
-// 搜索式标签选择相关变量
-const fragmentCategorySearch = ref('')
-const fragmentThemeSearch = ref('')
-const showFragmentCategoryDropdown = ref(false)
-const showFragmentThemeDropdown = ref(false)
-const filteredFragmentCategories = ref<string[]>([])
-const filteredFragmentThemes = ref<string[]>([])
-
-// 框架笔记搜索变量
-const frameworkSubjectSearch = ref('')
-const frameworkKnowledgeSearch = ref('')
-const showFrameworkSubjectDropdown = ref(false)
-const showFrameworkKnowledgeDropdown = ref(false)
-const filteredFrameworkSubjects = ref<string[]>([])
-const filteredFrameworkKnowledge = ref<string[]>([])
-
-// 求学笔记搜索变量
-const studySubjectSearch = ref('')
-const studyKnowledgeSearch = ref('')
-const showStudySubjectDropdown = ref(false)
-const showStudyKnowledgeDropdown = ref(false)
-const filteredStudySubjects = ref<string[]>([])
-const filteredStudyKnowledge = ref<string[]>([])
-
-// 背诵笔记搜索变量
+// 背诵笔记搜索变量（科目为单选，保留）
 const memorizationSubjectSearch = ref('')
-const memorizationKnowledgeSearch = ref('')
 const showMemorizationSubjectDropdown = ref(false)
-const showMemorizationKnowledgeDropdown = ref(false)
 const filteredMemorizationSubjects = ref<string[]>([])
-const filteredMemorizationKnowledge = ref<string[]>([])
 
-// 实战笔记搜索变量
+// 实战笔记搜索变量（领域为单选，保留）
 const practicalDomainSearch = ref('')
-const practicalTechStackSearch = ref('')
 const showPracticalDomainDropdown = ref(false)
-const showPracticalTechStackDropdown = ref(false)
 const filteredPracticalDomains = ref<string[]>([])
-const filteredPracticalTechStacks = ref<string[]>([])
 
 // 配置管理搜索变量
 const configType1Search = ref('')
@@ -3627,6 +3102,89 @@ const availablePracticalTechStacks = computed(() => {
   const configs = allConfigs.value.filter(c => c.noteType === 'practical' && c.configType === 'techStack')
   return configs.map(c => c.configName).sort()
 })
+
+// ===== TagSearchInput组件使用的别名 =====
+const fragmentCategories = availableFragmentCategories
+const fragmentThemes = availableFragmentThemes
+const frameworkSubjects = availableFrameworkSubjects
+const frameworkKnowledge = availableFrameworkKnowledge
+const studySubjects = availableStudySubjects
+const studyKnowledge = availableStudyKnowledge
+const memorizationKnowledge = availableMemorizationKnowledge
+const practicalTechStacks = availablePracticalTechStacks
+
+// ===== TagSearchInput的add事件处理函数 =====
+const handleFragmentCategoryAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'fragment', configType: 'category', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加分类失败:', error)
+  }
+}
+
+const handleFragmentThemeAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'fragment', configType: 'theme', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加主题失败:', error)
+  }
+}
+
+const handleFrameworkSubjectAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'framework', configType: 'subjectType', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加学科类型失败:', error)
+  }
+}
+
+const handleFrameworkKnowledgeAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'framework', configType: 'knowledgePoint', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加知识点失败:', error)
+  }
+}
+
+const handleStudySubjectAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'study', configType: 'subject', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加学科失败:', error)
+  }
+}
+
+const handleStudyKnowledgeAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'study', configType: 'knowledgePoint', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加知识点失败:', error)
+  }
+}
+
+const handleMemorizationKnowledgeAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'memorization', configType: 'knowledgePoint', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加知识点失败:', error)
+  }
+}
+
+const handlePracticalTechStackAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'practical', configType: 'techStack', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加技术栈失败:', error)
+  }
+}
 
 // 学科类型和项目类型选项（已从 defaultOptions.ts 导入）
 
@@ -3949,199 +3507,7 @@ const selectFragmentCategory = (category: string) => {
   }
 }
 
-// 搜索式标签选择 - 碎片分类
-const filterFragmentCategories = () => {
-  const search = fragmentCategorySearch.value.toLowerCase().trim()
-  if (search) {
-    filteredFragmentCategories.value = availableFragmentCategories.value.filter(cat => 
-      cat.toLowerCase().includes(search)
-    )
-  } else {
-    filteredFragmentCategories.value = availableFragmentCategories.value
-  }
-}
-
-const addFragmentCategoryFromSearch = () => {
-  const category = fragmentCategorySearch.value.trim()
-  if (category && !recordForm.fragmentCategory.includes(category)) {
-    recordForm.fragmentCategory.push(category)
-    // 如果是新分类，保存到配置中
-    if (!availableFragmentCategories.value.includes(category)) {
-      saveTypeToStorage('fragmentCategory', category)
-    }
-    fragmentCategorySearch.value = ''
-    showFragmentCategoryDropdown.value = false
-  }
-}
-
-const selectFragmentCategoryFromDropdown = (category: string) => {
-  if (!recordForm.fragmentCategory.includes(category)) {
-    recordForm.fragmentCategory.push(category)
-  }
-  fragmentCategorySearch.value = ''
-  showFragmentCategoryDropdown.value = false
-}
-
-// 搜索式标签选择 - 碎片主题
-const filterFragmentThemes = () => {
-  const search = fragmentThemeSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredFragmentThemes.value = availableFragmentThemes.value.filter(theme => 
-      theme.toLowerCase().includes(search)
-    )
-  } else {
-    filteredFragmentThemes.value = availableFragmentThemes.value
-  }
-}
-
-const addFragmentThemeFromSearch = () => {
-  const theme = fragmentThemeSearch.value.trim()
-  if (theme && !recordForm.fragmentTheme.includes(theme)) {
-    recordForm.fragmentTheme.push(theme)
-    // 如果是新主题，保存到配置中
-    if (!availableFragmentThemes.value.includes(theme)) {
-      saveTypeToStorage('fragmentTheme', theme)
-    }
-    fragmentThemeSearch.value = ''
-    showFragmentThemeDropdown.value = false
-  }
-}
-
-const selectFragmentThemeFromDropdown = (theme: string) => {
-  if (!recordForm.fragmentTheme.includes(theme)) {
-    recordForm.fragmentTheme.push(theme)
-  }
-  fragmentThemeSearch.value = ''
-  showFragmentThemeDropdown.value = false
-}
-
-// ========== 框架笔记搜索处理 ==========
-const filterFrameworkSubjects = () => {
-  const search = frameworkSubjectSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredFrameworkSubjects.value = availableFrameworkSubjects.value.filter(subject => 
-      subject.toLowerCase().includes(search)
-    )
-  } else {
-    filteredFrameworkSubjects.value = availableFrameworkSubjects.value
-  }
-}
-
-const addFrameworkSubjectFromSearch = () => {
-  const subject = frameworkSubjectSearch.value.trim()
-  if (subject && !recordForm.subjectType.includes(subject)) {
-    recordForm.subjectType.push(subject)
-    if (!availableFrameworkSubjects.value.includes(subject)) {
-      saveTypeToStorage('frameworkSubject', subject)
-    }
-    frameworkSubjectSearch.value = ''
-    showFrameworkSubjectDropdown.value = false
-  }
-}
-
-const selectFrameworkSubjectFromDropdown = (subject: string) => {
-  if (!recordForm.subjectType.includes(subject)) {
-    recordForm.subjectType.push(subject)
-  }
-  frameworkSubjectSearch.value = ''
-  showFrameworkSubjectDropdown.value = false
-}
-
-const filterFrameworkKnowledge = () => {
-  const search = frameworkKnowledgeSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredFrameworkKnowledge.value = availableFrameworkKnowledge.value.filter(knowledge => 
-      knowledge.toLowerCase().includes(search)
-    )
-  } else {
-    filteredFrameworkKnowledge.value = availableFrameworkKnowledge.value
-  }
-}
-
-const addFrameworkKnowledgeFromSearch = () => {
-  const knowledge = frameworkKnowledgeSearch.value.trim()
-  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-    if (!availableFrameworkKnowledge.value.includes(knowledge)) {
-      saveTypeToStorage('frameworkKnowledge', knowledge)
-    }
-    frameworkKnowledgeSearch.value = ''
-    showFrameworkKnowledgeDropdown.value = false
-  }
-}
-
-const selectFrameworkKnowledgeFromDropdown = (knowledge: string) => {
-  if (!recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-  }
-  frameworkKnowledgeSearch.value = ''
-  showFrameworkKnowledgeDropdown.value = false
-}
-
-// ========== 求学笔记搜索处理 ==========
-const filterStudySubjects = () => {
-  const search = studySubjectSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredStudySubjects.value = availableStudySubjects.value.filter(subject => 
-      subject.toLowerCase().includes(search)
-    )
-  } else {
-    filteredStudySubjects.value = availableStudySubjects.value
-  }
-}
-
-const addStudySubjectFromSearch = () => {
-  const subject = studySubjectSearch.value.trim()
-  if (subject && !recordForm.studySubject.includes(subject)) {
-    recordForm.studySubject.push(subject)
-    if (!availableStudySubjects.value.includes(subject)) {
-      saveTypeToStorage('studySubject', subject)
-    }
-    studySubjectSearch.value = ''
-    showStudySubjectDropdown.value = false
-  }
-}
-
-const selectStudySubjectFromDropdown = (subject: string) => {
-  if (!recordForm.studySubject.includes(subject)) {
-    recordForm.studySubject.push(subject)
-  }
-  studySubjectSearch.value = ''
-  showStudySubjectDropdown.value = false
-}
-
-const filterStudyKnowledge = () => {
-  const search = studyKnowledgeSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredStudyKnowledge.value = availableStudyKnowledge.value.filter(knowledge => 
-      knowledge.toLowerCase().includes(search)
-    )
-  } else {
-    filteredStudyKnowledge.value = availableStudyKnowledge.value
-  }
-}
-
-const addStudyKnowledgeFromSearch = () => {
-  const knowledge = studyKnowledgeSearch.value.trim()
-  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-    if (!availableStudyKnowledge.value.includes(knowledge)) {
-      saveTypeToStorage('studyKnowledge', knowledge)
-    }
-    studyKnowledgeSearch.value = ''
-    showStudyKnowledgeDropdown.value = false
-  }
-}
-
-const selectStudyKnowledgeFromDropdown = (knowledge: string) => {
-  if (!recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-  }
-  studyKnowledgeSearch.value = ''
-  showStudyKnowledgeDropdown.value = false
-}
-
-// ========== 背诵笔记搜索处理 ==========
+// ========== 背诵笔记搜索处理（科目为单选，保留）==========
 const filterMemorizationSubjects = () => {
   const search = memorizationSubjectSearch.value.toLowerCase().trim()
   if (search) {
@@ -4171,38 +3537,7 @@ const selectMemorizationSubjectFromDropdown = (subject: string) => {
   showMemorizationSubjectDropdown.value = false
 }
 
-const filterMemorizationKnowledge = () => {
-  const search = memorizationKnowledgeSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredMemorizationKnowledge.value = availableMemorizationKnowledge.value.filter(knowledge => 
-      knowledge.toLowerCase().includes(search)
-    )
-  } else {
-    filteredMemorizationKnowledge.value = availableMemorizationKnowledge.value
-  }
-}
-
-const addMemorizationKnowledgeFromSearch = () => {
-  const knowledge = memorizationKnowledgeSearch.value.trim()
-  if (knowledge && !recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-    if (!availableMemorizationKnowledge.value.includes(knowledge)) {
-      saveTypeToStorage('memorizationKnowledge', knowledge)
-    }
-    memorizationKnowledgeSearch.value = ''
-    showMemorizationKnowledgeDropdown.value = false
-  }
-}
-
-const selectMemorizationKnowledgeFromDropdown = (knowledge: string) => {
-  if (!recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
-  }
-  memorizationKnowledgeSearch.value = ''
-  showMemorizationKnowledgeDropdown.value = false
-}
-
-// ========== 实战笔记搜索处理 ==========
+// ========== 实战笔记搜索处理（领域为单选，保留）==========
 const filterPracticalDomains = () => {
   const search = practicalDomainSearch.value.toLowerCase().trim()
   if (search) {
@@ -4232,37 +3567,7 @@ const selectPracticalDomainFromDropdown = (domain: string) => {
   showPracticalDomainDropdown.value = false
 }
 
-const filterPracticalTechStacks = () => {
-  const search = practicalTechStackSearch.value.toLowerCase().trim()
-  if (search) {
-    filteredPracticalTechStacks.value = availablePracticalTechStacks.value.filter(tech => 
-      tech.toLowerCase().includes(search)
-    )
-  } else {
-    filteredPracticalTechStacks.value = availablePracticalTechStacks.value
-  }
-}
-
-const addPracticalTechStackFromSearch = () => {
-  const tech = practicalTechStackSearch.value.trim()
-  if (tech && !recordForm.techTags.includes(tech)) {
-    recordForm.techTags.push(tech)
-    if (!availablePracticalTechStacks.value.includes(tech)) {
-      saveTypeToStorage('practicalTechStack', tech)
-    }
-    practicalTechStackSearch.value = ''
-    showPracticalTechStackDropdown.value = false
-  }
-}
-
-const selectPracticalTechStackFromDropdown = (tech: string) => {
-  if (!recordForm.techTags.includes(tech)) {
-    recordForm.techTags.push(tech)
-  }
-  practicalTechStackSearch.value = ''
-  showPracticalTechStackDropdown.value = false
-}
-
+// ========== 标签移除函数 ==========
 
 // 添加技术栈标签
 const addTechTag = () => {
@@ -6462,6 +5767,390 @@ const resetImageSize = () => {
   showImageResizer.value = false
   selectedImage.value = null
 }
+
+// ==================== 归档管理功能 ====================
+
+// 加载归档列表（用于批量添加时选择归档）
+const loadArchiveList = async () => {
+  try {
+    const response = await getArchiveList({})
+    console.log('归档列表响应:', response)
+    if (response.data) {
+      archives.value = response.data || []
+      console.log('已加载归档列表:', archives.value)
+      // 输出第一个归档的详细信息
+      if (archives.value.length > 0) {
+        console.log('第一个归档对象:', archives.value[0])
+        console.log('第一个归档的ID:', archives.value[0].id)
+      }
+    }
+  } catch (error) {
+    console.error('加载归档列表失败:', error)
+  }
+}
+
+// 获取归档类型标签
+const getArchiveTypeLabel = (type: string | undefined) => {
+  const typeMap: Record<string, string> = {
+    book: '书籍',
+    course: '课程',
+    material: '材料',
+    video: '视频',
+    other: '其他'
+  }
+  return typeMap[type || ''] || '未分类'
+}
+
+// 获取笔记类型标签
+const getNoteTypeLabel = (type: string) => {
+  const typeMap: Record<string, string> = {
+    fragment: '碎片笔记',
+    study: '求学笔记',
+    memorization: '背诵笔记',
+    exercise: '刷题笔记',
+    practical: '实战笔记',
+    framework: '框架笔记'
+  }
+  return typeMap[type] || type
+}
+
+// 格式化日期
+const formatDate = (dateStr: string | undefined) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('zh-CN', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  })
+}
+
+
+// ==================== 归档管理功能 ====================
+
+// 关闭归档管理界面
+const closeArchiveManager = () => {
+  showArchiveManager.value = false
+  archiveViewMode.value = 'archive'
+  archiveViewSearch.value = ''
+  archiveViewTypeFilter.value = ''
+  noteViewSearch.value = ''
+  noteViewTypeFilter.value = ''
+  expandedArchives.value = []
+}
+
+// 归档视角：过滤归档列表
+const filteredArchivesInView = computed(() => {
+  return archives.value.filter(archive => {
+    const matchName = !archiveViewSearch.value || 
+      archive.archiveName.toLowerCase().includes(archiveViewSearch.value.toLowerCase())
+    const matchType = !archiveViewTypeFilter.value || archive.archiveType === archiveViewTypeFilter.value
+    return matchName && matchType
+  })
+})
+
+// 笔记视角：过滤笔记列表
+const filteredNotesInView = computed(() => {
+  return allNotes.value.filter(note => {
+    const matchQuery = !noteViewSearch.value || 
+      note.title?.toLowerCase().includes(noteViewSearch.value.toLowerCase()) ||
+      note.summary?.toLowerCase().includes(noteViewSearch.value.toLowerCase())
+    const matchType = !noteViewTypeFilter.value || note.type === noteViewTypeFilter.value
+    return matchQuery && matchType
+  })
+})
+
+// 切换归档展开/收起
+const toggleArchiveExpand = async (archiveId: number | undefined) => {
+  if (!archiveId) {
+    console.error('归档ID不存在')
+    return
+  }
+  
+  const index = expandedArchives.value.indexOf(archiveId)
+  if (index > -1) {
+    expandedArchives.value.splice(index, 1)
+  } else {
+    expandedArchives.value.push(archiveId)
+    // 加载这个归档的笔记列表
+    await loadArchiveNotes(archiveId)
+  }
+}
+
+// 加载归档的笔记列表
+const loadArchiveNotes = async (archiveId: number) => {
+  try {
+    console.log('正在加载归档笔记，归档ID:', archiveId)
+    const response = await getArchiveDetail(archiveId)
+    console.log('归档详情响应:', response)
+    
+    if (response && response.data) {
+      const notes = response.data.notes || []
+      console.log('归档包含的笔记:', notes)
+      archiveNotesMap.value[archiveId] = notes
+      
+      // 更新笔记-归档映射
+      notes.forEach((note: any) => {
+        if (!noteArchiveMap.value[note.noteId]) {
+          noteArchiveMap.value[note.noteId] = []
+        }
+        // 避免重复添加
+        const exists = noteArchiveMap.value[note.noteId].some((a: any) => a.archiveId === archiveId)
+        if (!exists) {
+          noteArchiveMap.value[note.noteId].push({
+            archiveId: archiveId,
+            archiveName: archives.value.find(a => a.id === archiveId)?.archiveName,
+            relationId: note.relationId
+          })
+        }
+      })
+      console.log('archiveNotesMap 已更新:', archiveNotesMap.value)
+    } else {
+      console.warn('响应数据为空')
+      archiveNotesMap.value[archiveId] = []
+    }
+  } catch (error) {
+    console.error('加载归档笔记失败:', error)
+    archiveNotesMap.value[archiveId] = []
+  }
+}
+
+// 获取归档的笔记列表
+const getArchiveNotes = (archiveId: number | undefined) => {
+  if (!archiveId) {
+    console.warn('getArchiveNotes: 归档ID为空')
+    return []
+  }
+  const notes = archiveNotesMap.value[archiveId] || []
+  console.log(`getArchiveNotes(${archiveId}):`, notes)
+  return notes
+}
+
+// 获取标签数量
+const getTagsCount = (tags: string | undefined) => {
+  if (!tags) return 0
+  try {
+    const tagArray = JSON.parse(tags)
+    return Array.isArray(tagArray) ? tagArray.length : 0
+  } catch {
+    return 0
+  }
+}
+
+// 归档视角：点击"添加笔记"按钮
+const addNotesToArchive = (archiveId: number) => {
+  selectedNoteIdsForBatch.value = []
+  showArchiveListForBatch.value = true
+  // 这里可以直接选中这个归档，或者让用户从笔记列表选择
+  // 为了保持一致性，这里弹出笔记选择界面
+}
+
+// 笔记视角：快速添加笔记到归档
+const quickAddNoteToArchive = (noteId: number) => {
+  selectedNoteIdsForBatch.value = [noteId]
+  showArchiveListForBatch.value = true
+}
+
+// 从归档中移除笔记
+const removeNoteFromArchiveAction = async (relationId: number, archiveId: number) => {
+  if (!confirm('确定要从归档中移除这条笔记吗？')) {
+    return
+  }
+  
+  try {
+    await removeNoteFromArchive(relationId, archiveId)
+    alert('移除成功')
+    
+    // 从 noteArchiveMap 中移除（用于笔记视角）
+    Object.keys(noteArchiveMap.value).forEach(noteId => {
+      const archives = noteArchiveMap.value[Number(noteId)]
+      if (archives) {
+        const index = archives.findIndex(a => a.relationId === relationId)
+        if (index > -1) {
+          archives.splice(index, 1)
+          // 如果该笔记没有任何归档了，也可以保留空数组
+        }
+      }
+    })
+    
+    // 重新加载归档笔记（用于归档视角）
+    if (expandedArchives.value.includes(archiveId)) {
+      await loadArchiveNotes(archiveId)
+    }
+    
+    // 重新加载归档列表（更新笔记数量）
+    await loadArchiveList()
+  } catch (error) {
+    console.error('移除笔记失败:', error)
+    alert('移除失败')
+  }
+}
+
+// 过滤归档列表（用于批量添加）
+const filteredArchivesForBatch = computed(() => {
+  return archives.value.filter(archive => {
+    const matchName = !batchArchiveSearch.value || 
+      archive.archiveName.toLowerCase().includes(batchArchiveSearch.value.toLowerCase())
+    const matchType = !batchArchiveTypeFilter.value || archive.archiveType === batchArchiveTypeFilter.value
+    return matchName && matchType
+  })
+})
+
+// 打开创建归档弹窗（批量添加模式）
+const openCreateArchiveForBatch = () => {
+  showArchiveListForBatch.value = false
+  batchArchiveForm.archiveName = ''
+  batchArchiveForm.archiveType = ''
+  batchArchiveForm.description = ''
+  batchArchiveForm.sourceInfo = ''
+  showCreateArchiveForBatchDialog.value = true
+}
+
+// 关闭创建归档弹窗
+const closeCreateArchiveForBatch = () => {
+  showCreateArchiveForBatchDialog.value = false
+}
+
+// 创建归档并添加笔记
+const createArchiveAndAddNotes = async () => {
+  try {
+    if (!batchArchiveForm.archiveName.trim()) {
+      alert('请输入归档名称')
+      return
+    }
+
+    // 创建归档
+    const response = await createArchive(batchArchiveForm)
+    if (response.data && response.data.id) {
+      const archiveId = response.data.id
+      const archiveName = batchArchiveForm.archiveName
+      
+      // 批量添加笔记到归档
+      let successCount = 0
+      for (const noteId of selectedNoteIdsForBatch.value) {
+        try {
+          const addResponse = await addNoteToArchive({
+            archiveId,
+            noteId
+          })
+          successCount++
+          
+          // 立即更新 noteArchiveMap（用于笔记视角）
+          if (!noteArchiveMap.value[noteId]) {
+            noteArchiveMap.value[noteId] = []
+          }
+          // 从响应中获取 relationId（后端返回的data就是relationId）
+          const relationId = addResponse?.data || 0
+          noteArchiveMap.value[noteId].push({
+            archiveId: archiveId,
+            archiveName: archiveName,
+            relationId: relationId
+          })
+        } catch (error) {
+          console.error(`添加笔记${noteId}失败:`, error)
+        }
+      }
+      
+      alert(`成功创建归档并添加 ${successCount}/${selectedNoteIdsForBatch.value.length} 条笔记`)
+      
+      // 关闭弹窗并重置
+      closeCreateArchiveForBatch()
+      await loadArchiveList()
+    }
+  } catch (error) {
+    console.error('创建归档失败:', error)
+    alert('创建归档失败')
+  }
+}
+
+// 将选中的笔记添加到指定归档
+const addSelectedNotesToArchive = async (archiveId: number) => {
+  try {
+    let successCount = 0
+    let errorCount = 0
+    const archive = archives.value.find(a => a.id === archiveId)
+    
+    for (const noteId of selectedNoteIdsForBatch.value) {
+      try {
+        const response = await addNoteToArchive({
+          archiveId,
+          noteId
+        })
+        successCount++
+        
+        // 立即更新 noteArchiveMap（用于笔记视角）
+        if (archive) {
+          if (!noteArchiveMap.value[noteId]) {
+            noteArchiveMap.value[noteId] = []
+          }
+          // 检查是否已存在
+          const exists = noteArchiveMap.value[noteId].some(a => a.archiveId === archiveId)
+          if (!exists) {
+            // 从响应中获取 relationId（后端返回的data就是relationId）
+            const relationId = response?.data || 0
+            noteArchiveMap.value[noteId].push({
+              archiveId: archiveId,
+              archiveName: archive.archiveName,
+              relationId: relationId
+            })
+          }
+        }
+      } catch (error: any) {
+        // 如果是已存在的错误，也算成功
+        if (error.response?.data?.message?.includes('已在此归档中')) {
+          successCount++
+        } else {
+          errorCount++
+          console.error(`添加笔记${noteId}失败:`, error)
+        }
+      }
+    }
+    
+    if (errorCount > 0) {
+      alert(`添加完成：成功 ${successCount} 条，失败 ${errorCount} 条`)
+    } else {
+      alert(`成功添加 ${successCount} 条笔记到归档`)
+    }
+    
+    // 关闭弹窗并重置
+    showArchiveListForBatch.value = false
+    await loadArchiveList()
+    // 如果当前归档已展开，重新加载其笔记列表
+    if (expandedArchives.value.includes(archiveId)) {
+      await loadArchiveNotes(archiveId)
+    }
+  } catch (error) {
+    console.error('批量添加笔记失败:', error)
+    alert('批量添加失败')
+  }
+}
+
+// 加载所有笔记的归档映射（用于笔记视角）
+const loadAllNoteArchiveMap = async () => {
+  try {
+    noteArchiveMap.value = {}
+    for (const archive of archives.value) {
+      await loadArchiveNotes(archive.id!)
+    }
+  } catch (error) {
+    console.error('加载笔记归档映射失败:', error)
+  }
+}
+
+// 监听归档管理界面打开
+watch(showArchiveManager, async (newVal) => {
+  if (newVal) {
+    await loadArchiveList()
+    await loadAllNoteArchiveMap()
+  }
+})
+
+// 监听选择归档弹窗打开，加载归档列表
+watch(showArchiveListForBatch, (newVal) => {
+  if (newVal) {
+    loadArchiveList()
+  }
+})
 </script>
 
 <style scoped>
@@ -6488,6 +6177,21 @@ const resetImageSize = () => {
 .modal-leave-to {
   opacity: 0;
   transform: scale(0.9) translateY(20px);
+}
+
+/* 滑动展开动画 */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
 }
 
 /* 背景遮罩动画 */

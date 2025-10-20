@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.NoteArchiveRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.NoteArchiveRelation">
+        <id column="ID" property="id"/>
+        <result column="ARCHIVE_ID" property="archiveId"/>
+        <result column="NOTE_ID" property="noteId"/>
+        <result column="RELATION_NOTE" property="relationNote"/>
+        <result column="REC_CREATOR" property="recCreator"/>
+        <result column="REC_CREATE_TIME" property="recCreateTime"/>
+        <result column="REC_REVISOR" property="recRevisor"/>
+        <result column="REC_REVISE_TIME" property="recReviseTime"/>
+        <result column="ARCH_FLAG" property="archFlag"/>
+    </resultMap>
+
+    <resultMap id="NoteResultMap" type="com.knowledge.dto.NoteArchiveNoteDTO">
+        <result column="NOTE_ID" property="noteId"/>
+        <result column="TITLE" property="title"/>
+        <result column="TYPE" property="type"/>
+        <result column="SUMMARY" property="summary"/>
+        <result column="TAGS" property="tags"/>
+        <result column="RELATION_NOTE" property="relationNote"/>
+        <result column="RELATION_ID" property="relationId"/>
+        <result column="REC_CREATE_TIME" property="recCreateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.knowledge.entity.NoteArchiveRelation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO note_archive_relation (
+            ARCHIVE_ID,
+            NOTE_ID,
+            RELATION_NOTE,
+            REC_CREATOR,
+            REC_CREATE_TIME,
+            ARCH_FLAG
+        ) VALUES (
+            #{archiveId},
+            #{noteId},
+            #{relationNote},
+            #{recCreator},
+            NOW(),
+            0
+        )
+    </insert>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM note_archive_relation WHERE ID = #{id}
+    </delete>
+
+    <delete id="deleteByArchiveId" parameterType="long">
+        DELETE FROM note_archive_relation WHERE ARCHIVE_ID = #{archiveId}
+    </delete>
+
+    <delete id="deleteByNoteId" parameterType="long">
+        DELETE FROM note_archive_relation WHERE NOTE_ID = #{noteId}
+    </delete>
+
+    <update id="updateRelationNote">
+        UPDATE note_archive_relation
+        SET RELATION_NOTE = #{relationNote},
+            REC_REVISE_TIME = NOW()
+        WHERE ID = #{id}
+    </update>
+
+    <select id="selectNotesByArchiveId" parameterType="long" resultMap="NoteResultMap">
+        SELECT 
+            nar.ID AS RELATION_ID,
+            nar.NOTE_ID,
+            nar.RELATION_NOTE,
+            n.TITLE,
+            n.TYPE,
+            n.SUMMARY,
+            n.TAGS,
+            n.REC_CREATE_TIME
+        FROM note_archive_relation nar
+        LEFT JOIN km_note n ON nar.NOTE_ID = n.ID
+        WHERE nar.ARCHIVE_ID = #{archiveId} 
+          AND nar.ARCH_FLAG = 0
+          AND n.ARCH_FLAG = 0
+        ORDER BY nar.REC_CREATE_TIME DESC
+    </select>
+
+    <select id="selectArchiveIdsByNoteId" parameterType="long" resultType="long">
+        SELECT ARCHIVE_ID 
+        FROM note_archive_relation 
+        WHERE NOTE_ID = #{noteId} AND ARCH_FLAG = 0
+    </select>
+
+    <select id="checkExists" resultType="int">
+        SELECT COUNT(*) 
+        FROM note_archive_relation 
+        WHERE ARCHIVE_ID = #{archiveId} 
+          AND NOTE_ID = #{noteId} 
+          AND ARCH_FLAG = 0
+    </select>
+
+    <select id="countByArchiveId" parameterType="long" resultType="int">
+        SELECT COUNT(*) 
+        FROM note_archive_relation 
+        WHERE ARCHIVE_ID = #{archiveId} AND ARCH_FLAG = 0
+    </select>
+
+</mapper>
+
