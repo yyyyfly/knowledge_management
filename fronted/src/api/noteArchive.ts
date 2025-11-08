@@ -38,49 +38,49 @@ export interface NoteArchiveNote {
  * 创建归档
  */
 export const createArchive = (data: NoteArchive) => {
-  return request.post('/api/note-archive/create', data)
+  return request.post('/note-archive/create', data)
 }
 
 /**
  * 更新归档
  */
 export const updateArchive = (data: NoteArchive) => {
-  return request.post('/api/note-archive/update', data)
+  return request.post('/note-archive/update', data)
 }
 
 /**
  * 删除归档
  */
 export const deleteArchive = (id: number) => {
-  return request.delete(`/api/note-archive/delete/${id}`)
+  return request.delete(`/note-archive/delete/${id}`)
 }
 
 /**
  * 查询归档详情
  */
 export const getArchiveDetail = (id: number) => {
-  return request.get<NoteArchiveDetail>(`/api/note-archive/detail/${id}`)
+  return request.get<NoteArchiveDetail>(`/note-archive/detail/${id}`)
 }
 
 /**
  * 查询归档列表
  */
 export const getArchiveList = (params?: { archiveName?: string; archiveType?: string }) => {
-  return request.get<NoteArchive[]>('/api/note-archive/list', { params })
+  return request.get<NoteArchive[]>('/note-archive/list', { params })
 }
 
 /**
  * 添加笔记到归档
  */
 export const addNoteToArchive = (data: { archiveId: number; noteId: number; relationNote?: string }) => {
-  return request.post('/api/note-archive/add-note', null, { params: data })
+  return request.post('/note-archive/add-note', null, { params: data })
 }
 
 /**
  * 从归档中移除笔记
  */
 export const removeNoteFromArchive = (relationId: number, archiveId: number) => {
-  return request.delete('/api/note-archive/remove-note', { 
+  return request.delete('/note-archive/remove-note', { 
     params: { relationId, archiveId } 
   })
 }
@@ -89,7 +89,7 @@ export const removeNoteFromArchive = (relationId: number, archiveId: number) => 
  * 更新关联备注
  */
 export const updateRelationNote = (relationId: number, relationNote: string) => {
-  return request.post('/api/note-archive/update-relation-note', null, { 
+  return request.post('/note-archive/update-relation-note', null, { 
     params: { relationId, relationNote } 
   })
 }
@@ -98,6 +98,13 @@ export const updateRelationNote = (relationId: number, relationNote: string) => 
  * 查询笔记关联的所有归档
  */
 export const getArchivesByNoteId = (noteId: number) => {
-  return request.get<number[]>(`/api/note-archive/by-note/${noteId}`)
+  return request.get<number[]>(`/note-archive/by-note/${noteId}`)
+}
+
+/**
+ * 查询归档中的所有笔记ID
+ */
+export const getArchiveNoteIds = (archiveId: number) => {
+  return request.get<number[]>(`/note-archive/${archiveId}/notes`)
 }
 

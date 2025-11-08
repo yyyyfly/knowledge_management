@@ -4,14 +4,14 @@
     <div class="mb-8">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-          <i class="fas fa-graduation-cap text-white text-2xl"></i>
+          <i class="fas fa-book-open text-white text-2xl"></i>
         </div>
           <div>
-          <h1 class="text-3xl font-bold text-gray-900">求学笔记</h1>
-          <p class="text-gray-600">课程学习和知识掌握的笔记回顾</p>
-          </div>
+          <h1 class="text-3xl font-bold text-gray-900">拓展笔记</h1>
+          <p class="text-gray-600">原文记录、深度理解、知识拓展</p>
         </div>
       </div>
+    </div>
 
     <!-- 推荐巩固区 -->
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
@@ -42,7 +42,7 @@
       <i class="fas fa-search text-4xl text-blue-600 mb-4"></i>
       <h3 class="text-xl font-bold text-gray-900 mb-2">搜索所有笔记</h3>
       <p class="text-gray-600">手动选择想要复习的笔记内容</p>
-    </div>
+        </div>
 
     <!-- 笔记列表弹窗 -->
     <Transition name="modal-fade">
@@ -53,11 +53,11 @@
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
               <div class="flex items-center space-x-3">
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <i class="fas fa-graduation-cap text-2xl text-blue-600"></i>
+                  <i class="fas fa-book-open text-2xl text-blue-600"></i>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-semibold text-gray-900">求学笔记列表</h3>
-                  <p class="text-sm text-gray-500">{{ studyNotes.length }} 条笔记</p>
+                  <h3 class="text-2xl font-semibold text-gray-900">拓展笔记列表</h3>
+                  <p class="text-sm text-gray-500">{{ expansionNotes.length }} 条笔记</p>
                 </div>
               </div>
               <button 
@@ -102,8 +102,16 @@
                   </div>
                   
                   <div class="flex flex-wrap gap-1">
-                    <span v-if="note.studySubject" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                      {{ note.studySubject }}
+                    <!-- 项目标签 -->
+                    <span v-if="note.project" class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-medium">
+                      {{ note.project }}
+                    </span>
+                    <!-- 知识点标签 -->
+                    <span v-for="knowledgePoint in (note.knowledgePoint || []).slice(0, 2)" :key="knowledgePoint" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                      {{ knowledgePoint }}
+                    </span>
+                    <span v-if="note.knowledgePoint && note.knowledgePoint.length > 2" class="text-xs text-gray-500 px-2 py-1">
+                      +{{ note.knowledgePoint.length - 2 }}
                     </span>
                   </div>
                 </div>
@@ -155,7 +163,7 @@
               </div>
               
               <!-- Tab切换 -->
-              <div class="flex space-x-2 mb-2 flex-wrap">
+              <div class="flex space-x-2 mb-2">
                 <button v-for="tab in tabs" :key="tab.value" @click="activeTab = tab.value"
                   :class="[ 'px-4 py-2 rounded-t-lg font-medium transition', activeTab === tab.value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ]">
                   {{ tab.label }}
@@ -169,13 +177,9 @@
               
               <div>
                 <p class="text-sm font-medium text-gray-700 mb-2">详细内容：</p>
-                <div class="note-content bg-gray-50 p-4 rounded-lg min-h-[100px]">
-                  <div v-if="activeTab === 'coreConcept'" v-html="selectedNote?.coreConcept || '暂无内容'"></div>
-                  <div v-else-if="activeTab === 'mechanism'" v-html="selectedNote?.mechanism || '暂无内容'"></div>
-                  <div v-else-if="activeTab === 'applicationCase'" v-html="selectedNote?.applicationCase || '暂无内容'"></div>
-                  <div v-else-if="activeTab === 'extension'" v-html="selectedNote?.extension || '暂无内容'"></div>
-                  <div v-else-if="activeTab === 'commonMistake'" v-html="selectedNote?.commonMistake || '暂无内容'"></div>
-                  <div v-else-if="activeTab === 'reflection'" v-html="selectedNote?.reflection || '暂无内容'"></div>
+                <div class="note-content bg-gray-50 p-4 rounded-lg min-h-[80px]">
+                  <div v-if="activeTab === 'original'" v-html="selectedNote?.originalText || '暂无内容'"></div>
+                  <div v-else-if="activeTab === 'understanding'" v-html="selectedNote?.understanding || '暂无内容'"></div>
                 </div>
               </div>
               
@@ -184,18 +188,29 @@
                   <span>创建时间：{{ formatDate(selectedNote?.recCreateTime) }}</span>
                 </div>
                 
-                <div v-if="selectedNote?.studySubject" class="flex items-center space-x-2">
-                  <span class="text-sm font-medium text-gray-700">课程：</span>
-                  <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                    {{ selectedNote.studySubject }}
+                <!-- 项目标签 -->
+                <div v-if="selectedNote?.project" class="flex items-center space-x-2">
+                  <span class="text-sm font-medium text-gray-700">学科项目：</span>
+                  <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs">
+                    {{ selectedNote.project }}
+                  </span>
+                </div>
+                
+                <!-- 知识点标签 -->
+                <div v-if="selectedNote?.knowledgePoint && selectedNote.knowledgePoint.length > 0" class="flex items-center space-x-2">
+                  <span class="text-sm font-medium text-gray-700">知识点：</span>
+                  <div class="flex flex-wrap gap-1">
+                    <span v-for="knowledgePoint in selectedNote.knowledgePoint" :key="knowledgePoint" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                      {{ knowledgePoint }}
                     </span>
                   </div>
                 </div>
-                
+              </div>
+
               <!-- 完成巩固按钮 -->
               <div class="flex gap-4 mt-6">
                 <button @click="handleCompleteReview" 
-                        class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+                        class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
                   <i class="fas fa-check-circle mr-2"></i>
                   完成巩固
                 </button>
@@ -218,56 +233,54 @@
 import { ref, computed, onMounted, onActivated } from 'vue'
 import { getNotesByType } from '@/services/noteService'
 import { getRecommendedNotes, completeReview } from '@/api/note'
-import dayjs from 'dayjs'
 import { formatDate } from '@/utils/dateUtils'
 
-// 定义求学笔记类型
-type StudyNote = {
+// 定义拓展笔记类型
+type ExpansionNote = {
   id: number
   title: string
   content: string
   type: string
   summary?: string
-  studySubject: string
+  project: string
+  knowledgePoint: string[]
   reviewCount?: number
   createTime?: string
   recCreateTime?: string
   lastReviewTime?: string
-  coreConcept?: string
-  mechanism?: string
-  applicationCase?: string
-  extension?: string
-  commonMistake?: string
-  reflection?: string
+  originalText?: string
+  understanding?: string
 }
 
 // 响应式数据
-const studyNotesData = ref<StudyNote[]>([])
-const recommendedNotes = ref<StudyNote[]>([])
+const expansionNotesData = ref<ExpansionNote[]>([])
+const recommendedNotes = ref<ExpansionNote[]>([])
 
-// 加载求学笔记
+// 加载拓展笔记
 const loadNotes = async () => {
   try {
-    const notes = await getNotesByType('study')
-    studyNotesData.value = notes.map((note: any) => ({
+    const notes = await getNotesByType('expansion')
+    expansionNotesData.value = notes.map((note: any) => ({
       ...note,
+      knowledgePoint: Array.isArray(note.knowledgePoint) ? note.knowledgePoint : [],
       reviewCount: note.reviewCount || 0,
-      studySubject: note.studySubject || '未分类'
-    })) as StudyNote[]
+      project: note.project || '未分类'
+    })) as ExpansionNote[]
   } catch (error) {
-    console.error('加载求学笔记失败:', error)
+    console.error('加载拓展笔记失败:', error)
   }
 }
 
 // 加载推荐巩固笔记
 const loadRecommendedNotes = async () => {
   try {
-    const response = await getRecommendedNotes('study')
+    const response = await getRecommendedNotes('expansion')
     if (response.data && Array.isArray(response.data)) {
       recommendedNotes.value = response.data.map((note: any) => ({
         ...note,
+        knowledgePoint: Array.isArray(note.knowledgePoint) ? note.knowledgePoint : [],
         reviewCount: note.reviewCount || 0,
-        studySubject: note.studySubject || '未分类'
+        project: note.project || '未分类'
       }))
     }
   } catch (error) {
@@ -287,26 +300,15 @@ onActivated(() => {
   loadRecommendedNotes()
 })
 
-const studyNotes = computed(() => studyNotesData.value)
+const expansionNotes = computed(() => expansionNotesData.value)
 
 const showNotesList = ref(false)
 const showNoteDetail = ref(false)
-const selectedNote = ref<StudyNote | null>(null)
+const selectedNote = ref<ExpansionNote | null>(null)
 const searchQuery = ref('')
 
-// Tab切换
-const tabs = [
-  { label: '核心概念', value: 'coreConcept' },
-  { label: '机制原理', value: 'mechanism' },
-  { label: '应用案例', value: 'applicationCase' },
-  { label: '延伸对比', value: 'extension' },
-  { label: '常见误区', value: 'commonMistake' },
-  { label: '思考理解', value: 'reflection' }
-]
-const activeTab = ref('coreConcept')
-
 const filteredNotes = computed(() => {
-  let notes = studyNotes.value
+  let notes = expansionNotes.value
   
   if (searchQuery.value) {
     notes = notes.filter(note => {
@@ -318,10 +320,17 @@ const filteredNotes = computed(() => {
   return notes
 })
 
-const viewNoteDetail = (note: StudyNote) => {
+// Tab切换 - 只有两个Tab：原文记录和理解记录
+const tabs = [
+  { label: '原文记录', value: 'original' },
+  { label: '理解记录', value: 'understanding' }
+]
+const activeTab = ref('original')
+
+const viewNoteDetail = (note: ExpansionNote) => {
   selectedNote.value = note
   showNoteDetail.value = true
-  activeTab.value = 'coreConcept'
+  activeTab.value = 'original'
 }
 
 // 完成巩固
@@ -356,7 +365,7 @@ const formatLastReviewTime = (lastReviewTime: string | undefined) => {
   return `${Math.floor(diffDays / 30)}个月前`
 }
 
-</script> 
+</script>
 
 <style scoped>
 /* 弹窗动画 */
@@ -391,4 +400,5 @@ const formatLastReviewTime = (lastReviewTime: string | undefined) => {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-</style> 
+</style>
+

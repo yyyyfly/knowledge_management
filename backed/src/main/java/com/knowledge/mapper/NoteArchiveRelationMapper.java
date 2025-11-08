@@ -52,6 +52,11 @@ public interface NoteArchiveRelationMapper {
     List<Long> selectArchiveIdsByNoteId(@Param("noteId") Long noteId);
     
     /**
+     * 查询归档中的所有笔记ID
+     */
+    List<Long> selectNoteIdsByArchiveId(@Param("archiveId") Long archiveId);
+    
+    /**
      * 检查关联是否存在
      */
     int checkExists(@Param("archiveId") Long archiveId, @Param("noteId") Long noteId);

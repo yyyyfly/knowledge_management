@@ -1,0 +1,171 @@
+/* 笔记内容富文本样式 - 全局共享 */
+.note-content {
+  color: #1f2937;
+  line-height: 1.75;
+}
+
+.note-content h1 {
+  font-size: 2em;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  line-height: 1.2;
+  color: #111827;
+}
+
+.note-content h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-top: 1.25em;
+  margin-bottom: 0.625em;
+  line-height: 1.3;
+  color: #111827;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.3em;
+}
+
+.note-content h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  line-height: 1.4;
+  color: #374151;
+}
+
+.note-content h4 {
+  font-size: 1.125em;
+  font-weight: 600;
+  margin-top: 0.875em;
+  margin-bottom: 0.5em;
+  color: #374151;
+}
+
+.note-content p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.note-content ul,
+.note-content ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-left: 2em;
+}
+
+.note-content ul {
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.note-content ol {
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+
+.note-content li {
+  margin-top: 0.375em;
+  margin-bottom: 0.375em;
+  padding-left: 0.25em;
+}
+
+/* 嵌套列表 */
+.note-content li > ul,
+.note-content li > ol {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.note-content ul ul {
+  list-style-type: circle;
+}
+
+.note-content ul ul ul {
+  list-style-type: square;
+}
+
+.note-content strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.note-content em {
+  font-style: italic;
+}
+
+.note-content code {
+  background-color: #f3f4f6;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'Courier New', monospace;
+  color: #dc2626;
+}
+
+.note-content pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.note-content pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.note-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #4b5563;
+  font-style: italic;
+  background-color: #eff6ff;
+  padding: 0.75em 1em;
+  border-radius: 0.25rem;
+}
+
+.note-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.note-content a:hover {
+  color: #2563eb;
+}
+
+.note-content hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.5em 0;
+}
+
+.note-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.note-content table th,
+.note-content table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.note-content table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.note-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 0.5rem;
+}
+

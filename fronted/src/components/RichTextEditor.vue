@@ -304,8 +304,36 @@ const borderColorClass = computed(() => {
 
 :deep(.ProseMirror ul),
 :deep(.ProseMirror ol) {
-  padding-left: 1.5em;
+  padding-left: 2em;
   margin: 0.5em 0;
+}
+
+:deep(.ProseMirror ul) {
+  list-style-type: disc;
+}
+
+:deep(.ProseMirror ol) {
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+
+:deep(.ProseMirror li) {
+  margin: 0.25em 0;
+  padding-left: 0.25em;
+}
+
+/* 嵌套列表 */
+:deep(.ProseMirror li > ul),
+:deep(.ProseMirror li > ol) {
+  margin: 0.25em 0;
+}
+
+:deep(.ProseMirror ul ul) {
+  list-style-type: circle;
+}
+
+:deep(.ProseMirror ul ul ul) {
+  list-style-type: square;
 }
 
 :deep(.ProseMirror code) {

@@ -85,6 +85,13 @@
         FROM note_archive_relation 
         WHERE NOTE_ID = #{noteId} AND ARCH_FLAG = 0
     </select>
+    
+    <!-- 查询归档中的所有笔记ID -->
+    <select id="selectNoteIdsByArchiveId" parameterType="long" resultType="long">
+        SELECT NOTE_ID 
+        FROM note_archive_relation 
+        WHERE ARCHIVE_ID = #{archiveId} AND ARCH_FLAG = 0
+    </select>
 
     <select id="checkExists" resultType="int">
         SELECT COUNT(*) 

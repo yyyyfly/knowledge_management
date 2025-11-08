@@ -62,6 +62,12 @@ const router = createRouter({
       component: () => import('@/views/daily/DailySummary.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/ready-to-deploy',
+      name: 'ready-to-deploy',
+      component: () => import('@/views/daily/ReadyToDeploy.vue'),
+      meta: { requiresAuth: true }
+    },
     // 素材组 - 笔记页面
     {
       path: '/framework-notes',
@@ -76,9 +82,9 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/memorization-notes',
-      name: 'memorization-notes',
-      component: () => import('@/views/materials/MemorizationNotes.vue'),
+      path: '/expansion-notes',
+      name: 'expansion-notes',
+      component: () => import('@/views/materials/ExpansionNotes.vue'),
       meta: { requiresAuth: true }
     },
     {
@@ -139,12 +145,6 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     // 系统管理
-    {
-      path: '/system-overview',
-      name: 'system-overview',
-      component: () => import('@/views/system/SystemOverview.vue'),
-      meta: { requiresAuth: true }
-    },
     {
       path: '/version-history',
       name: 'version-history',

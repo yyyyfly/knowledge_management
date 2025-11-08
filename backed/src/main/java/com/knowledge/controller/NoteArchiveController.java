@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2025-10-20
  */
 @RestController
-@RequestMapping("/api/note-archive")
+@RequestMapping("/note-archive")
 @CrossOrigin(origins = "*")
 public class NoteArchiveController {
     
@@ -102,6 +102,14 @@ public class NoteArchiveController {
     @GetMapping("/by-note/{noteId}")
     public Result<List<Long>> getArchivesByNoteId(@PathVariable Long noteId) {
         return archiveService.getArchivesByNoteId(noteId);
+    }
+    
+    /**
+     * 查询归档中的所有笔记ID
+     */
+    @GetMapping("/{archiveId}/notes")
+    public Result<List<Long>> getArchiveNoteIds(@PathVariable Long archiveId) {
+        return archiveService.getArchiveNoteIds(archiveId);
     }
 }
 

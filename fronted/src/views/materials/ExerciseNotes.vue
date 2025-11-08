@@ -172,7 +172,7 @@
               
               <div>
                 <p class="text-sm font-medium text-gray-700 mb-2">详细内容：</p>
-                <div class="text-sm text-gray-600 prose prose-sm max-w-none min-h-[80px] bg-gray-50 p-4 rounded-lg">
+                <div class="note-content bg-gray-50 p-4 rounded-lg min-h-[80px]">
                   <div v-if="activeTab === 'question'" v-html="selectedNote?.questionDescription || '暂无内容'"></div>
                   <div v-else-if="activeTab === 'analysis'" v-html="selectedNote?.analysis || '暂无内容'"></div>
                   <div v-else-if="activeTab === 'answer'" v-html="selectedNote?.referenceAnswer || '暂无内容'"></div>
@@ -180,9 +180,9 @@
               </div>
               
               <div class="space-y-3">
-              <div class="flex items-center space-x-4 text-sm text-gray-500">
-                  <span>创建时间：{{ formatDate(selectedNote?.createTime || '') }}</span>
-                    </div>
+                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                  <span>创建时间：{{ formatDate(selectedNote?.recCreateTime) }}</span>
+                </div>
                 
                 <div class="flex items-center space-x-2">
                   <span v-if="selectedNote?.exerciseKnowledge" class="bg-pink-100 text-pink-700 px-2 py-1 rounded text-xs">
@@ -221,6 +221,7 @@ import { ref, computed, onMounted, onActivated } from 'vue'
 import { getNotesByType } from '@/services/noteService'
 import { getRecommendedNotes, completeReview } from '@/api/note'
 import dayjs from 'dayjs'
+import { formatDate } from '@/utils/dateUtils'
 
 // 定义刷题笔记类型
 type ExerciseNote = {
@@ -352,10 +353,6 @@ const formatLastReviewTime = (lastReviewTime: string | undefined) => {
   if (diffDays < 7) return `${diffDays}天前`
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
   return `${Math.floor(diffDays / 30)}个月前`
-}
-
-const formatDate = (timestamp: string) => {
-  return dayjs(timestamp).format('YYYY-MM-DD')
 }
 
 const getDifficultyClass = (difficulty: string) => {

@@ -25,6 +25,7 @@
         <result column="original_text" property="originalText"/>
         <result column="explanation" property="explanation"/>
         <result column="cue" property="cue"/>
+        <result column="understanding" property="understanding"/>
         <!-- 刷题笔记字段 -->
         <result column="exercise_source" property="exerciseSource"/>
         <result column="exercise_subject" property="exerciseSubject"/>
@@ -58,7 +59,7 @@
         id, type, title, summary, content, tags,
         subject_type, knowledge_point, 
         study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
-        project, original_text, explanation, cue,
+        project, original_text, explanation, cue, understanding,
         exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
         question_description, analysis, reference_answer,
         tech_tags, project_type, requirement_description, design_thinking, reference_design,
@@ -111,7 +112,7 @@
             type, title, summary, content, tags,
             subject_type, knowledge_point, 
             study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
-            project, original_text, explanation, cue,
+            project, original_text, explanation, cue, understanding,
             exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
             question_description, analysis, reference_answer,
             tech_tags, project_type, requirement_description, design_thinking, reference_design,
@@ -121,7 +122,7 @@
             #{type}, #{title}, #{summary}, #{content}, #{tags},
             #{subjectType}, #{knowledgePoint}, 
             #{studySubject}, #{coreConcept}, #{mechanism}, #{applicationCase}, #{extension}, #{commonMistake}, #{reflection},
-            #{project}, #{originalText}, #{explanation}, #{cue},
+            #{project}, #{originalText}, #{explanation}, #{cue}, #{understanding},
             #{exerciseSource}, #{exerciseSubject}, #{exerciseKnowledge}, #{exerciseDifficulty},
             #{questionDescription}, #{analysis}, #{referenceAnswer},
             #{techTags}, #{projectType}, #{requirementDescription}, #{designThinking}, #{referenceDesign},
@@ -154,6 +155,7 @@
             <if test="originalText != null and originalText != ''">original_text = #{originalText},</if>
             <if test="explanation != null and explanation != ''">explanation = #{explanation},</if>
             <if test="cue != null and cue != ''">cue = #{cue},</if>
+            <if test="understanding != null and understanding != ''">understanding = #{understanding},</if>
             <!-- 刷题笔记字段 -->
             <if test="exerciseSource != null and exerciseSource != ''">exercise_source = #{exerciseSource},</if>
             <if test="exerciseSubject != null and exerciseSubject != ''">exercise_subject = #{exerciseSubject},</if>

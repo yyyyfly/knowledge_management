@@ -342,25 +342,25 @@
           </div>
         </div>
 
-        <!-- 背诵笔记仪表盘 -->
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-5 hover:shadow-lg transition-shadow cursor-pointer border border-green-200" @click="$router.push('/memorization-notes')">
+        <!-- 拓展笔记仪表盘 -->
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-5 hover:shadow-lg transition-shadow cursor-pointer border border-blue-200" @click="$router.push('/expansion-notes')">
           <div class="flex items-center justify-between mb-3">
-            <h4 class="text-lg font-semibold text-gray-900">背诵笔记</h4>
-            <span class="bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-medium">记忆</span>
+            <h4 class="text-lg font-semibold text-gray-900">拓展笔记</h4>
+            <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">拓展</span>
           </div>
-          <p class="text-gray-600 mb-3 text-sm">重点内容、公式记忆、知识点背诵</p>
+          <p class="text-gray-600 mb-3 text-sm">原文记录、深度理解、知识拓展</p>
           <div class="flex justify-between items-center mb-3">
             <div>
               <p class="text-gray-500 text-sm">素材数量</p>
-              <p class="text-xl font-bold text-gray-900">{{ noteStats.memorization }} 条</p>
+              <p class="text-xl font-bold text-gray-900">{{ noteStats.expansion }} 条</p>
             </div>
-            <div class="text-green-500">
-              <i class="fas fa-lightbulb text-2xl"></i>
+            <div class="text-blue-500">
+              <i class="fas fa-book-open text-2xl"></i>
             </div>
           </div>
           <div class="flex items-center text-sm text-gray-500">
             <i class="fas fa-clock mr-1"></i>
-            <span>最近更新: {{ getLatestUpdate('memorization') }}</span>
+            <span>最近更新: {{ getLatestUpdate('expansion') }}</span>
           </div>
         </div>
 
@@ -925,42 +925,12 @@
           </div>
           </div>
         </div>
-    <!-- 统计图表 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <!-- 素材增长趋势 -->
-      <div class="bg-white rounded-xl shadow-soft p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-            <i class="fa-solid fa-chart-line text-primary mr-3"></i>
-            素材增长趋势
-          </h3>
-          </div>
-        <div class="h-64">
-          <canvas ref="materialsChartRef"></canvas>
-            </div>
-          </div>
-
-      <!-- 行动组月度统计 -->
-      <div class="bg-white rounded-xl shadow-soft p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-            <i class="fa-solid fa-briefcase text-secondary mr-3"></i>
-            行动组月度统计
-          </h3>
-          </div>
-        <div class="h-64">
-          <canvas ref="actionsChartRef"></canvas>
-        </div>
-          </div>
-            </div>
-
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, onActivated, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Chart from 'chart.js/auto'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
@@ -972,9 +942,6 @@ const router = useRouter()
 
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
-
-const materialsChartRef = ref<HTMLCanvasElement>()
-const actionsChartRef = ref<HTMLCanvasElement>()
 
 // 响应式数据容器
 const noteStats = ref<any>({ framework: 0, study: 0, memorization: 0, exercise: 0, practical: 0, fragment: 0 })
@@ -1616,51 +1583,6 @@ const getLatestUpdate = (type: 'framework' | 'study' | 'memorization' | 'exercis
   return latest ? dayjs(latest).fromNow() : '暂无数据'
 }
 
-// 近6个月的月份标签
-const getRecentMonths = (n = 6) => {
-  const arr: string[] = []
-  // 获取当前北京时间
-  const now = new Date()
-  const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000)
-  // 往前推6个月作为基准
-  const baseDate = new Date(beijingTime)
-  baseDate.setMonth(baseDate.getMonth() - 5) // 往前推5个月，这样加上当前月就是6个月
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + (n - 1 - i), 1)
-    arr.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
-  }
-  return arr
-}
-const recentMonths = getRecentMonths(6)
-
-// 所有笔记按月创建数量（使用异步加载的数据）
-const notesByMonth = computed(() => {
-  const map: Record<string, number> = {}
-  recentMonths.forEach(m => (map[m] = 0))
-  allNotes.value.forEach(note => {
-    const d = new Date(note.createTime || note.recCreateTime || '')
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    if (map[key] !== undefined) map[key]++
-  })
-  return recentMonths.map(m => map[m])
-})
-
-// 所有任务按月完成数量（使用异步加载的数据）
-const tasksByMonth = computed(() => {
-  const map: Record<string, number> = {}
-  recentMonths.forEach(m => (map[m] = 0))
-  allTasks.value.forEach(task => {
-    if (task.completedTime) {
-      const d = new Date(task.completedTime)
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-      if (map[key] !== undefined) map[key]++
-        }
-  })
-  return recentMonths.map(m => map[m])
-})
-
-// loadData 函数已在上面定义
-
 // 组件激活时刷新数据（当从其他页面切换回来时）
 onActivated(() => {
   console.log('【总览面板】页面被激活，刷新数据...')
@@ -1678,81 +1600,6 @@ onMounted(async () => {
   timeUpdateTimer = window.setInterval(() => {
     currentTime.value = Date.now()
   }, 60000) // 60秒更新一次
-  
-  // 然后初始化图表
-  // 素材增长趋势图表（改为折线图）
-  if (materialsChartRef.value) {
-    const ctx = materialsChartRef.value.getContext('2d')
-    if (ctx) {
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: recentMonths,
-          datasets: [{
-            label: '笔记创建数',
-            data: notesByMonth.value,
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-          }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-            legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-              grid: { color: 'rgba(0,0,0,0.1)' }
-                },
-                x: {
-              grid: { display: false }
-                }
-            }
-        }
-    })
-    }
-}
-
-  // 行动组月度统计图表（改为所有任务按月完成数量）
-  if (actionsChartRef.value) {
-    const ctx = actionsChartRef.value.getContext('2d')
-    if (ctx) {
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: recentMonths,
-            datasets: [{
-            label: '任务完成数',
-            data: tasksByMonth.value,
-            borderColor: 'rgb(34, 197, 94)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            tension: 0.4,
-            fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-            legend: { display: false }
-                },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: 'rgba(0,0,0,0.1)' }
-            },
-            x: {
-              grid: { display: false }
-            }
-    }
-}
-      })
-    }
-  }
 })
 
 // 组件卸载时清除定时器

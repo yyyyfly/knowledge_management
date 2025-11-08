@@ -181,5 +181,17 @@ public class NoteArchiveService {
             return Result.error("查询笔记归档失败：" + e.getMessage());
         }
     }
+    
+    /**
+     * 查询归档中的所有笔记ID
+     */
+    public Result<List<Long>> getArchiveNoteIds(Long archiveId) {
+        try {
+            List<Long> noteIds = relationMapper.selectNoteIdsByArchiveId(archiveId);
+            return Result.success(noteIds);
+        } catch (Exception e) {
+            return Result.error("查询归档笔记失败：" + e.getMessage());
+        }
+    }
 }
 

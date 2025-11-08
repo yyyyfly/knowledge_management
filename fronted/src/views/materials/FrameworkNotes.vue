@@ -161,13 +161,13 @@
             
             <div>
               <p class="text-sm font-medium text-gray-700 mb-2">详细内容：</p>
-                <div class="prose prose-sm max-w-none text-gray-600 bg-gray-50 p-4 rounded-lg min-h-[100px]" v-html="selectedNote?.content || '暂无内容'">
+                <div class="note-content bg-gray-50 p-4 rounded-lg min-h-[100px]" v-html="selectedNote?.content || '暂无内容'">
                 </div>
             </div>
             
               <div class="space-y-3">
             <div class="flex items-center space-x-4 text-sm text-gray-500">
-                  <span>创建时间：{{ formatDate(selectedNote?.createTime || '') }}</span>
+                  <span>创建时间：{{ formatDate(selectedNote?.recCreateTime) }}</span>
             </div>
             
                 <div v-if="selectedNote?.subjectType" class="flex items-center space-x-2">
@@ -205,6 +205,7 @@ import { ref, computed, onMounted, onActivated } from 'vue'
 import { getNotesByType } from '@/services/noteService'
 import { getRecommendedNotes, completeReview } from '@/api/note'
 import dayjs from 'dayjs'
+import { formatDate } from '@/utils/dateUtils'
 
 // 定义框架笔记类型
 type FrameworkNote = {
@@ -323,9 +324,6 @@ const formatLastReviewTime = (lastReviewTime: string | undefined) => {
   return `${Math.floor(diffDays / 30)}个月前`
 }
 
-const formatDate = (timestamp: string) => {
-  return dayjs(timestamp).format('YYYY-MM-DD')
-}
   </script>
 
 <style scoped>

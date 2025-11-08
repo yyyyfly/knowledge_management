@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectKeyPointMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectKeyPoint">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="type" property="type"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="REC_CREATOR" property="recCreator"/>
+        <result column="REC_CREATE_TIME" property="recCreateTime"/>
+        <result column="REC_REVISOR" property="recRevisor"/>
+        <result column="REC_REVISE_TIME" property="recReviseTime"/>
+        <result column="ARCH_FLAG" property="archFlag"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, project_id, type, title, content, sort_order,
+        REC_CREATOR, REC_CREATE_TIME, REC_REVISOR, REC_REVISE_TIME, ARCH_FLAG
+    </sql>
+
+    <!-- 插入 -->
+    <insert id="insertSelective" parameterType="com.knowledge.entity.ProjectKeyPoint" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO project_key_point
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="type != null">type,</if>
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="recCreator != null">REC_CREATOR,</if>
+            <if test="recRevisor != null">REC_REVISOR,</if>
+            REC_CREATE_TIME, REC_REVISE_TIME, ARCH_FLAG
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="recCreator != null">#{recCreator},</if>
+            <if test="recRevisor != null">#{recRevisor},</if>
+            NOW(), NOW(), '1'
+        </trim>
+    </insert>
+
+    <!-- 根据ID删除 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM project_key_point WHERE id = #{id}
+    </delete>
+
+    <!-- 根据项目ID删除 -->
+    <delete id="deleteByProjectId" parameterType="java.lang.Long">
+        DELETE FROM project_key_point WHERE project_id = #{projectId}
+    </delete>
+
+    <!-- 更新 -->
+    <update id="updateByIdSelective" parameterType="com.knowledge.entity.ProjectKeyPoint">
+        UPDATE project_key_point
+        <set>
+            <if test="type != null">type = #{type},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="recRevisor != null">REC_REVISOR = #{recRevisor},</if>
+            REC_REVISE_TIME = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM project_key_point
+        WHERE id = #{id} AND ARCH_FLAG = '1'
+    </select>
+
+    <!-- 根据项目ID查询 -->
+    <select id="selectByProjectId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM project_key_point
+        WHERE project_id = #{projectId} AND ARCH_FLAG = '1'
+        ORDER BY sort_order ASC, REC_CREATE_TIME DESC
+    </select>
+
+    <!-- 根据项目ID和类型查询 -->
+    <select id="selectByProjectIdAndType" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM project_key_point
+        WHERE project_id = #{projectId} AND type = #{type} AND ARCH_FLAG = '1'
+        ORDER BY sort_order ASC, REC_CREATE_TIME DESC
+    </select>
+
+    <!-- 统计数量 -->
+    <select id="countByProjectId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM project_key_point
+        WHERE project_id = #{projectId} AND ARCH_FLAG = '1'
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

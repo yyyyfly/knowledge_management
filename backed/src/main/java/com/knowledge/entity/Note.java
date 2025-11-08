@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 public class Note extends BaseEntity {
     
     /**
-     * 笔记类型:framework-框架笔记,study-求学笔记,memorization-背诵笔记,exercise-刷题笔记,practical-实战笔记,fragment-碎片笔记
+     * 笔记类型:framework-框架笔记,study-求学笔记,memorization-背诵笔记,expansion-拓展笔记,exercise-刷题笔记,practical-实战笔记,fragment-碎片笔记
      */
     private String type;
     
@@ -106,6 +106,11 @@ public class Note extends BaseEntity {
      * 记忆提示词
      */
     private String cue;
+    
+    /**
+     * 理解记录（拓展笔记专用）
+     */
+    private String understanding;
     
     // ===== 刷题笔记字段 =====
     /**

@@ -1401,23 +1401,24 @@ const getWeatherEmoji = (condition: string): string => {
 
 // 将英文天气状况翻译为中文
 const translateWeatherCondition = (englishCondition: string): string => {
-  const lowerCondition = englishCondition.toLowerCase()
+  if (!englishCondition) return '未知'
+  const lowerCondition = englishCondition.toLowerCase().trim()
   
   // 晴天
   if (lowerCondition.includes('sunny') || lowerCondition === 'clear') return '晴'
   if (lowerCondition.includes('clear sky')) return '晴空'
   
-  // 多云
-  if (lowerCondition === 'partly cloudy') return '多云'
-  if (lowerCondition === 'cloudy') return '阴'
+  // 多云（注意顺序：先匹配长的，再匹配短的）
+  if (lowerCondition.includes('partly cloudy')) return '多云'
+  if (lowerCondition.includes('partly cloud')) return '多云'
+  if (lowerCondition === 'cloudy' || lowerCondition.includes('cloud')) return '阴'
   if (lowerCondition === 'overcast') return '阴天'
-  if (lowerCondition.includes('partly cloud')) return '局部多云'
   
   // 雨
   if (lowerCondition === 'light rain') return '小雨'
   if (lowerCondition === 'moderate rain') return '中雨'
   if (lowerCondition === 'heavy rain') return '大雨'
-  if (lowerCondition.includes('rain shower')) return '阵雨'
+  if (lowerCondition.includes('rain shower') || lowerCondition.includes('shower')) return '阵雨'
   if (lowerCondition.includes('drizzle')) return '毛毛雨'
   if (lowerCondition.includes('rain')) return '雨'
   
@@ -1433,8 +1434,8 @@ const translateWeatherCondition = (englishCondition: string): string => {
   if (lowerCondition.includes('storm')) return '暴风雨'
   
   // 雾霾
-  if (lowerCondition === 'mist') return '薄雾'
-  if (lowerCondition === 'fog') return '雾'
+  if (lowerCondition === 'mist' || lowerCondition.includes('mist')) return '薄雾'
+  if (lowerCondition === 'fog' || lowerCondition.includes('fog')) return '雾'
   if (lowerCondition.includes('haze')) return '霾'
   
   // 其他
@@ -1442,8 +1443,9 @@ const translateWeatherCondition = (englishCondition: string): string => {
   if (lowerCondition.includes('dust')) return '浮尘'
   if (lowerCondition.includes('sand')) return '沙尘'
   
-  // 如果没有匹配到，返回原文（可能API已返回中文）
-  return englishCondition
+  // 如果没有匹配到，返回未知
+  console.warn(`未知的天气状况: ${englishCondition}`)
+  return '未知'
 }
 
 // 加载天气信息

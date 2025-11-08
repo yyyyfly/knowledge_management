@@ -12,7 +12,7 @@
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <!-- 任务执行 -->
         <div 
           @click="openOperation('taskExecution')"
@@ -66,6 +66,20 @@
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">打卡操作</h4>
             <p class="text-gray-600">每日打卡、习惯养成和目标追踪</p>
+          </div>
+        </div>
+
+        <!-- 笔记调用 -->
+        <div 
+          @click="openOperation('noteReference')"
+          class="p-6 border-2 border-dashed border-indigo-300 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 cursor-pointer transition-all duration-200"
+        >
+          <div class="text-center">
+            <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-book-open text-2xl text-indigo-600"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">笔记调用</h4>
+            <p class="text-gray-600">关联项目笔记，快速调用相关知识和资料</p>
           </div>
         </div>
       </div>
@@ -823,213 +837,229 @@
           </div>
         </div>
       </template>
-    </Transition>
 
-    <!-- 素材调用模块 -->
-    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-900">素材调用</h3>
-        <div class="flex items-center space-x-2">
-          <span class="text-sm text-gray-500">点击卡片进入对应类型的素材库</span>
-        </div>
+      <!-- 笔记调用 -->
+      <template v-else-if="currentOperation === 'noteReference'">
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-8 max-h-[80vh] flex flex-col">
+          <div class="flex items-center justify-between mb-6 flex-shrink-0">
+            <h3 class="text-xl font-semibold text-gray-900">笔记调用</h3>
+            <button 
+              @click="closeOperation()"
+              class="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
       </div>
       
-      <!-- 素材类型卡片 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- 碎片笔记卡片 -->
-        <div 
-          @click="openMaterialType('fragment')"
-          class="p-6 border-2 border-pink-200 rounded-xl hover:border-pink-400 hover:bg-pink-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center group-hover:bg-pink-200 transition-colors">
-              <i class="fas fa-lightbulb text-2xl text-pink-600"></i>
+          <!-- 项目筛选和搜索 -->
+          <div class="mb-6 flex-shrink-0">
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+              <!-- 搜索框 -->
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">搜索项目</label>
+                <div class="relative">
+                  <input 
+                    v-model="noteProjectSearchQuery" 
+                    type="text" 
+                    placeholder="输入项目名称搜索..."
+                    class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                  <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">碎片笔记</h4>
-              <p class="text-sm text-gray-600">灵感和想法记录</p>
             </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('fragment').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-pink-600 group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </div>
-
-        <!-- 框架笔记卡片 -->
-        <div 
-          @click="openMaterialType('framework')"
-          class="p-6 border-2 border-purple-200 rounded-xl hover:border-purple-400 hover:bg-purple-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-              <i class="fas fa-sitemap text-2xl text-purple-600"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">框架笔记</h4>
-              <p class="text-sm text-gray-600">知识框架和体系结构</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('framework').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-purple-600 group-hover:translate-x-1 transition-transform"></i>
+              
+              <!-- 分类筛选 -->
+              <div class="w-full md:w-64">
+                <label class="block text-sm font-medium text-gray-700 mb-2">项目分类</label>
+                <select 
+                  v-model="noteProjectCategoryFilter"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">全部分类</option>
+                  <option value="defense">战争行动</option>
+                  <option value="construction">工程建设</option>
+                  <option value="diplomatic">外交行动</option>
+                </select>
           </div>
         </div>
 
-        <!-- 求学笔记卡片 -->
-        <div 
-          @click="openMaterialType('study')"
-          class="p-6 border-2 border-blue-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <i class="fas fa-graduation-cap text-2xl text-blue-600"></i>
+            <!-- 项目选择下拉框 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">选择项目</label>
+              <select 
+                v-model="selectedProjectForNotes" 
+                @change="loadProjectNotes"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">请选择项目</option>
+                <option v-for="project in filteredProjectsForNotes" :key="project.id" :value="project.id">
+                  {{ project.name }} 
+                  <template v-if="project.category === 'defense'">【战争行动】</template>
+                  <template v-else-if="project.category === 'construction'">【工程建设】</template>
+                  <template v-else-if="project.category === 'diplomatic'">【外交行动】</template>
+                </option>
+              </select>
+              
+              <!-- 筛选结果统计 -->
+              <div class="mt-2 text-sm text-gray-500">
+                共找到 {{ filteredProjectsForNotes.length }} 个项目
             </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">求学笔记</h4>
-              <p class="text-sm text-gray-600">课程学习和知识积累</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('study').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-blue-600 group-hover:translate-x-1 transition-transform"></i>
           </div>
         </div>
 
-        <!-- 背诵笔记卡片 -->
-        <div 
-          @click="openMaterialType('memorization')"
-          class="p-6 border-2 border-green-200 rounded-xl hover:border-green-400 hover:bg-green-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-              <i class="fas fa-lightbulb text-2xl text-green-600"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">背诵笔记</h4>
-              <p class="text-sm text-gray-600">重点内容和记忆技巧</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('memorization').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-green-600 group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </div>
-
-
-
-        <!-- 刷题笔记卡片 -->
-        <div 
-          @click="openMaterialType('exercise')"
-          class="p-6 border-2 border-orange-200 rounded-xl hover:border-orange-400 hover:bg-orange-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-              <i class="fa-regular fa-pen-to-square text-2xl text-orange-600"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">刷题笔记</h4>
-              <p class="text-sm text-gray-600">题目解析和解题技巧</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('exercise').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-orange-600 group-hover:translate-x-1 transition-transform"></i>
+          <!-- 已关联笔记列表 -->
+          <div v-if="selectedProjectForNotes" class="flex-1 overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-lg font-semibold text-gray-900">已关联笔记</h4>
+              <div class="flex space-x-3">
+                <button 
+                  @click="showAddNoteDialog = true"
+                  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center space-x-2"
+                >
+                  <i class="fas fa-plus"></i>
+                  <span>添加笔记</span>
+                </button>
+                <button 
+                  @click="openArchiveImportDialog"
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2"
+                >
+                  <i class="fas fa-folder-open"></i>
+                  <span>从归档批量添加</span>
+                </button>
           </div>
         </div>
 
-        <!-- 实战笔记卡片 -->
-        <div 
-          @click="openMaterialType('practical')"
-          class="p-6 border-2 border-red-200 rounded-xl hover:border-red-400 hover:bg-red-50 cursor-pointer transition-all duration-200 group"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center group-hover:bg-red-200 transition-colors">
-              <i class="fa-solid fa-flask text-2xl text-red-600"></i>
+            <!-- 笔记卡片网格 -->
+            <div v-if="projectNotes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div 
+                v-for="note in projectNotes" 
+                :key="note.id"
+                class="p-4 border-2 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer"
+                :class="getNoteTypeBorderClass(note.type)"
+                @click="viewNoteDetail(note)"
+              >
+                <div class="flex items-start justify-between mb-3">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="getNoteTypeIconClass(note.type)">
+                      <i :class="getNoteTypeIcon(note.type)" class="text-sm"></i>
             </div>
-            <div class="flex-1">
-              <h4 class="text-lg font-semibold text-gray-900">实战笔记</h4>
-              <p class="text-sm text-gray-600">项目实践和技术应用</p>
+                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getNoteTypeClass(note.type)">
+                      {{ getNoteTypeText(note.type) }}
+                    </span>
+            </div>
+                  <button 
+                    @click.stop="removeNoteFromProject(note.id)"
+                    class="text-red-500 hover:text-red-700"
+                    title="移除关联"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+            </div>
+                <h5 class="text-md font-semibold text-gray-900 mb-2 line-clamp-2">{{ note.title }}</h5>
+                <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ note.summary }}</p>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                  <span>{{ note.createTime || note.recCreateTime }}</span>
+                  <div class="flex space-x-1" v-if="Array.isArray(note.tags) && note.tags.length > 0">
+                    <span v-for="tag in note.tags.slice(0, 2)" :key="tag" class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                      {{ tag }}
+                    </span>
             </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ getMaterialsByType('practical').length }} 条笔记</span>
-            <i class="fas fa-chevron-right text-red-600 group-hover:translate-x-1 transition-transform"></i>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 素材类型详情弹窗 -->
+            <!-- 空状态 -->
+            <div v-else class="text-center py-12 text-gray-500">
+              <i class="fas fa-book-open text-6xl mb-4 text-indigo-200"></i>
+              <p class="text-lg font-medium mb-2">暂无关联笔记</p>
+              <p class="text-sm mb-4">点击"添加笔记"按钮，为项目关联相关笔记</p>
+              <button 
+                @click="showAddNoteDialog = true"
+                class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                添加笔记
+              </button>
+            </div>
+            </div>
+
+          <!-- 未选择项目提示 -->
+          <div v-else class="flex-1 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+              <i class="fas fa-folder-open text-6xl mb-4 text-gray-300"></i>
+              <p class="text-lg font-medium">请先选择一个项目</p>
+          </div>
+          </div>
+        </div>
+      </template>
+    </Transition>
+
+    <!-- 添加笔记弹窗 -->
     <Transition name="modal-fade">
-      <div v-if="showMaterialTypeDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div v-if="showAddNoteDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <Transition name="modal-slide">
           <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
             <!-- 弹窗头部 -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
-              <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center" :class="getMaterialTypeIconClass(currentMaterialType)">
-                  <i :class="getMaterialTypeIcon(currentMaterialType)" class="text-2xl"></i>
-                </div>
-                <div>
-                  <h3 class="text-2xl font-semibold text-gray-900">{{ getMaterialTypeText(currentMaterialType) }}</h3>
-                  <p class="text-sm text-gray-500">{{ getMaterialsByType(currentMaterialType).length }} 条笔记</p>
-                </div>
-              </div>
+              <h3 class="text-2xl font-semibold text-gray-900">添加笔记到项目</h3>
               <button 
-                @click="closeMaterialTypeDetail"
+                @click="closeAddNoteDialog"
                 class="text-gray-500 hover:text-gray-700 transition-colors"
               >
                 <i class="fas fa-times text-2xl"></i>
               </button>
             </div>
             
-            <!-- 搜索框 -->
+            <!-- 搜索和筛选 -->
             <div class="p-6 border-b border-gray-200">
-              <div class="relative">
+              <div class="flex gap-4">
+                <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <input 
-                  v-model="materialTypeSearchQuery"
+                    v-model="noteSearchQuery"
                   type="text" 
-                  :placeholder="`搜索${getMaterialTypeText(currentMaterialType)}...`"
-                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                    placeholder="搜索笔记标题或内容..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                </div>
+                <select 
+                  v-model="noteFilterType"
+                  class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 >
+                  <option value="">全部类型</option>
+                  <option value="fragment">碎片笔记</option>
+                  <option value="framework">框架笔记</option>
+                  <option value="study">求学笔记</option>
+                  <option value="memorization">背诵笔记</option>
+                  <option value="exercise">刷题笔记</option>
+                  <option value="practical">实战笔记</option>
+                </select>
               </div>
             </div>
             
-            <!-- 素材列表 - 可滚动区域 -->
+            <!-- 笔记列表 -->
             <div class="flex-1 overflow-y-auto p-6">
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div 
-                  v-for="material in filteredMaterialTypeList" 
-                  :key="material.id"
-                  class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 cursor-pointer transition-all duration-200 group"
-                  @click="viewMaterialDetail(material)"
+                  v-for="note in filteredAvailableNotes" 
+                  :key="note.id"
+                  class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-indigo-300 cursor-pointer transition-all duration-200"
+                  @click="addNoteToProject(note)"
                 >
-                  <div class="mb-3">
-                    <h5 class="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-purple-600 transition-colors">{{ material.title }}</h5>
-                  </div>
-                  <p class="text-xs text-gray-600 mb-3 line-clamp-2">{{ material.summary }}</p>
-                  
-                  <!-- 背诵笔记显示知识点 -->
-                  <div v-if="material.type === 'memorization' && Array.isArray(material.knowledgePoint)" class="flex flex-wrap gap-1 mb-2">
-                    <span v-for="kp in material.knowledgePoint.slice(0, 3)" :key="kp" class="bg-green-100 text-green-600 px-1 py-0.5 rounded text-xs">
-                      {{ kp }}
+                  <div class="flex items-start justify-between mb-3">
+                    <span class="px-2 py-1 rounded text-xs font-medium" :class="getNoteTypeClass(note.type)">
+                      {{ getNoteTypeText(note.type) }}
                     </span>
+                    <i class="fas fa-plus-circle text-indigo-600 text-xl"></i>
                   </div>
-                  
+                  <h5 class="text-sm font-medium text-gray-900 mb-2 line-clamp-2">{{ note.title }}</h5>
+                  <p class="text-xs text-gray-600 mb-2 line-clamp-2">{{ note.summary }}</p>
                   <div class="flex items-center justify-between text-xs text-gray-500">
-                    <span>{{ material.createTime || material.recCreateTime }}</span>
-                    <div class="flex space-x-1" v-if="Array.isArray(material.tags) && material.tags.length > 0">
-                      <span v-for="tag in material.tags.slice(0, 2)" :key="tag" class="bg-gray-100 text-gray-600 px-1 py-0.5 rounded text-xs">
-                        {{ tag }}
-                      </span>
-                    </div>
+                    <span>{{ note.createTime || note.recCreateTime }}</span>
                   </div>
                 </div>
                 
                 <!-- 空状态 -->
-                <div v-if="filteredMaterialTypeList.length === 0" class="col-span-full text-center py-16 text-gray-500">
+                <div v-if="filteredAvailableNotes.length === 0" class="col-span-full text-center py-16 text-gray-500">
                   <i class="fas fa-search text-5xl mb-4 text-gray-300"></i>
                   <p class="text-lg font-medium mb-2">未找到匹配的笔记</p>
                   <p class="text-sm">请尝试调整搜索条件</p>
@@ -1041,7 +1071,79 @@
       </div>
     </Transition>
 
-    <!-- 素材详情弹窗 -->
+    <!-- 从归档批量添加弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showArchiveImportDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <Transition name="modal-slide">
+          <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <!-- 弹窗头部 -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 class="text-2xl font-semibold text-gray-900">从归档批量添加笔记</h3>
+              <button 
+                @click="closeArchiveImportDialog"
+                class="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <i class="fas fa-times text-2xl"></i>
+              </button>
+            </div>
+            
+            <!-- 说明 -->
+            <div class="p-6 border-b border-gray-200 bg-blue-50">
+              <div class="flex items-start">
+                <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                <div class="text-sm text-gray-700">
+                  <p class="font-semibold mb-1">快速关联归档中的所有笔记</p>
+                  <p>选择一个笔记归档，系统会自动将该归档中的所有笔记添加到当前项目中。</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 归档列表 -->
+            <div class="flex-1 overflow-y-auto p-6">
+              <div v-if="isLoadingArchives" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-3"></i>
+                <p class="text-gray-500">加载归档中...</p>
+              </div>
+              
+              <div v-else-if="archives.length === 0" class="text-center py-12 text-gray-500">
+                <i class="fas fa-folder-open text-6xl mb-4 text-gray-300"></i>
+                <p class="text-lg font-medium mb-2">暂无归档</p>
+                <p class="text-sm">请先在笔记归档页面创建归档</p>
+              </div>
+              
+              <div v-else class="space-y-3">
+                <div 
+                  v-for="archive in archives" 
+                  :key="archive.id"
+                  class="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 cursor-pointer transition-all duration-200"
+                  @click="importArchiveNotes(archive)"
+                >
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900">{{ archive.title }}</h4>
+                      </div>
+                      <p v-if="archive.description" class="text-sm text-gray-600 mb-2">{{ archive.description }}</p>
+                      <div class="flex items-center text-xs text-gray-500">
+                        <span v-if="archive.author" class="mr-3">
+                          <i class="fas fa-user mr-1"></i>{{ archive.author }}
+                        </span>
+                        <span>
+                          <i class="fas fa-sticky-note mr-1"></i>{{ archive.noteCount || 0 }} 条笔记
+                        </span>
+                      </div>
+                    </div>
+                    <i class="fas fa-arrow-circle-right text-green-600 text-2xl"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+
+    <!-- 笔记详情弹窗 -->
     <Transition name="modal-fade">
       <div v-if="showMaterialDetail" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <Transition name="modal-slide">
@@ -2303,7 +2405,6 @@ const loadData = async () => {
     // 使用 noteService 获取笔记数据，自动处理数组字段
     const notesData = await getAllNotes()
     notes.value = notesData
-    materials.value = notesData
     console.log('【项目执行】加载笔记数据:', notes.value.length, '个')
   } catch (error) {
     console.error('【项目执行】加载数据失败:', error)
@@ -2457,17 +2558,25 @@ const suggestedTags = defaultProjectTags
 // 项目心得记录（从后端加载）
 const projectRecords = ref<any[]>([])
 
-// 素材调用相关数据
-const materials = ref<Note[]>([])
-const materialSearchQuery = ref('')
-const materialFilterType = ref('')
+// 笔记调用相关数据
+const selectedProjectForNotes = ref('')
+const projectNotes = ref<Note[]>([])
+const showAddNoteDialog = ref(false)
+const noteSearchQuery = ref('')
+const noteFilterType = ref('')
+const showNoteDetail = ref(false)
+const selectedNoteDetail = ref<Note | null>(null)
+const noteProjectSearchQuery = ref('') // 项目搜索关键词
+const noteProjectCategoryFilter = ref('') // 项目分类筛选
+
+// 归档批量导入相关
+const showArchiveImportDialog = ref(false)
+const archives = ref<any[]>([])
+const isLoadingArchives = ref(false)
+
+// 保留素材详情相关（用于通用笔记详情显示）
 const showMaterialDetail = ref(false)
 const selectedMaterial = ref<Note | null>(null)
-
-// 素材类型详情相关数据
-const showMaterialTypeDetail = ref(false)
-const currentMaterialType = ref<Note['type']>('basic')
-const materialTypeSearchQuery = ref('')
 
 // 筛选后的任务
 const filteredTasks = computed(() => {
@@ -2495,47 +2604,48 @@ const filteredTasks = computed(() => {
   return filtered
 })
 
-// 筛选后的素材
-const filteredMaterials = computed(() => {
-  let filtered = materials.value
+// 筛选后的项目列表（用于笔记调用）
+const filteredProjectsForNotes = computed(() => {
+  let filtered = projects.value
   
-  // 按类型筛选
-  if (materialFilterType.value) {
-    filtered = filtered.filter(material => material.type === materialFilterType.value)
+  // 按分类筛选
+  if (noteProjectCategoryFilter.value) {
+    filtered = filtered.filter(project => project.category === noteProjectCategoryFilter.value)
   }
   
   // 按搜索关键词筛选
-  if (materialSearchQuery.value) {
-    const query = materialSearchQuery.value.toLowerCase()
-    filtered = filtered.filter(material => 
-      material.title.toLowerCase().includes(query) ||
-      material.summary.toLowerCase().includes(query) ||
-      material.tags.some(tag => tag.toLowerCase().includes(query))
+  if (noteProjectSearchQuery.value) {
+    const query = noteProjectSearchQuery.value.toLowerCase()
+    filtered = filtered.filter(project => 
+      project.name.toLowerCase().includes(query) ||
+      (project.description && project.description.toLowerCase().includes(query))
     )
   }
   
   return filtered
 })
 
-// 按类型获取素材
-const getMaterialsByType = (type: Note['type']) => {
-  return filteredMaterials.value.filter(material => material.type === type)
-}
-
-// 筛选后的素材类型列表
-const filteredMaterialTypeList = computed(() => {
-  const typeMaterials = materials.value.filter(material => material.type === currentMaterialType.value)
+// 筛选后的可用笔记（排除已关联的）
+const filteredAvailableNotes = computed(() => {
+  const projectNoteIds = new Set(projectNotes.value.map(n => n.id))
+  let filtered = notes.value.filter(note => !projectNoteIds.has(note.id))
   
-  if (!materialTypeSearchQuery.value) {
-    return typeMaterials
+  // 按类型筛选
+  if (noteFilterType.value) {
+    filtered = filtered.filter(note => note.type === noteFilterType.value)
   }
   
-  const query = materialTypeSearchQuery.value.toLowerCase()
-  return typeMaterials.filter(material => 
-    material.title.toLowerCase().includes(query) ||
-    material.summary.toLowerCase().includes(query) ||
-    material.tags.some(tag => tag.toLowerCase().includes(query))
-  )
+  // 按搜索关键词筛选
+  if (noteSearchQuery.value) {
+    const query = noteSearchQuery.value.toLowerCase()
+    filtered = filtered.filter(note => 
+      note.title.toLowerCase().includes(query) ||
+      note.summary.toLowerCase().includes(query) ||
+      (Array.isArray(note.tags) && note.tags.some(tag => tag.toLowerCase().includes(query)))
+    )
+  }
+  
+  return filtered
 })
 
 // 按项目分类的任务
@@ -3178,44 +3288,190 @@ const closeRecordDetail = () => {
   selectedRecord.value = null
 }
 
-// 素材相关方法
-// 获取素材类型样式类
-const getMaterialTypeClass = (type: Note['type']) => {
-  const classes = {
-    basic: 'bg-purple-100 text-purple-600',
-    study: 'bg-blue-100 text-blue-600',
-    book: 'bg-green-100 text-green-600',
-    exercise: 'bg-indigo-100 text-indigo-600',
-    practical: 'bg-orange-100 text-orange-600',
-    fragment: 'bg-pink-100 text-pink-600'
+// ========== 笔记调用相关方法 ==========
+
+// 加载项目关联的笔记
+const loadProjectNotes = async () => {
+  if (!selectedProjectForNotes.value) {
+    projectNotes.value = []
+    return
   }
-  return classes[type] || 'bg-gray-100 text-gray-600'
+  
+  try {
+    // 从后端加载项目关联的笔记ID
+    const response = await request.get(`/project/${selectedProjectForNotes.value}/notes`)
+    if (response.code === 200) {
+      const noteIds = response.data || []
+      // 根据ID从笔记列表中筛选出关联的笔记
+      projectNotes.value = notes.value.filter(note => noteIds.includes(note.id))
+    }
+  } catch (error) {
+    console.error('加载项目笔记失败:', error)
+    // 如果后端接口还没实现，暂时从本地筛选（可选）
+    projectNotes.value = []
+  }
 }
 
-// 获取素材类型文本
-const getMaterialTypeText = (type: Note['type']) => {
-  const texts = {
-    framework: '框架笔记',
-    study: '求学笔记',
-    memorization: '背诵笔记',
-    exercise: '刷题笔记',
-    practical: '实战笔记',
-    fragment: '碎片笔记'
+// 添加笔记到项目
+const addNoteToProject = async (note: Note) => {
+  if (!selectedProjectForNotes.value) return
+  
+  try {
+    const response = await request.post(`/project/${selectedProjectForNotes.value}/notes`, {
+      noteId: note.id
+    })
+    
+    if (response.code === 200) {
+      // 添加成功，更新本地列表
+      projectNotes.value.push(note)
+      alert('✅ 笔记已关联到项目')
+    } else {
+      alert('关联失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('关联笔记失败:', error)
+    // 如果后端接口还没实现，暂时添加到本地列表
+    if (!projectNotes.value.find(n => n.id === note.id)) {
+      projectNotes.value.push(note)
+      alert('✅ 笔记已关联到项目（本地模式）')
+    }
   }
-  return texts[type] || '未知类型'
 }
 
-// 查看素材详情
-const viewMaterialDetail = (material: Note) => {
+// 从项目移除笔记
+const removeNoteFromProject = async (noteId: number) => {
+  if (!selectedProjectForNotes.value) return
+  if (!confirm('确定要移除这个笔记的关联吗？')) return
+  
+  try {
+    const response = await request.delete(`/project/${selectedProjectForNotes.value}/notes/${noteId}`)
+    
+    if (response.code === 200) {
+      // 移除成功
+      projectNotes.value = projectNotes.value.filter(n => n.id !== noteId)
+      alert('✅ 已移除笔记关联')
+    } else {
+      alert('移除失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('移除笔记关联失败:', error)
+    // 如果后端接口还没实现，暂时从本地列表移除
+    projectNotes.value = projectNotes.value.filter(n => n.id !== noteId)
+    alert('✅ 已移除笔记关联（本地模式）')
+  }
+}
+
+// 关闭添加笔记弹窗
+const closeAddNoteDialog = () => {
+  showAddNoteDialog.value = false
+  noteSearchQuery.value = ''
+  noteFilterType.value = ''
+}
+
+// 打开归档导入弹窗并加载归档列表
+const openArchiveImportDialog = async () => {
+  showArchiveImportDialog.value = true
+  await loadArchives()
+}
+
+// 关闭归档导入弹窗
+const closeArchiveImportDialog = () => {
+  showArchiveImportDialog.value = false
+  archives.value = []
+}
+
+// 加载归档列表
+const loadArchives = async () => {
+  isLoadingArchives.value = true
+  try {
+    const response = await request.get('/note-archive/list')
+    if (response.code === 200) {
+      archives.value = response.data || []
+    } else {
+      archives.value = []
+    }
+  } catch (error) {
+    console.error('加载归档列表失败:', error)
+    archives.value = []
+  } finally {
+    isLoadingArchives.value = false
+  }
+}
+
+// 批量导入归档中的所有笔记
+const importArchiveNotes = async (archive: any) => {
+  if (!selectedProjectForNotes.value) return
+  
+  try {
+    // 获取归档中的所有笔记ID
+    const response = await request.get(`/note-archive/${archive.id}/notes`)
+    if (response.code === 200) {
+      const noteIds = response.data || []
+      
+      if (noteIds.length === 0) {
+        alert('该归档中没有笔记')
+        return
+      }
+      
+      // 批量添加笔记到项目
+      let successCount = 0
+      let failCount = 0
+      
+      for (const noteId of noteIds) {
+        try {
+          await request.post(`/project/${selectedProjectForNotes.value}/notes`, {
+            noteId: noteId
+          })
+          successCount++
+        } catch (error) {
+          console.error(`添加笔记 ${noteId} 失败:`, error)
+          failCount++
+        }
+      }
+      
+      // 重新加载项目笔记
+      await loadProjectNotes()
+      
+      // 显示结果
+      if (failCount === 0) {
+        alert(`成功添加 ${successCount} 条笔记！`)
+      } else {
+        alert(`添加完成：成功 ${successCount} 条，失败 ${failCount} 条（可能已经关联过）`)
+      }
+      
+      // 关闭弹窗
+      closeArchiveImportDialog()
+    } else {
+      alert('获取归档笔记失败：' + (response.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('批量导入笔记失败:', error)
+    alert('批量导入失败，请重试')
+  }
+}
+
+// 获取归档类型文本
+const getArchiveTypeText = (type: string) => {
+  const typeMap: Record<string, string> = {
+    'book': '书籍',
+    'course': '课程',
+    'material': '材料',
+    'video': '视频',
+    'other': '其他'
+  }
+  return typeMap[type] || '未知'
+}
+
+// 查看笔记详情
+const viewNoteDetail = (note: Note) => {
   // 确保数组字段被正确解析
-  const normalizedMaterial = { ...material }
+  const normalizedNote = { ...note }
   
   // 处理可能是 JSON 字符串的字段
   const ensureArray = (value: any) => {
     if (!value) return []
     if (Array.isArray(value)) return value
     if (typeof value === 'string') {
-      // 尝试解析 JSON 字符串
       if (value.trim().startsWith('[')) {
         try {
           const parsed = JSON.parse(value)
@@ -3224,45 +3480,26 @@ const viewMaterialDetail = (material: Note) => {
           // 忽略解析错误
         }
       }
-      // 如果是逗号分隔的字符串
       return value.split(',').map((item: string) => item.trim()).filter((item: string) => item !== '')
     }
     return [value]
   }
   
-  // 确保所有可能的数组字段都是数组
-  if (normalizedMaterial.tags) normalizedMaterial.tags = ensureArray(normalizedMaterial.tags) as string[]
-  if (normalizedMaterial.knowledgePoint) normalizedMaterial.knowledgePoint = ensureArray(normalizedMaterial.knowledgePoint) as string[]
+  if (normalizedNote.tags) normalizedNote.tags = ensureArray(normalizedNote.tags) as string[]
+  if (normalizedNote.knowledgePoint) normalizedNote.knowledgePoint = ensureArray(normalizedNote.knowledgePoint) as string[]
   
-  selectedMaterial.value = normalizedMaterial
+  selectedMaterial.value = normalizedNote
   showMaterialDetail.value = true
 }
 
-// 关闭素材详情
+// 关闭笔记详情
 const closeMaterialDetail = () => {
   showMaterialDetail.value = false
   selectedMaterial.value = null
 }
 
-
-
-// 素材类型相关方法
-// 打开素材类型详情
-const openMaterialType = (type: Note['type']) => {
-  currentMaterialType.value = type
-  materialTypeSearchQuery.value = ''
-  showMaterialTypeDetail.value = true
-}
-
-// 关闭素材类型详情
-const closeMaterialTypeDetail = () => {
-  showMaterialTypeDetail.value = false
-  currentMaterialType.value = 'framework'
-  materialTypeSearchQuery.value = ''
-}
-
-// 获取素材类型图标类
-const getMaterialTypeIconClass = (type: Note['type']) => {
+// 获取笔记类型样式类
+const getNoteTypeClass = (type: Note['type']) => {
   const classes = {
     framework: 'bg-purple-100 text-purple-600',
     study: 'bg-blue-100 text-blue-600',
@@ -3274,18 +3511,61 @@ const getMaterialTypeIconClass = (type: Note['type']) => {
   return classes[type] || 'bg-gray-100 text-gray-600'
 }
 
-// 获取素材类型图标
-const getMaterialTypeIcon = (type: Note['type']) => {
+// 获取笔记类型边框样式类
+const getNoteTypeBorderClass = (type: Note['type']) => {
+  const classes = {
+    framework: 'border-purple-200 hover:border-purple-400',
+    study: 'border-blue-200 hover:border-blue-400',
+    memorization: 'border-green-200 hover:border-green-400',
+    exercise: 'border-orange-200 hover:border-orange-400',
+    practical: 'border-red-200 hover:border-red-400',
+    fragment: 'border-pink-200 hover:border-pink-400'
+  }
+  return classes[type] || 'border-gray-200 hover:border-gray-400'
+}
+
+// 获取笔记类型文本
+const getNoteTypeText = (type: Note['type']) => {
+  const texts = {
+    framework: '框架笔记',
+    study: '求学笔记',
+    memorization: '背诵笔记',
+    exercise: '刷题笔记',
+    practical: '实战笔记',
+    fragment: '碎片笔记'
+  }
+  return texts[type] || '未知类型'
+}
+
+// 获取笔记类型图标
+const getNoteTypeIcon = (type: Note['type']) => {
   const icons = {
     framework: 'fas fa-sitemap',
     study: 'fas fa-graduation-cap',
     memorization: 'fas fa-lightbulb',
     exercise: 'fa-regular fa-pen-to-square',
     practical: 'fa-solid fa-flask',
-    fragment: 'fas fa-lightbulb'
+    fragment: 'fas fa-puzzle-piece'
   }
   return icons[type] || 'fas fa-file'
 }
+
+// 获取笔记类型图标样式类
+const getNoteTypeIconClass = (type: Note['type']) => {
+  const classes = {
+    framework: 'bg-purple-100 text-purple-600',
+    study: 'bg-blue-100 text-blue-600',
+    memorization: 'bg-green-100 text-green-600',
+    exercise: 'bg-orange-100 text-orange-600',
+    practical: 'bg-red-100 text-red-600',
+    fragment: 'bg-pink-100 text-pink-600'
+  }
+  return classes[type] || 'bg-gray-100 text-gray-600'
+}
+
+// 保留旧的方法名以兼容素材详情弹窗
+const getMaterialTypeClass = getNoteTypeClass
+const getMaterialTypeText = getNoteTypeText
 
 // 折叠功能方法
 // 切换项目折叠状态
@@ -3410,7 +3690,7 @@ const getFrequencyClassForCheckin = (frequency: string) => {
   return map[frequency] || 'bg-gray-100 text-gray-700'
 }
 
-const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueManagement' | 'checkinOperation') => {
+const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueManagement' | 'checkinOperation' | 'noteReference') => {
   // 关闭所有相关视图（为未来扩展预留）
   currentOperation.value = ''
   setTimeout(() => {
@@ -3422,6 +3702,13 @@ const openOperation = (operation: 'taskExecution' | 'projectRecord' | 'issueMana
     // 如果打开打卡操作，加载打卡项目
     if (operation === 'checkinOperation') {
       loadCheckinItems()
+    }
+    // 如果打开笔记调用，重置状态
+    if (operation === 'noteReference') {
+      selectedProjectForNotes.value = ''
+      projectNotes.value = []
+      noteProjectSearchQuery.value = ''
+      noteProjectCategoryFilter.value = ''
     }
   }, 0)
 }

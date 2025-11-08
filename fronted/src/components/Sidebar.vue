@@ -165,7 +165,7 @@
           </div>
         </div>
 
-        <!-- 日常行动 -->
+        <!-- 执行行动 -->
         <div class="space-y-1">
           <button 
             @click="toggleGroup('daily')" 
@@ -173,14 +173,14 @@
           >
             <div class="flex items-center">
               <div class="w-6 flex justify-center">
-                <i class="fa-solid fa-calendar-day"></i>
+                <i class="fa-solid fa-bolt"></i>
               </div>
-              <span class="ml-3">日常行动</span>
+              <span class="ml-3">执行行动</span>
             </div>
             <i class="fa-solid fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expandedGroups.daily }"></i>
           </button>
           
-          <!-- 日常行动子菜单 -->
+          <!-- 执行行动子菜单 -->
           <div v-show="expandedGroups.daily" class="pl-8 space-y-1">
             <router-link to="/daily/material-record" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
               <div class="w-6 flex justify-center">
@@ -199,6 +199,12 @@
                 <i class="fa-solid fa-clipboard-list"></i>
               </div>
               <span class="ml-3">日常总结</span>
+            </router-link>
+            <router-link to="/ready-to-deploy" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-flag-checkered"></i>
+              </div>
+              <span class="ml-3">整装待发</span>
             </router-link>
           </div>
         </div>
@@ -220,12 +226,6 @@
           
           <!-- 系统配置子菜单 -->
           <div v-show="expandedGroups.system" class="pl-8 space-y-1">
-            <router-link to="/system-overview" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
-              <div class="w-6 flex justify-center">
-                <i class="fa-solid fa-circle-info"></i>
-              </div>
-              <span class="ml-3">系统概述</span>
-            </router-link>
             <router-link to="/version-history" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
               <div class="w-6 flex justify-center">
                 <i class="fa-solid fa-code-branch"></i>
@@ -260,7 +260,7 @@ const materialsConfig = [
   { name: '碎片笔记', path: '/fragment-notes', icon: 'fa-solid fa-puzzle-piece' },
   { name: '框架笔记', path: '/framework-notes', icon: 'fa-solid fa-sitemap' },
   { name: '求学笔记', path: '/study-notes', icon: 'fa-solid fa-graduation-cap' },
-  { name: '背诵笔记', path: '/memorization-notes', icon: 'fa-regular fa-lightbulb' },
+  { name: '拓展笔记', path: '/expansion-notes', icon: 'fa-solid fa-book-open' },
   { name: '刷题笔记', path: '/exercise-notes', icon: 'fa-regular fa-pen-to-square' },
   { name: '实战笔记', path: '/practical-notes', icon: 'fa-solid fa-flask' }
 ]

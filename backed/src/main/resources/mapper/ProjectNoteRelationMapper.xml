@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectNoteRelationMapper">
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectNoteRelation">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="project_id" jdbcType="INTEGER" property="projectId" />
+        <result column="note_id" jdbcType="INTEGER" property="noteId" />
+        <result column="note_type" jdbcType="VARCHAR" property="noteType" />
+        <result column="rec_creator" jdbcType="VARCHAR" property="recCreator" />
+        <result column="rec_create_time" jdbcType="TIMESTAMP" property="recCreateTime" />
+        <result column="rec_revisor" jdbcType="VARCHAR" property="recRevisor" />
+        <result column="rec_revise_time" jdbcType="TIMESTAMP" property="recReviseTime" />
+        <result column="arch_flag" jdbcType="CHAR" property="archFlag" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, project_id, note_id, note_type, rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+    </sql>
+
+    <!-- 插入项目笔记关联 -->
+    <insert id="insertSelective" parameterType="com.knowledge.entity.ProjectNoteRelation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO project_note_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">project_id,</if>
+            <if test="noteId != null">note_id,</if>
+            <if test="noteType != null">note_type,</if>
+            <if test="recCreator != null">rec_creator,</if>
+            <if test="recCreateTime != null">rec_create_time,</if>
+            <if test="recRevisor != null">rec_revisor,</if>
+            <if test="recReviseTime != null">rec_revise_time,</if>
+            <if test="archFlag != null">arch_flag,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="projectId != null">#{projectId,jdbcType=INTEGER},</if>
+            <if test="noteId != null">#{noteId,jdbcType=INTEGER},</if>
+            <if test="noteType != null">#{noteType,jdbcType=VARCHAR},</if>
+            <if test="recCreator != null">#{recCreator,jdbcType=VARCHAR},</if>
+            <if test="recCreateTime != null">#{recCreateTime,jdbcType=TIMESTAMP},</if>
+            <if test="recRevisor != null">#{recRevisor,jdbcType=VARCHAR},</if>
+            <if test="recReviseTime != null">#{recReviseTime,jdbcType=TIMESTAMP},</if>
+            <if test="archFlag != null">#{archFlag,jdbcType=CHAR},</if>
+        </trim>
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM project_note_relation
+        WHERE id = #{id,jdbcType=INTEGER}
+        AND arch_flag = '1'
+    </select>
+
+    <!-- 根据项目ID查询关联的笔记ID列表 -->
+    <select id="selectNoteIdsByProjectId" resultType="java.lang.Integer">
+        SELECT note_id
+        FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据笔记ID查询关联的项目ID列表 -->
+    <select id="selectProjectIdsByNoteId" resultType="java.lang.Integer">
+        SELECT project_id
+        FROM project_note_relation
+        WHERE note_id = #{noteId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据项目ID和笔记ID查询关联记录 -->
+    <select id="selectByProjectIdAndNoteId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND note_id = #{noteId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+    </select>
+
+    <!-- 根据项目ID删除所有关联 -->
+    <delete id="deleteByProjectId">
+        DELETE FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 根据笔记ID删除所有关联 -->
+    <delete id="deleteByNoteId">
+        DELETE FROM project_note_relation
+        WHERE note_id = #{noteId,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 删除指定的项目笔记关联 -->
+    <delete id="deleteByProjectIdAndNoteId">
+        DELETE FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND note_id = #{noteId,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 查询项目的笔记数量 -->
+    <select id="countByProjectId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+    </select>
+
+    <!-- 查询笔记关联的项目数量 -->
+    <select id="countByNoteId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM project_note_relation
+        WHERE note_id = #{noteId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+    </select>
+
+    <!-- 根据项目ID查询所有关联记录 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM project_note_relation
+        WHERE project_id = #{projectId,jdbcType=INTEGER}
+        AND arch_flag = '1'
+        ORDER BY rec_create_time DESC
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

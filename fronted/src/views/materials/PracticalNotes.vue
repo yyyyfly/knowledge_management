@@ -398,7 +398,7 @@
 
                 <!-- 底部信息 -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <span class="text-xs text-gray-500">{{ formatDate(note.createTime) }}</span>
+                  <span class="text-xs text-gray-500">{{ formatDate(note.recCreateTime) }}</span>
                   <i class="fas fa-arrow-right text-orange-500 group-hover:translate-x-1 transition-transform"></i>
                 </div>
               </div>
@@ -427,7 +427,7 @@
               <div>
                 <h3 class="text-2xl font-bold text-white">{{ selectedNote?.title }}</h3>
                 <div class="flex items-center mt-2 space-x-3">
-                  <span class="text-orange-100 text-sm">{{ formatDate(selectedNote?.createTime || '') }}</span>
+                  <span class="text-orange-100 text-sm">{{ formatDate(selectedNote?.recCreateTime) }}</span>
                 </div>
               </div>
               <button @click="showNoteDetail = false" class="text-white/80 hover:text-white transition-colors">
@@ -474,7 +474,7 @@
                 <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
                 详细内容
               </h4>
-              <div class="text-gray-700 prose prose-sm max-w-none">
+              <div class="note-content">
                 <div v-if="activeTab === 'requirement'" v-html="selectedNote.requirementDescription || '暂无内容'"></div>
                 <div v-else-if="activeTab === 'design'" v-html="selectedNote.designThinking || '暂无内容'"></div>
                 <div v-else-if="activeTab === 'reference'" v-html="selectedNote.referenceDesign || '暂无内容'"></div>
@@ -522,6 +522,7 @@ import { getAllNotes } from '@/services/noteService'
 import { getRecommendedNotes, completeReview } from '@/api/note'
 import { getAllProjectTemplates, createProjectTemplate, updateProjectTemplate, deleteProjectTemplate } from '@/api/projectTemplate'
 import type { ProjectTemplate as ApiProjectTemplate } from '@/api/projectTemplate'
+import { formatDate } from '@/utils/dateUtils'
 
 type Note = {
   id: number
@@ -832,12 +833,6 @@ const formatLastReviewTime = (lastReviewTime: string | undefined) => {
   if (diffDays < 7) return `${diffDays}天前`
   if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
   return `${Math.floor(diffDays / 30)}个月前`
-}
-
-// 格式化日期
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString()
 }
 </script>
 

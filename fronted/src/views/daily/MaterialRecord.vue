@@ -166,7 +166,7 @@
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-plus text-2xl text-blue-600"></i>
             </div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">【1】新建笔记</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">新建笔记</h4>
             <p class="text-gray-600">创建新的学习笔记、阅读笔记或思考记录</p>
           </div>
         </div>
@@ -181,7 +181,7 @@
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-edit text-2xl text-green-600"></i>
             </div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">【2】管理笔记</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">管理笔记</h4>
             <p class="text-gray-600">查看、编辑、删除已有的笔记记录</p>
           </div>
         </div>
@@ -196,7 +196,7 @@
             <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-archive text-2xl text-purple-600"></i>
             </div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">【3】笔记归档</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">笔记归档</h4>
             <p class="text-gray-600">查看归档列表，整理笔记来源</p>
           </div>
         </div>
@@ -298,12 +298,21 @@
                     <i class="fas fa-info-circle mr-1"></i>{{ archive.sourceInfo }}
                   </p>
                 </div>
-                <button 
-                  @click="toggleArchiveExpand(archive.id)"
-                  class="text-purple-600 hover:text-purple-700 transition-colors"
-                >
-                  <i :class="expandedArchives.includes(archive.id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-                </button>
+                <div class="flex items-center space-x-2">
+                  <button 
+                    @click="deleteArchiveConfirm(archive.id, archive.archiveName)"
+                    class="text-red-500 hover:text-red-700 transition-colors"
+                    title="删除归档"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  <button 
+                    @click="toggleArchiveExpand(archive.id)"
+                    class="text-purple-600 hover:text-purple-700 transition-colors"
+                  >
+                    <i :class="expandedArchives.includes(archive.id) ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+                  </button>
+                </div>
               </div>
 
               <!-- 展开显示笔记列表 -->
@@ -527,6 +536,23 @@
                   </div>
                 </div>
                 
+                <!-- 拓展笔记 - 显示学科项目和知识点 -->
+                <div v-if="record.type === 'expansion'" class="space-y-1">
+                  <div v-if="record.project" class="flex items-center space-x-2 text-sm text-gray-600">
+                    <i class="fas fa-book-open text-blue-500"></i>
+                    <span>学科项目：{{ record.project }}</span>
+                  </div>
+                  <div v-if="record.knowledgePoint && record.knowledgePoint.length > 0" class="flex items-center space-x-2 text-sm text-gray-600">
+                    <i class="fas fa-lightbulb text-blue-500"></i>
+                    <span>知识点：</span>
+                    <div class="flex flex-wrap gap-1">
+                      <span v-for="point in record.knowledgePoint" :key="point" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
+                        {{ point }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
                 <!-- 书籍笔记 - 显示书籍信息 -->
                 <div v-if="record.type === 'book'" class="space-y-1">
                   <div v-if="record.bookName" class="flex items-center space-x-2 text-sm text-gray-600">
@@ -630,7 +656,7 @@
               <p v-if="record.summary" class="text-gray-600 mb-2 font-medium">{{ record.summary }}</p>
               <div class="text-gray-600 mb-3" v-html="record.content"></div>
               <div class="flex items-center space-x-4 text-sm text-gray-500">
-                <span>{{ record.createTime }}</span>
+                <span>{{ formatDate(record.recCreateTime) }}</span>
               </div>
             </div>
             <div class="flex space-x-2">
@@ -711,7 +737,7 @@
                     <option value="fragment">碎片笔记</option>
                     <option value="framework">框架笔记</option>
                     <option value="study">求学笔记</option>
-                    <option value="memorization">背诵笔记</option>
+                    <option value="expansion">拓展笔记</option>
                     <option value="exercise">刷题笔记</option>
                     <option value="practical">实战笔记</option>
                   </select>
@@ -744,9 +770,9 @@
                       <div class="text-gray-600 text-xs">学习知识记录</div>
                     </div>
                     <div class="bg-white bg-opacity-60 rounded-lg p-3 border border-blue-100">
-                      <i class="fas fa-bookmark text-yellow-500 mb-1"></i>
-                      <div class="font-medium text-yellow-700">背诵笔记</div>
-                      <div class="text-gray-600 text-xs">重要内容背诵</div>
+                      <i class="fas fa-book-open text-blue-500 mb-1"></i>
+                      <div class="font-medium text-blue-700">拓展笔记</div>
+                      <div class="text-gray-600 text-xs">原文理解拓展</div>
                     </div>
                     <div class="bg-white bg-opacity-60 rounded-lg p-3 border border-blue-100">
                       <i class="fas fa-code text-red-500 mb-1"></i>
@@ -1244,85 +1270,35 @@
                   </div>
                 </div>
 
-                <!-- 背诵笔记 -->
-                <div v-if="recordForm.type === 'memorization'" class="space-y-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200 shadow-sm">
+                <!-- 拓展笔记 -->
+                <div v-if="recordForm.type === 'expansion'" class="space-y-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200 shadow-sm">
                   <div class="flex items-center mb-4">
-                    <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
-                      <i class="fas fa-bookmark text-white text-sm"></i>
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                      <i class="fas fa-book-open text-white text-sm"></i>
                     </div>
-                    <h4 class="text-lg font-semibold text-amber-900">背诵笔记配置</h4>
+                    <h4 class="text-lg font-semibold text-blue-900">拓展笔记配置</h4>
                   </div>
                   
-                  <!-- 科目 -->
+                  <!-- 学科项目 -->
                   <div>
                     <div class="flex items-center justify-between mb-2">
-                      <label class="block text-sm font-medium text-gray-700">科目</label>
+                      <label class="block text-sm font-medium text-gray-700">学科项目</label>
                       <button 
                         type="button"
-                        @click="openConfigManager('memorization', 'subject')"
-                        class="text-sm text-amber-600 hover:text-amber-800 flex items-center space-x-1"
+                        @click="openConfigManager('expansion', 'project')"
+                        class="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
                         <span>管理</span>
                       </button>
                     </div>
                     
-                    <!-- 搜索/选择科目（单选） -->
-                    <div class="relative">
-                      <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                          <input 
-                            v-model="memorizationSubjectSearch"
-                            type="text" 
-                            placeholder="搜索或新建科目..."
-                            @focus="showMemorizationSubjectDropdown = true"
-                            @input="filterMemorizationSubjects"
-                            @keyup.enter="addMemorizationSubjectFromSearch"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 form-input pr-8"
-                          >
-                          <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <button 
-                          type="button"
-                          @click="addMemorizationSubjectFromSearch"
-                          :disabled="!memorizationSubjectSearch.trim()"
-                          class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-1 btn-hover whitespace-nowrap"
-                        >
-                          <i class="fas fa-plus"></i>
-                          <span>添加</span>
-                        </button>
-                      </div>
-                      
-                      <!-- 下拉搜索结果（单选） -->
-                      <div v-if="showMemorizationSubjectDropdown && filteredMemorizationSubjects.length > 0" 
-                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        <button
-                          v-for="subject in filteredMemorizationSubjects"
-                          :key="subject"
-                          type="button"
-                          @click="selectMemorizationSubjectFromDropdown(subject)"
-                          class="w-full text-left px-4 py-2 hover:bg-amber-50 transition-colors flex items-center justify-between group"
-                        >
-                          <span>{{ subject }}</span>
-                          <i v-if="recordForm.project !== subject" class="fas fa-check text-amber-600 opacity-0 group-hover:opacity-100"></i>
-                          <i v-else class="fas fa-check text-green-600"></i>
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div v-if="recordForm.project" class="mt-2">
-                      <span class="text-sm text-gray-500">当前科目: </span>
-                      <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm inline-flex items-center space-x-1">
-                        <span>{{ recordForm.project }}</span>
-                        <button 
-                          type="button"
-                          @click="recordForm.project = ''"
-                          class="text-amber-500 hover:text-amber-700"
-                        >
-                          <i class="fas fa-times"></i>
-                        </button>
-                      </span>
-                    </div>
+                    <input 
+                      v-model="recordForm.project" 
+                      type="text" 
+                      placeholder="请输入学科项目"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input"
+                    >
                   </div>
                   
                   <!-- 知识点 -->
@@ -1331,119 +1307,100 @@
                       <label class="block text-sm font-medium text-gray-700">知识点</label>
                       <button 
                         type="button"
-                        @click="openConfigManager('memorization', 'knowledgePoint')"
-                        class="text-sm text-amber-600 hover:text-amber-800 flex items-center space-x-1"
+                        @click="openConfigManager('expansion', 'knowledgePoint')"
+                        class="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
                         <span>管理</span>
                       </button>
                     </div>
                     
-                    <!-- 搜索/添加知识点 -->
                     <TagSearchInput
                       v-model:selected="recordForm.knowledgePoint"
-                      :all-options="memorizationKnowledge"
+                      :all-options="expansionKnowledge"
                       placeholder="搜索或新建知识点..."
-                      color="orange"
-                      @add="handleMemorizationKnowledgeAdd"
+                      color="blue"
+                      @add="handleExpansionKnowledgeAdd"
                     />
                     <TagDisplay
                       v-if="recordForm.knowledgePoint.length > 0"
                       :tags="recordForm.knowledgePoint"
-                      color="orange"
+                      color="blue"
                       @remove="removeKnowledgePoint"
                     />
-                    </div>
+                  </div>
                   
-                  <!-- 背诵笔记专用内容字段 -->
-                  <div class="pt-4 border-t border-amber-200 mt-4">
+                  <!-- 拓展笔记专用内容字段 -->
+                  <div class="pt-4 border-t border-blue-200 mt-4">
                     <div class="flex items-center mb-4">
-                      <div class="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mr-2">
+                      <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-2">
                         <i class="fas fa-brain text-white text-xs"></i>
                       </div>
-                      <h5 class="text-md font-semibold text-amber-800">背诵内容编辑</h5>
-                </div>
+                      <h5 class="text-md font-semibold text-blue-800">拓展内容编辑</h5>
+                    </div>
 
                     <!-- 标题 -->
                     <div class="mb-4">
-                      <label class="block text-sm font-medium text-amber-800 mb-2">
-                        <i class="fas fa-heading text-amber-600 mr-1"></i>
+                      <label class="block text-sm font-medium text-blue-800 mb-2">
+                        <i class="fas fa-heading text-blue-600 mr-1"></i>
                         标题
                       </label>
-                    <input 
+                      <input 
                         v-model="recordForm.title" 
-                      type="text" 
+                        type="text" 
                         placeholder="请输入标题"
-                        class="w-full px-4 py-3 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white shadow-sm form-input"
-                    >
-                  </div>
+                        class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm form-input"
+                      >
+                    </div>
 
                     <!-- 摘要 -->
                     <div class="mb-6">
-                      <label class="block text-sm font-medium text-amber-800 mb-2">
-                        <i class="fas fa-align-left text-amber-600 mr-1"></i>
+                      <label class="block text-sm font-medium text-blue-800 mb-2">
+                        <i class="fas fa-align-left text-blue-600 mr-1"></i>
                         摘要
                       </label>
                       <textarea 
                         v-model="recordForm.summary" 
                         rows="3" 
                         placeholder="请输入摘要..."
-                        class="w-full px-4 py-3 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white shadow-sm form-input"
+                        class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm form-input"
                       ></textarea>
                     </div>
                     
-                    <!-- 原文内容编辑器 -->
+                    <!-- 原文记录编辑器 -->
                     <div class="mb-6">
                       <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-file-text text-yellow-600 mr-1"></i>
-                        原文内容
+                        <i class="fas fa-file-text text-blue-600 mr-1"></i>
+                        原文记录
                       </label>
                       <RichTextEditor 
                         :editor="originalTextEditor"
                         border-color="gray"
-                        @insert-table="insertMemorizationTable(originalTextEditor)"
-                        @insert-image="insertMemorizationImage(originalTextEditor)"
-                        @upload-image="uploadMemorizationImage(originalTextEditor)"
-                        @set-link="setMemorizationLink(originalTextEditor)"
+                        @insert-table="insertExpansionTable(originalTextEditor)"
+                        @insert-image="insertExpansionImage(originalTextEditor)"
+                        @upload-image="uploadExpansionImage(originalTextEditor)"
+                        @set-link="setExpansionLink(originalTextEditor)"
                         @import-markdown="importMarkdown(originalTextEditor)"
                       />
-                      <p class="text-xs text-gray-500 mt-1">输入需要背诵的原始文本内容</p>
+                      <p class="text-xs text-gray-500 mt-1">输入需要拓展的原始文本内容</p>
                     </div>
                     
-                    <!-- 解释说明编辑器 -->
-                    <div class="mb-6">
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-comment-dots text-yellow-600 mr-1"></i>
-                        解释说明
-                      </label>
-                      <RichTextEditor 
-                        :editor="explanationEditor"
-                        border-color="gray"
-                        @insert-table="insertMemorizationTable(explanationEditor)"
-                        @insert-image="insertMemorizationImage(explanationEditor)"
-                        @upload-image="uploadMemorizationImage(explanationEditor)"
-                        @set-link="setMemorizationLink(explanationEditor)"
-                        @import-markdown="importMarkdown(explanationEditor)"
-                      />
-                      <p class="text-xs text-gray-500 mt-1">对原文内容的详细解释和理解</p>
-                    </div>
-                    
-                    <!-- 记忆提示词编辑器 -->
+                    <!-- 理解记录编辑器 -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-lightbulb text-yellow-600 mr-1"></i>
-                        记忆提示词
+                        <i class="fas fa-brain text-blue-600 mr-1"></i>
+                        理解记录
                       </label>
                       <RichTextEditor 
-                        :editor="cueEditor"
+                        :editor="understandingEditor"
                         border-color="gray"
-                        @insert-table="insertMemorizationTable(cueEditor)"
-                        @insert-image="insertMemorizationImage(cueEditor)"
-                        @upload-image="uploadMemorizationImage(cueEditor)"
-                        @set-link="setMemorizationLink(cueEditor)"
-                        @import-markdown="importMarkdown(cueEditor)"
+                        @insert-table="insertExpansionTable(understandingEditor)"
+                        @insert-image="insertExpansionImage(understandingEditor)"
+                        @upload-image="uploadExpansionImage(understandingEditor)"
+                        @set-link="setExpansionLink(understandingEditor)"
+                        @import-markdown="importMarkdown(understandingEditor)"
                       />
-                      <p class="text-xs text-gray-500 mt-1">帮助快速回忆原文的关键词或线索</p>
+                      <p class="text-xs text-gray-500 mt-1">对原文内容的深度理解和分析</p>
                     </div>
                   </div>
                 </div>
@@ -2318,6 +2275,102 @@
     </div>
   </div>
 
+  <!-- 笔记选择弹窗（添加笔记到归档） -->
+  <div v-if="showNoteSelectDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="showNoteSelectDialog = false">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-fade-in">
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-2xl font-bold">选择笔记</h3>
+            <p class="text-indigo-100 text-sm mt-1">选择要添加到归档的笔记</p>
+          </div>
+          <button @click="showNoteSelectDialog = false" class="text-white hover:text-gray-200">
+            <i class="fas fa-times text-2xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 搜索和筛选 -->
+      <div class="p-6 border-b border-gray-200 bg-gray-50">
+        <div class="flex gap-4">
+          <div class="flex-1 relative">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input 
+              v-model="noteViewSearch"
+              type="text" 
+              placeholder="搜索笔记标题..."
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+          </div>
+          <select 
+            v-model="noteViewTypeFilter"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">全部类型</option>
+            <option value="fragment">碎片笔记</option>
+            <option value="framework">框架笔记</option>
+            <option value="study">求学笔记</option>
+            <option value="memorization">背诵笔记</option>
+            <option value="exercise">刷题笔记</option>
+            <option value="practical">实战笔记</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 笔记列表 -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="note in filteredNotesInView" 
+            :key="note.id"
+            class="p-4 border-2 rounded-lg transition-all duration-200 cursor-pointer"
+            :class="selectedNoteIdsForBatch.includes(note.id) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'"
+            @click="toggleNoteSelection(note.id)"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <span class="px-2 py-1 rounded text-xs font-medium" :class="getTypeClass(note.type)">
+                {{ getTypeText(note.type) }}
+              </span>
+              <i class="text-xl" :class="selectedNoteIdsForBatch.includes(note.id) ? 'fas fa-check-circle text-indigo-600' : 'far fa-circle text-gray-400'"></i>
+            </div>
+            <h5 class="text-sm font-medium text-gray-900 mb-2 line-clamp-2">{{ note.title }}</h5>
+            <p class="text-xs text-gray-600 line-clamp-2">{{ note.summary }}</p>
+          </div>
+        </div>
+        
+        <div v-if="filteredNotesInView.length === 0" class="text-center py-16 text-gray-500">
+          <i class="fas fa-search text-6xl mb-4 text-gray-300"></i>
+          <p class="text-lg font-medium mb-2">未找到笔记</p>
+          <p class="text-sm">请尝试调整搜索条件</p>
+        </div>
+      </div>
+
+      <!-- 底部操作栏 -->
+      <div class="border-t border-gray-200 p-6 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-600">
+            已选择 <span class="font-semibold text-indigo-600">{{ selectedNoteIdsForBatch.length }}</span> 条笔记
+          </div>
+          <div class="flex space-x-3">
+            <button 
+              @click="showNoteSelectDialog = false"
+              class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              取消
+            </button>
+            <button 
+              @click="confirmAddNotesToArchive"
+              :disabled="selectedNoteIdsForBatch.length === 0"
+              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              添加到归档
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 新建归档并添加笔记弹窗 -->
   <div v-if="showCreateArchiveForBatchDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="closeCreateArchiveForBatch">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
@@ -2412,6 +2465,7 @@ import Underline from '@tiptap/extension-underline'
 import Strike from '@tiptap/extension-strike'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
+import { mergeAttributes } from '@tiptap/core'
 import CodeBlock from '@tiptap/extension-code-block'
 import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
@@ -2437,6 +2491,8 @@ import {
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import TagSearchInput from '@/components/TagSearchInput.vue'
 import TagDisplay from '@/components/TagDisplay.vue'
+// 导入日期工具
+import { formatDate } from '@/utils/dateUtils'
 
 type Note = any
 
@@ -2461,6 +2517,8 @@ const noteViewTypeFilter = ref('')  // 笔记类型筛选
 
 // 批量添加到归档相关
 const showArchiveListForBatch = ref(false)  // 显示选择归档弹窗
+const showNoteSelectDialog = ref(false)  // 显示笔记选择弹窗（添加笔记到归档）
+const targetArchiveId = ref<number | null>(null)  // 目标归档ID
 const batchArchiveSearch = ref('')  // 归档搜索
 const batchArchiveTypeFilter = ref('')  // 归档类型筛选
 const selectedNoteIdsForBatch = ref<number[]>([])  // 待添加到归档的笔记ID列表
@@ -2490,7 +2548,7 @@ const configDialogForm = reactive({
 const noteTypes = [
   { value: 'fragment', label: '碎片笔记', icon: 'fas fa-puzzle-piece' },
   { value: 'study', label: '求学笔记', icon: 'fas fa-graduation-cap' },
-  { value: 'memorization', label: '背诵笔记', icon: 'fas fa-bookmark' },
+  { value: 'expansion', label: '拓展笔记', icon: 'fas fa-book-open' },
   { value: 'exercise', label: '刷题笔记', icon: 'fas fa-code' },
   { value: 'practical', label: '实战笔记', icon: 'fas fa-tools' },
   { value: 'framework', label: '框架笔记', icon: 'fas fa-sitemap' }
@@ -2500,7 +2558,7 @@ const noteTypes = [
 const configTypeMap: Record<string, { type1: { key: string, label: string }, type2: { key: string, label: string } }> = {
   fragment: { type1: { key: 'category', label: '分类' }, type2: { key: 'theme', label: '主题' } },
   study: { type1: { key: 'subject', label: '学科' }, type2: { key: 'knowledgePoint', label: '知识点' } },
-  memorization: { type1: { key: 'subject', label: '科目' }, type2: { key: 'knowledgePoint', label: '知识点' } },
+  expansion: { type1: { key: 'project', label: '学科项目' }, type2: { key: 'knowledgePoint', label: '知识点' } },
   exercise: { type1: { key: 'source', label: '题目来源' }, type2: { key: 'subject', label: '学科类型' } },
   practical: { type1: { key: 'domain', label: '领域' }, type2: { key: 'techStack', label: '技术栈' } },
   framework: { type1: { key: 'subjectType', label: '学科类型' }, type2: { key: 'knowledgePoint', label: '知识点类型' } }
@@ -2524,7 +2582,7 @@ const loadNotes = async () => {
 // 加载所有配置
 const loadAllConfigs = async () => {
   try {
-    const types = ['fragment', 'study', 'memorization', 'exercise', 'practical', 'framework']
+    const types = ['fragment', 'study', 'expansion', 'exercise', 'practical', 'framework']
     const promises = types.map(type => getConfigsByNoteType(type))
     const results = await Promise.all(promises)
     
@@ -2837,6 +2895,8 @@ const recordForm = reactive({
   originalText: '',
   explanation: '',
   cue: '',
+  // 拓展笔记字段
+  understanding: '',        // 理解记录（富文本）
   // 刷题笔记字段
   exerciseSource: '',                  // 题目来源 - 单标签
   exerciseSubject: '',                 // 学科类型 - 单标签
@@ -3089,6 +3149,20 @@ const availableMemorizationKnowledge = computed(() => {
   return configs.map(c => c.configName).sort()
 })
 
+// 拓展笔记可用学科项目
+const availableExpansionProjects = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'expansion' && c.configType === 'project')
+  return configs.map(c => c.configName).sort()
+})
+
+// 拓展笔记可用知识点
+const expansionKnowledge = computed(() => {
+  // 从API配置中获取
+  const configs = allConfigs.value.filter(c => c.noteType === 'expansion' && c.configType === 'knowledgePoint')
+  return configs.map(c => c.configName).sort()
+})
+
 // 实战笔记可用领域
 const availablePracticalDomains = computed(() => {
   // 从API配置中获取
@@ -3177,6 +3251,15 @@ const handleMemorizationKnowledgeAdd = async (tagName: string) => {
   }
 }
 
+const handleExpansionKnowledgeAdd = async (tagName: string) => {
+  try {
+    await createConfig({ noteType: 'expansion', configType: 'knowledgePoint', configName: tagName })
+    await loadAllConfigs()
+  } catch (error) {
+    console.error('添加知识点失败:', error)
+  }
+}
+
 const handlePracticalTechStackAdd = async (tagName: string) => {
   try {
     await createConfig({ noteType: 'practical', configType: 'techStack', configName: tagName })
@@ -3204,9 +3287,12 @@ const storedFragmentThemes = ref<string[]>([])
 // 界面控制
 const showCreateForm = ref(false)
 const showManageNotes = ref(false)
-const isEditing = ref(false)
-const editingRecordId = ref<number | null>(null)
-const showTableMenu = ref(false)
+  const isEditing = ref(false)
+  const editingRecordId = ref<number | null>(null)
+  const showTableMenu = ref(false)
+  
+  // 图片映射：保存图片占位符和原始图片的对应关系
+  const imageMap = ref<Map<string, string>>(new Map())
 const tableRows = ref(3)
 const tableCols = ref(3)
 
@@ -3415,6 +3501,7 @@ const getTypeSpecificTitle = () => {
     fragment: '碎片笔记 - 分类标签管理',
     framework: '框架笔记 - 结构框架管理',
     study: '求学笔记 - 学习课程管理',
+    expansion: '拓展笔记 - 学科项目管理',
     memorization: '背诵笔记 - 记忆要点管理',
     exercise: '刷题笔记 - 练习题目管理',
     practical: '实战笔记 - 实战项目管理'
@@ -3753,31 +3840,41 @@ const editRecord = (record: Note) => {
     recordForm.studySubject = recordData.studySubject ? [...recordData.studySubject] : []
     recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
     recordForm.content = record.content || ''
+    recordForm.coreConcept = recordData.coreConcept || ''
+    recordForm.mechanism = recordData.mechanism || ''
+    recordForm.applicationCase = recordData.applicationCase || ''
+    recordForm.extension = recordData.extension || ''
+    recordForm.commonMistake = recordData.commonMistake || ''
+    recordForm.reflection = recordData.reflection || ''
+  } else if (record.type === 'expansion') {
+    recordForm.project = recordData.project || ''
+    recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
+    recordForm.originalText = recordData.originalText || ''
+    recordForm.understanding = recordData.understanding || ''
+    recordForm.content = record.content || ''
   } else if (record.type === 'memorization') {
     recordForm.project = recordData.project || ''
     recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
-    // 如果背诵笔记有originalText则使用originalText，否则使用content
     recordForm.originalText = recordData.originalText || record.content || ''
     recordForm.explanation = recordData.explanation || ''
     recordForm.cue = recordData.cue || ''
-    // 为了支持类型切换，也要设置content字段
     recordForm.content = record.content || ''
-    
-    // 设置背诵笔记编辑器内容
-    setTimeout(() => {
-      originalTextEditor.value?.commands.setContent(recordForm.originalText)
-      explanationEditor.value?.commands.setContent(recordData.explanation || '')
-      cueEditor.value?.commands.setContent(recordData.cue || '')
-    }, 100)
   } else if (record.type === 'exercise') {
     recordForm.exerciseSource = recordData.exerciseSource || ''
     recordForm.exerciseSubject = recordData.exerciseSubject || ''
     recordForm.exerciseKnowledge = recordData.exerciseKnowledge ? [...recordData.exerciseKnowledge] : []
+    recordForm.exerciseDifficulty = recordData.exerciseDifficulty || ''
     recordForm.content = record.content || ''
+    recordForm.questionDescription = recordData.questionDescription || ''
+    recordForm.analysis = recordData.analysis || ''
+    recordForm.referenceAnswer = recordData.referenceAnswer || ''
   } else if (record.type === 'practical') {
     recordForm.techTags = recordData.techTags ? [...recordData.techTags] : []
     recordForm.projectType = recordData.projectType ? [...recordData.projectType] : []
     recordForm.content = record.content || ''
+    recordForm.requirementDescription = recordData.requirementDescription || ''
+    recordForm.designThinking = recordData.designThinking || ''
+    recordForm.referenceDesign = recordData.referenceDesign || ''
   } else if (record.type === 'fragment') {
     recordForm.fragmentCategory = recordData.fragmentCategory ? [...recordData.fragmentCategory] : []
     recordForm.fragmentTheme = recordData.fragmentTheme ? [...recordData.fragmentTheme] : []
@@ -3785,25 +3882,185 @@ const editRecord = (record: Note) => {
     recordForm.content = record.content || ''
   }
   
-  // 设置编辑器内容
-  setTimeout(() => {
-    if (record.type === 'memorization') {
-      // 背诵笔记不设置主编辑器内容，因为它有专用编辑器
-  if (editor.value) {
-        editor.value.commands.setContent('')
-      }
-    } else {
-      // 其他类型使用content字段的内容
-      if (editor.value && recordForm.content) {
-        editor.value.commands.setContent(recordForm.content)
-      }
-    }
-  }, 100)
-  
-  // 设置编辑状态
+  // 先设置编辑状态
   isEditing.value = true
   editingRecordId.value = record.id
   showCreateForm.value = true
+  
+  // 等待表单显示和编辑器初始化后再设置内容
+  nextTick(() => {
+    setTimeout(() => {
+      console.log('=== 开始加载编辑器内容 ===')
+      console.log('笔记类型:', record.type)
+      console.log('笔记标题:', record.title)
+      
+      if (record.type === 'expansion') {
+        // 拓展笔记：使用2个专用编辑器
+        console.log('加载拓展笔记内容...')
+        if (originalTextEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.originalText || '')
+          originalTextEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 原文编辑器已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (understandingEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.understanding || '')
+          understandingEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 理解编辑器已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        // 清空主编辑器
+        if (editor.value) {
+          editor.value.commands.setContent('')
+        }
+      } else if (record.type === 'memorization') {
+        // 背诵笔记：使用3个专用编辑器
+        console.log('加载背诵笔记内容...')
+        if (originalTextEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.originalText || '')
+          originalTextEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 原文编辑器已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (explanationEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.explanation || '')
+          explanationEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 解释编辑器已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (cueEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.cue || '')
+          cueEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 提示词编辑器已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        // 清空主编辑器
+        if (editor.value) {
+          editor.value.commands.setContent('')
+        }
+      } else if (record.type === 'study') {
+        // 求学笔记：使用6个专用编辑器
+        console.log('加载求学笔记内容...')
+        if (coreConceptEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.coreConcept || '')
+          coreConceptEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 核心概念已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (mechanismEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.mechanism || '')
+          mechanismEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 机制原理已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (applicationCaseEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.applicationCase || '')
+          applicationCaseEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 应用案例已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (extensionEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.extension || '')
+          extensionEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 延伸对比已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (commonMistakeEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.commonMistake || '')
+          commonMistakeEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 常见误区已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (reflectionEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.reflection || '')
+          reflectionEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 思考理解已加载，内容长度:', contentWithPlaceholders.length)
+        }
+      } else if (record.type === 'exercise') {
+        // 刷题笔记：使用3个专用编辑器
+        console.log('加载刷题笔记内容...')
+        if (questionDescriptionEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.questionDescription || '')
+          questionDescriptionEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 题目描述已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (analysisEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.analysis || '')
+          analysisEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 分析理解已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (referenceAnswerEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.referenceAnswer || '')
+          referenceAnswerEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 参考答案已加载，内容长度:', contentWithPlaceholders.length)
+        }
+      } else if (record.type === 'practical') {
+        // 实战笔记：使用3个专用编辑器
+        console.log('加载实战笔记内容...')
+        if (requirementDescriptionEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.requirementDescription || '')
+          requirementDescriptionEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 需求描述已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (designThinkingEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.designThinking || '')
+          designThinkingEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 设计思路已加载，内容长度:', contentWithPlaceholders.length)
+        }
+        if (referenceDesignEditor.value) {
+          const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.referenceDesign || '')
+          referenceDesignEditor.value.commands.setContent(contentWithPlaceholders)
+          console.log('✓ 参考设计已加载，内容长度:', contentWithPlaceholders.length)
+        }
+      } else {
+        // 碎片笔记、框架笔记：使用主编辑器
+        console.log('加载主编辑器内容，长度:', recordForm.content?.length || 0)
+        console.log('内容是否包含图片:', recordForm.content?.includes('<img') || false)
+        console.log('内容预览（前200字符）:', recordForm.content?.substring(0, 200))
+        
+        if (editor.value) {
+          if (recordForm.content) {
+            try {
+              // 清空后再设置，确保内容完全替换
+              editor.value.commands.clearContent()
+              console.log('已清空编辑器')
+              
+              // 将图片替换为占位符
+              const contentWithPlaceholders = replaceImagesWithPlaceholders(recordForm.content)
+              console.log('替换后内容长度:', contentWithPlaceholders.length)
+              console.log('图片占位符数量:', imageMap.value.size)
+              
+              // 等待一下再设置新内容
+              setTimeout(() => {
+                try {
+                  // 尝试使用 parseOptions 来保留所有属性
+                  const parseOptions = {
+                    preserveWhitespace: 'full' as const,
+                  }
+                  
+                  editor.value?.commands.setContent(contentWithPlaceholders, false, parseOptions)
+                  console.log('✓ 主编辑器内容已加载成功')
+                  
+                  // 立即验证
+                  setTimeout(() => {
+                    const currentContent = editor.value?.getHTML()
+                    const hasPlaceholder = currentContent?.includes('image-placeholder') || false
+                    
+                    console.log('验证：编辑器当前内容长度:', currentContent?.length || 0)
+                    console.log('验证：是否包含占位符:', hasPlaceholder)
+                    
+                    if (hasPlaceholder) {
+                      console.log('✅ 图片占位符已成功加载到编辑器中')
+                    }
+                  }, 150)
+                  
+                } catch (error) {
+                  console.error('❌ 加载内容失败:', error)
+                }
+              }, 50)
+            } catch (error) {
+              console.error('❌ 设置编辑器内容失败:', error)
+            }
+          } else {
+            console.warn('⚠️ 内容为空')
+          }
+        } else {
+          console.error('❌ 主编辑器未初始化')
+        }
+      }
+      console.log('=== 编辑器内容加载完成 ===')
+    }, 300)
+  })
 }
 
 // 删除记录
@@ -3825,6 +4082,53 @@ const deleteRecord = async (id: number) => {
     }
   }
 }
+
+// 将图片替换为占位符
+const replaceImagesWithPlaceholders = (html: string): string => {
+  imageMap.value.clear()
+  let imageIndex = 0
+  
+  return html.replace(/<img[^>]*src="(data:image\/[^"]+)"[^>]*>/g, (match) => {
+    const placeholderId = `IMAGE_PLACEHOLDER_${imageIndex++}`
+    imageMap.value.set(placeholderId, match)
+    
+    // 返回一个带样式的占位符
+    return `<span class="image-placeholder" style="display: inline-block; padding: 8px 16px; margin: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-weight: bold; cursor: pointer; user-select: none;" data-placeholder-id="${placeholderId}">🖼️ 图片 ${imageIndex}</span>`
+  })
+}
+
+// 将占位符还原为图片
+const restorePlaceholdersToImages = (html: string): string => {
+  let restored = html
+  
+  imageMap.value.forEach((originalImage, placeholderId) => {
+    const placeholderRegex = new RegExp(`<span[^>]*data-placeholder-id="${placeholderId}"[^>]*>.*?</span>`, 'g')
+    restored = restored.replace(placeholderRegex, originalImage)
+  })
+  
+  return restored
+}
+
+// 自定义 Image 扩展，允许 Base64 图片
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: element => element.getAttribute('src'),
+        renderHTML: attributes => {
+          if (!attributes.src) {
+            return {}
+          }
+          return {
+            src: attributes.src, // 不验证，直接使用
+          }
+        },
+      },
+    }
+  },
+})
 
 // TipTap 编辑器
 const editor = useEditor({
@@ -3875,7 +4179,7 @@ const editor = useEditor({
         class: 'text-blue-600 underline',
       },
     }),
-    Image.configure({
+    CustomImage.configure({
       HTMLAttributes: {
         class: 'max-w-full h-auto cursor-pointer',
       },
@@ -3900,6 +4204,30 @@ const editor = useEditor({
   editorProps: {
     attributes: {
       class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] p-4',
+    },
+    handlePaste: (view, event) => {
+      const items = event.clipboardData?.items
+      if (!items) return false
+      
+      // 检查是否包含图片
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          event.preventDefault()
+          const file = items[i].getAsFile()
+          if (file) {
+            console.log('检测到粘贴图片:', file.name || '剪贴板图片')
+            // 使用压缩函数处理图片
+            compressImage(file).then(base64 => {
+              editor.value?.chain().focus().setImage({ src: base64 }).run()
+              console.log('粘贴图片已插入')
+            }).catch(error => {
+              console.error('粘贴图片处理失败:', error)
+            })
+          }
+          return true
+        }
+      }
+      return false
     },
   },
   onUpdate: ({ editor }) => {
@@ -4021,6 +4349,23 @@ const cueEditor = useEditor({
   },
   onUpdate: ({ editor }) => {
     recordForm.cue = editor.getHTML()
+  },
+})
+
+// 拓展笔记专用编辑器
+const understandingEditor = useEditor({
+  content: '',
+  extensions: [
+    ...memorizationEditorExtensions,
+    Placeholder.configure({ placeholder: '输入对原文的深度理解和分析...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[150px] p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.understanding = editor.getHTML()
   },
 })
 
@@ -4228,20 +4573,71 @@ const insertImage = () => {
   }
 }
 
+// 压缩图片
+const compressImage = (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      // 使用 window.Image 避免与 Tiptap 的 Image 扩展冲突
+      const img = new window.Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = img.width
+        let height = img.height
+        
+        // 如果图片宽度超过最大宽度，按比例缩放
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0, width, height)
+        
+        // 转换为 Base64，使用指定的质量
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality)
+        
+        // 计算压缩比例
+        const originalSize = (e.target?.result as string).length
+        const compressedSize = compressedBase64.length
+        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1)
+        
+        console.log(`图片压缩完成：原始大小 ${(originalSize / 1024).toFixed(1)}KB，压缩后 ${(compressedSize / 1024).toFixed(1)}KB，压缩率 ${compressionRatio}%`)
+        
+        resolve(compressedBase64)
+      }
+      img.onerror = reject
+      img.src = e.target?.result as string
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 // 上传图片
 const uploadImage = () => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (event) => {
+  input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        editor.value?.chain().focus().setImage({ src: url }).run()
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        
+        // 压缩图片
+        const compressedBase64 = await compressImage(file)
+        
+        // 插入到编辑器
+        editor.value?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
       }
-      reader.readAsDataURL(file)
     }
   }
   input.click()
@@ -4396,19 +4792,22 @@ const insertMemorizationImage = (editorInstance: any) => {
 }
 
 // 上传图片功能
-const uploadMemorizationImage = (editorInstance: any) => {
+const uploadMemorizationImage = async (editorInstance: any) => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (event) => {
+  input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        editorInstance?.chain().focus().setImage({ src: url }).run()
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        const compressedBase64 = await compressImage(file)
+        editorInstance?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
       }
-      reader.readAsDataURL(file)
     }
   }
   input.click()
@@ -4503,19 +4902,22 @@ const insertExerciseImage = (editorInstance: any) => {
 }
 
 // 上传图片功能
-const uploadExerciseImage = (editorInstance: any) => {
+const uploadExerciseImage = async (editorInstance: any) => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (event) => {
+  input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        editorInstance?.chain().focus().setImage({ src: url }).run()
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        const compressedBase64 = await compressImage(file)
+        editorInstance?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
       }
-      reader.readAsDataURL(file)
     }
   }
   input.click()
@@ -4553,19 +4955,22 @@ const insertStudyImage = (editorInstance: any) => {
 }
 
 // 上传图片功能
-const uploadStudyImage = (editorInstance: any) => {
+const uploadStudyImage = async (editorInstance: any) => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (event) => {
+  input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        editorInstance?.chain().focus().setImage({ src: url }).run()
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        const compressedBase64 = await compressImage(file)
+        editorInstance?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
       }
-      reader.readAsDataURL(file)
     }
   }
   input.click()
@@ -4578,6 +4983,46 @@ const undoStudy = (editorInstance: any) => {
 
 const redoStudy = (editorInstance: any) => {
   editorInstance?.chain().focus().redo().run()
+}
+
+// ===== 拓展笔记编辑器工具函数 =====
+const insertExpansionTable = (editorInstance: any) => {
+  editorInstance?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+}
+
+const insertExpansionImage = (editorInstance: any) => {
+  const url = prompt('请输入图片URL:')
+  if (url) {
+    editorInstance?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+const uploadExpansionImage = async (editorInstance: any) => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = async (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        const compressedBase64 = await compressImage(file)
+        editorInstance?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
+      }
+    }
+  }
+  input.click()
+}
+
+const setExpansionLink = (editorInstance: any) => {
+  const url = prompt('请输入链接URL:')
+  if (url) {
+    editorInstance?.chain().focus().setLink({ href: url }).run()
+  }
 }
 
 // 实战笔记编辑器
@@ -4677,19 +5122,22 @@ const insertPracticalImage = (editorInstance: any) => {
 }
 
 // 上传图片功能
-const uploadPracticalImage = (editorInstance: any) => {
+const uploadPracticalImage = async (editorInstance: any) => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (event) => {
+  input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        editorInstance?.chain().focus().setImage({ src: url }).run()
+      try {
+        console.log(`正在处理图片：${file.name}，大小：${(file.size / 1024).toFixed(1)}KB`)
+        const compressedBase64 = await compressImage(file)
+        editorInstance?.chain().focus().setImage({ src: compressedBase64 }).run()
+        console.log('图片已插入编辑器')
+      } catch (error) {
+        console.error('图片处理失败:', error)
+        alert('图片处理失败，请重试')
       }
-      reader.readAsDataURL(file)
     }
   }
   input.click()
@@ -4717,7 +5165,18 @@ const submitRecord = async () => {
   let hasContent = false
   let contentFieldName = '内容'
   
-  if (recordForm.type === 'memorization') {
+  if (recordForm.type === 'expansion') {
+    // 拓展笔记：检查两个专用编辑器的内容
+    const originalTextContent = originalTextEditor.value?.getHTML() || ''
+    const understandingContent = understandingEditor.value?.getHTML() || ''
+    
+    const hasOriginalText = originalTextContent && originalTextContent.trim() !== '' && originalTextContent !== '<p></p>' && originalTextContent !== '<p><br></p>'
+    const hasUnderstanding = understandingContent && understandingContent.trim() !== '' && understandingContent !== '<p></p>' && understandingContent !== '<p><br></p>'
+    
+    hasContent = hasOriginalText || hasUnderstanding
+    contentFieldName = '拓展内容（原文记录/理解记录至少填一项）'
+    console.log('拓展笔记内容检查:', { hasOriginalText, hasUnderstanding, hasContent })
+  } else if (recordForm.type === 'memorization') {
     // 背诵笔记：检查三个专用编辑器的内容
     const originalTextContent = originalTextEditor.value?.getHTML() || ''
     const explanationContent = explanationEditor.value?.getHTML() || ''
@@ -4801,13 +5260,20 @@ const submitRecord = async () => {
   // 准备提交的数据
   // 对于有专用富文本编辑器的笔记类型，content字段设置为空字符串
   let finalContent = ''
-  if (recordForm.type === 'memorization' || recordForm.type === 'exercise' || 
-      recordForm.type === 'practical' || recordForm.type === 'study') {
+  if (recordForm.type === 'expansion' || recordForm.type === 'memorization' || 
+      recordForm.type === 'exercise' || recordForm.type === 'practical' || recordForm.type === 'study') {
     // 这些类型有专用编辑器，content字段可以为空
     finalContent = ''
   } else {
     // 框架笔记、碎片笔记使用通用编辑器
     finalContent = editorContent
+    
+    // 将占位符还原为原始图片
+    if (imageMap.value.size > 0) {
+      console.log('检测到', imageMap.value.size, '个图片占位符，正在还原...')
+      finalContent = restorePlaceholdersToImages(finalContent)
+      console.log('✓ 图片已还原，最终内容长度:', finalContent.length)
+    }
   }
       
   const noteData: any = {
@@ -4822,71 +5288,154 @@ const submitRecord = async () => {
     noteData.subjectType = recordForm.subjectType.join(',')
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
       } else if (recordForm.type === 'study') {
+    // 求学笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.studySubject = recordForm.studySubject.join(',')
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
-    noteData.coreConcept = recordForm.coreConcept
-    noteData.mechanism = recordForm.mechanism
-    noteData.applicationCase = recordForm.applicationCase
-    noteData.extension = recordForm.extension
-    noteData.commonMistake = recordForm.commonMistake
-    noteData.reflection = recordForm.reflection
-             } else if (recordForm.type === 'memorization') {
+    
+    // 获取内容并还原图片占位符
+    noteData.coreConcept = restorePlaceholdersToImages(coreConceptEditor.value?.getHTML() || '')
+    noteData.mechanism = restorePlaceholdersToImages(mechanismEditor.value?.getHTML() || '')
+    noteData.applicationCase = restorePlaceholdersToImages(applicationCaseEditor.value?.getHTML() || '')
+    noteData.extension = restorePlaceholdersToImages(extensionEditor.value?.getHTML() || '')
+    noteData.commonMistake = restorePlaceholdersToImages(commonMistakeEditor.value?.getHTML() || '')
+    noteData.reflection = restorePlaceholdersToImages(reflectionEditor.value?.getHTML() || '')
+    
+    console.log('求学笔记保存数据（图片已还原）:', {
+      coreConcept: noteData.coreConcept.substring(0, 100),
+      mechanism: noteData.mechanism.substring(0, 100),
+      applicationCase: noteData.applicationCase.substring(0, 100)
+    })
+  } else if (recordForm.type === 'expansion') {
+    // 拓展笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.project = recordForm.project
     noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
-    noteData.originalText = recordForm.originalText
-    noteData.explanation = recordForm.explanation
-    noteData.cue = recordForm.cue
+    
+    // 获取内容并还原图片占位符
+    noteData.originalText = restorePlaceholdersToImages(originalTextEditor.value?.getHTML() || '')
+    noteData.understanding = restorePlaceholdersToImages(understandingEditor.value?.getHTML() || '')
+    
+    console.log('拓展笔记保存数据（图片已还原）:', {
+      originalText: noteData.originalText.substring(0, 100),
+      understanding: noteData.understanding.substring(0, 100)
+    })
+  } else if (recordForm.type === 'memorization') {
+    // 背诵笔记：从编辑器实时获取HTML内容（包含图片）
+    noteData.project = recordForm.project
+    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+    
+    // 获取内容并还原图片占位符
+    noteData.originalText = restorePlaceholdersToImages(originalTextEditor.value?.getHTML() || '')
+    noteData.explanation = restorePlaceholdersToImages(explanationEditor.value?.getHTML() || '')
+    noteData.cue = restorePlaceholdersToImages(cueEditor.value?.getHTML() || '')
+    
+    console.log('背诵笔记保存数据（图片已还原）:', {
+      originalText: noteData.originalText.substring(0, 100),
+      explanation: noteData.explanation.substring(0, 100)
+    })
       } else if (recordForm.type === 'exercise') {
+    // 刷题笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.exerciseSource = recordForm.exerciseSource
     noteData.exerciseSubject = recordForm.exerciseSubject
     noteData.exerciseKnowledge = recordForm.exerciseKnowledge.join(',')
     noteData.exerciseDifficulty = recordForm.exerciseDifficulty
-    noteData.questionDescription = recordForm.questionDescription
-    noteData.analysis = recordForm.analysis
-    noteData.referenceAnswer = recordForm.referenceAnswer
+    
+    // 获取内容并还原图片占位符
+    noteData.questionDescription = restorePlaceholdersToImages(questionDescriptionEditor.value?.getHTML() || '')
+    noteData.analysis = restorePlaceholdersToImages(analysisEditor.value?.getHTML() || '')
+    noteData.referenceAnswer = restorePlaceholdersToImages(referenceAnswerEditor.value?.getHTML() || '')
+    
+    // 检查是否包含图片
+    const hasImageInQuestion = noteData.questionDescription.includes('<img')
+    const hasImageInAnalysis = noteData.analysis.includes('<img')
+    const hasImageInAnswer = noteData.referenceAnswer.includes('<img')
+    
+    console.log('刷题笔记保存数据检查（图片已还原）:', {
+      questionDescription长度: noteData.questionDescription.length,
+      包含图片: hasImageInQuestion,
+      analysis长度: noteData.analysis.length,
+      包含图片_分析: hasImageInAnalysis,
+      referenceAnswer长度: noteData.referenceAnswer.length,
+      包含图片_答案: hasImageInAnswer
+    })
+    
+    if (hasImageInQuestion || hasImageInAnalysis || hasImageInAnswer) {
+      console.log('✅ 检测到图片数据，准备提交')
+    } else {
+      console.log('⚠️ 未检测到图片数据')
+    }
       } else if (recordForm.type === 'practical') {
+    // 实战笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.techTags = recordForm.techTags.join(',')
     noteData.projectType = recordForm.projectType.join(',')
-    noteData.requirementDescription = recordForm.requirementDescription
-    noteData.designThinking = recordForm.designThinking
-    noteData.referenceDesign = recordForm.referenceDesign
+    
+    // 获取内容并还原图片占位符
+    noteData.requirementDescription = restorePlaceholdersToImages(requirementDescriptionEditor.value?.getHTML() || '')
+    noteData.designThinking = restorePlaceholdersToImages(designThinkingEditor.value?.getHTML() || '')
+    noteData.referenceDesign = restorePlaceholdersToImages(referenceDesignEditor.value?.getHTML() || '')
+    
+    console.log('实战笔记保存数据（图片已还原）:', {
+      requirementDescription: noteData.requirementDescription.substring(0, 100),
+      designThinking: noteData.designThinking.substring(0, 100)
+    })
       } else if (recordForm.type === 'fragment') {
     noteData.fragmentCategory = recordForm.fragmentCategory.join(',')
     noteData.fragmentTheme = recordForm.fragmentTheme.join(',')
     noteData.importance = recordForm.importance
   }
+  
+  console.log('准备提交的完整数据:', noteData)
+  console.log('数据大小 (字符数):', JSON.stringify(noteData).length)
 
+  console.log('=== 开始提交数据到服务器 ===')
+  
   try {
     if (isEditing.value && editingRecordId.value) {
       // 编辑现有记录
       noteData.id = editingRecordId.value
+      console.log('执行更新操作，笔记ID:', editingRecordId.value)
       const response = await request.put('/note', noteData)
       
+      console.log('服务器响应:', response)
+      
       if (response.code === 200) {
-      alert('记录修改成功！')
+        console.log('✅ 保存成功！笔记ID:', response.data?.id || editingRecordId.value)
+        alert('记录修改成功！')
         // 重新加载数据
         await loadNotes()
       } else {
+        console.error('❌ 保存失败，服务器返回:', response)
         alert('修改失败：' + (response.message || '未知错误'))
-    }
-  } else {
-    // 创建新记录
+      }
+    } else {
+      // 创建新记录
+      console.log('执行创建操作')
       const response = await request.post('/note', noteData)
       
+      console.log('服务器响应:', response)
+      
       if (response.code === 200) {
+        console.log('✅ 保存成功！新笔记ID:', response.data?.id)
         alert('记录保存成功！')
         // 重新加载数据
         await loadNotes()
       } else {
+        console.error('❌ 保存失败，服务器返回:', response)
         alert('保存失败：' + (response.message || '未知错误'))
       }
-  }
+    }
 
-  closeModal()
+    closeModal()
   } catch (error) {
-    console.error('保存笔记失败:', error)
-    alert('保存失败，请检查网络连接')
+    console.error('❌ 保存笔记失败，捕获异常:', error)
+    console.error('异常详情:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response
+    })
+    alert('保存失败，请检查网络连接或查看控制台错误信息')
   }
+  
+  console.log('=== 提交流程结束 ===')
 }
 
 // 重置表单
@@ -4903,16 +5452,41 @@ const resetForm = () => {
   recordForm.subjectType = []
   recordForm.project = ''
   recordForm.knowledgePoint = []
+  
+  // 背诵笔记字段
   recordForm.originalText = ''
   recordForm.explanation = ''
   recordForm.cue = ''
+  
+  // 求学笔记字段
+  recordForm.studySubject = []
+  recordForm.coreConcept = ''
+  recordForm.mechanism = ''
+  recordForm.applicationCase = ''
+  recordForm.extension = ''
+  recordForm.commonMistake = ''
+  recordForm.reflection = ''
+  
+  // 刷题笔记字段
   recordForm.exerciseSource = ''
+  recordForm.exerciseSubject = ''
+  recordForm.exerciseKnowledge = []
   recordForm.exerciseDifficulty = ''
+  recordForm.questionDescription = ''
+  recordForm.analysis = ''
+  recordForm.referenceAnswer = ''
+  
+  // 实战笔记字段
   recordForm.techTags = []
+  recordForm.projectType = []
+  recordForm.requirementDescription = ''
+  recordForm.designThinking = ''
+  recordForm.referenceDesign = ''
+  
+  // 碎片笔记字段
   recordForm.fragmentCategory = []
   recordForm.fragmentTheme = []
   recordForm.importance = ''
-  recordForm.projectType = []
   
   // 重置输入框
   newSubject.value = ''
@@ -4928,27 +5502,96 @@ const resetForm = () => {
   newFragmentTheme.value = ''
   
   // 重置编辑器内容
+  console.log('开始重置所有编辑器...')
+  
+  // 主编辑器（碎片笔记、框架笔记）
   if (editor.value) {
     editor.value.commands.setContent('')
-    console.log('编辑器已重置')
+    console.log('✓ 主编辑器已重置')
   }
   
-  // 重置背诵笔记编辑器
+  // 背诵笔记的3个编辑器
   if (originalTextEditor.value) {
     originalTextEditor.value.commands.setContent('')
+    console.log('✓ 背诵笔记-原文编辑器已重置')
   }
   if (explanationEditor.value) {
     explanationEditor.value.commands.setContent('')
+    console.log('✓ 背诵笔记-解释编辑器已重置')
   }
   if (cueEditor.value) {
     cueEditor.value.commands.setContent('')
+    console.log('✓ 背诵笔记-提示词编辑器已重置')
   }
+  
+  // 拓展笔记的编辑器
+  if (understandingEditor.value) {
+    understandingEditor.value.commands.setContent('')
+    console.log('✓ 拓展笔记-理解编辑器已重置')
+  }
+  
+  // 求学笔记的6个编辑器
+  if (coreConceptEditor.value) {
+    coreConceptEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-核心概念编辑器已重置')
+  }
+  if (mechanismEditor.value) {
+    mechanismEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-机制原理编辑器已重置')
+  }
+  if (applicationCaseEditor.value) {
+    applicationCaseEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-应用案例编辑器已重置')
+  }
+  if (extensionEditor.value) {
+    extensionEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-延伸对比编辑器已重置')
+  }
+  if (commonMistakeEditor.value) {
+    commonMistakeEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-常见误区编辑器已重置')
+  }
+  if (reflectionEditor.value) {
+    reflectionEditor.value.commands.setContent('')
+    console.log('✓ 求学笔记-思考理解编辑器已重置')
+  }
+  
+  // 刷题笔记的3个编辑器
+  if (questionDescriptionEditor.value) {
+    questionDescriptionEditor.value.commands.setContent('')
+    console.log('✓ 刷题笔记-题目描述编辑器已重置')
+  }
+  if (analysisEditor.value) {
+    analysisEditor.value.commands.setContent('')
+    console.log('✓ 刷题笔记-分析理解编辑器已重置')
+  }
+  if (referenceAnswerEditor.value) {
+    referenceAnswerEditor.value.commands.setContent('')
+    console.log('✓ 刷题笔记-参考答案编辑器已重置')
+  }
+  
+  // 实战笔记的3个编辑器
+  if (requirementDescriptionEditor.value) {
+    requirementDescriptionEditor.value.commands.setContent('')
+    console.log('✓ 实战笔记-需求描述编辑器已重置')
+  }
+  if (designThinkingEditor.value) {
+    designThinkingEditor.value.commands.setContent('')
+    console.log('✓ 实战笔记-设计思路编辑器已重置')
+  }
+  if (referenceDesignEditor.value) {
+    referenceDesignEditor.value.commands.setContent('')
+    console.log('✓ 实战笔记-参考设计编辑器已重置')
+  }
+  
+  console.log('所有编辑器重置完成！')
 }
 
 // 获取类型样式
 const getTypeClass = (type: string) => {
   const classes = {
     study: 'bg-blue-100 text-blue-600',
+    expansion: 'bg-blue-100 text-blue-600',
     exercise: 'bg-orange-100 text-orange-600',
     practical: 'bg-red-100 text-red-600',
     fragment: 'bg-indigo-100 text-indigo-600',
@@ -4962,6 +5605,7 @@ const getTypeClass = (type: string) => {
 const getTypeText = (type: string) => {
   const texts = {
     study: '求学笔记',
+    expansion: '拓展笔记',
     exercise: '刷题笔记',
     practical: '实战笔记',
     fragment: '碎片笔记',
@@ -5806,6 +6450,7 @@ const getNoteTypeLabel = (type: string) => {
   const typeMap: Record<string, string> = {
     fragment: '碎片笔记',
     study: '求学笔记',
+    expansion: '拓展笔记',
     memorization: '背诵笔记',
     exercise: '刷题笔记',
     practical: '实战笔记',
@@ -5813,18 +6458,6 @@ const getNoteTypeLabel = (type: string) => {
   }
   return typeMap[type] || type
 }
-
-// 格式化日期
-const formatDate = (dateStr: string | undefined) => {
-  if (!dateStr) return ''
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN', { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit' 
-  })
-}
-
 
 // ==================== 归档管理功能 ====================
 
@@ -5874,6 +6507,65 @@ const toggleArchiveExpand = async (archiveId: number | undefined) => {
     expandedArchives.value.push(archiveId)
     // 加载这个归档的笔记列表
     await loadArchiveNotes(archiveId)
+  }
+}
+
+// 删除归档确认
+const deleteArchiveConfirm = (archiveId: number | undefined, archiveName: string) => {
+  if (!archiveId) {
+    console.error('归档ID不存在')
+    return
+  }
+  
+  if (confirm(`确定要删除归档"${archiveName}"吗？\n\n删除归档后，归档中的笔记本身不会被删除，只是移除归档关系。`)) {
+    deleteArchiveAction(archiveId)
+  }
+}
+
+// 删除归档
+const deleteArchiveAction = async (archiveId: number) => {
+  try {
+    console.log('开始删除归档，ID:', archiveId)
+    console.log('删除前归档数量:', archives.value.length)
+    
+    const response = await deleteArchive(archiveId)
+    console.log('删除响应:', response)
+    
+    if (response.code === 0 || response.code === 200) {
+      // 立即从归档列表中移除（确保界面立即更新）
+      const oldLength = archives.value.length
+      archives.value = archives.value.filter(a => a.id !== archiveId)
+      console.log('删除后归档数量:', archives.value.length, '预期删除:', oldLength - archives.value.length)
+      
+      // 从展开列表中移除
+      const index = expandedArchives.value.indexOf(archiveId)
+      if (index > -1) {
+        expandedArchives.value.splice(index, 1)
+      }
+      
+      // 从笔记映射中移除
+      delete archiveNotesMap.value[archiveId]
+      
+      // 更新笔记-归档映射
+      Object.keys(noteArchiveMap.value).forEach(noteId => {
+        noteArchiveMap.value[Number(noteId)] = noteArchiveMap.value[Number(noteId)].filter(
+          (a: any) => a.archiveId !== archiveId
+        )
+      })
+      
+      // 使用 setTimeout 延迟显示 alert，避免阻塞 UI 更新
+      setTimeout(() => {
+        alert('归档删除成功')
+      }, 100)
+      
+      // 重新加载归档列表（确保数据同步）
+      await loadArchiveList()
+    } else {
+      alert(response.message || '删除归档失败')
+    }
+  } catch (error) {
+    console.error('删除归档失败:', error)
+    alert('删除归档失败，请重试')
   }
 }
 
@@ -5939,10 +6631,86 @@ const getTagsCount = (tags: string | undefined) => {
 
 // 归档视角：点击"添加笔记"按钮
 const addNotesToArchive = (archiveId: number) => {
+  targetArchiveId.value = archiveId
   selectedNoteIdsForBatch.value = []
-  showArchiveListForBatch.value = true
-  // 这里可以直接选中这个归档，或者让用户从笔记列表选择
-  // 为了保持一致性，这里弹出笔记选择界面
+  showNoteSelectDialog.value = true
+}
+
+// 切换笔记选择状态
+const toggleNoteSelection = (noteId: number) => {
+  const index = selectedNoteIdsForBatch.value.indexOf(noteId)
+  if (index > -1) {
+    selectedNoteIdsForBatch.value.splice(index, 1)
+  } else {
+    selectedNoteIdsForBatch.value.push(noteId)
+  }
+}
+
+// 确认添加笔记到归档
+const confirmAddNotesToArchive = async () => {
+  if (!targetArchiveId.value || selectedNoteIdsForBatch.value.length === 0) {
+    return
+  }
+  
+  try {
+    let successCount = 0
+    let errorCount = 0
+    
+    for (const noteId of selectedNoteIdsForBatch.value) {
+      try {
+        const response = await addNoteToArchive({
+          archiveId: targetArchiveId.value,
+          noteId: noteId
+        })
+        
+        if (response.data && response.data.id) {
+          successCount++
+          
+          // 更新 noteArchiveMap（笔记视角需要）
+          if (!noteArchiveMap.value[noteId]) {
+            noteArchiveMap.value[noteId] = []
+          }
+          const archive = archives.value.find(a => a.id === targetArchiveId.value)
+          if (archive) {
+            noteArchiveMap.value[noteId].push({
+              archiveId: targetArchiveId.value,
+              archiveName: archive.archiveName,
+              relationId: response.data.id
+            })
+          }
+        }
+      } catch (error: any) {
+        // 如果是已存在的错误，也算成功
+        if (error.response?.data?.message?.includes('已在此归档中')) {
+          successCount++
+        } else {
+          errorCount++
+          console.error(`添加笔记${noteId}失败:`, error)
+        }
+      }
+    }
+    
+    if (errorCount > 0) {
+      alert(`添加完成：成功 ${successCount} 条，失败 ${errorCount} 条`)
+    } else {
+      alert(`成功添加 ${successCount} 条笔记到归档！`)
+    }
+    
+    // 关闭弹窗
+    showNoteSelectDialog.value = false
+    selectedNoteIdsForBatch.value = []
+    
+    // 重新加载归档列表（更新笔记数量）
+    await loadArchiveList()
+    
+    // 如果当前归档已展开，重新加载其笔记列表
+    if (expandedArchives.value.includes(targetArchiveId.value)) {
+      await loadArchiveNotes(targetArchiveId.value)
+    }
+  } catch (error) {
+    console.error('添加笔记到归档失败:', error)
+    alert('添加失败')
+  }
 }
 
 // 笔记视角：快速添加笔记到归档
