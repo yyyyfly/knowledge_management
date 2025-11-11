@@ -1,7 +1,7 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-6 bg-gray-50 h-screen overflow-hidden flex flex-col">
     <!-- 页面头部 -->
-    <div class="mb-8">
+    <div class="mb-6 flex-shrink-0">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -13,7 +13,7 @@
           </div>
         </div>
         <button 
-          @click="showCategoryManage = true"
+          @click="openCategoryManage"
           class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
         >
           <i class="fas fa-cog mr-2"></i>
@@ -23,7 +23,7 @@
     </div>
 
     <!-- 筛选和搜索区域 -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 mb-4 flex-shrink-0">
       <div class="flex items-center space-x-4">
         <div class="flex-1">
           <div class="relative">
@@ -33,14 +33,14 @@
               @input="handleSearch"
               type="text" 
               placeholder="搜索学科名称或标签..."
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             >
           </div>
         </div>
         <select 
           v-model="selectedCategory"
           @change="handleCategoryChange"
-          class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">全部分类</option>
           <option v-for="cat in categories" :key="cat.id" :value="cat.configName">
@@ -49,7 +49,7 @@
         </select>
         <button 
           @click="showAddDialog = true"
-          class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all duration-300 hover:shadow-lg"
+          class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all duration-300 hover:shadow-lg whitespace-nowrap"
         >
           <i class="fas fa-plus mr-2"></i>
           新增学科
@@ -58,64 +58,66 @@
     </div>
 
     <!-- 主体内容区域 -->
-    <div class="grid grid-cols-12 gap-6">
+    <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
       <!-- 左侧学科列表 -->
-      <div class="col-span-4 space-y-4">
-        <div 
-          v-for="outline in outlineList" 
-          :key="outline.id"
-          @click="selectOutline(outline)"
-          class="bg-white rounded-xl p-6 border-2 cursor-pointer transition-all hover:shadow-lg"
-          :class="selectedOutline?.id === outline.id ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-blue-300'"
-        >
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="text-lg font-bold text-gray-900">{{ outline.subjectName }}</h3>
-            <div class="flex space-x-2">
-              <button 
-                @click.stop="editOutline(outline)"
-                class="text-blue-600 hover:text-blue-700"
+      <div class="col-span-4 overflow-y-auto pr-2" style="max-height: calc(100vh - 240px);">
+        <div class="space-y-3">
+          <div 
+            v-for="outline in outlineList" 
+            :key="outline.id"
+            @click="selectOutline(outline)"
+            class="bg-white rounded-xl p-4 border-2 cursor-pointer transition-all hover:shadow-lg"
+            :class="selectedOutline?.id === outline.id ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-blue-300'"
+          >
+            <div class="flex items-start justify-between mb-2">
+              <h3 class="text-base font-bold text-gray-900">{{ outline.subjectName }}</h3>
+              <div class="flex space-x-2">
+                <button 
+                  @click.stop="editOutline(outline)"
+                  class="text-blue-600 hover:text-blue-700"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button 
+                  @click.stop="confirmDelete(outline.id)"
+                  class="text-red-600 hover:text-red-700"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div v-if="outline.subjectCategory" class="mb-2">
+              <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
+                {{ outline.subjectCategory }}
+              </span>
+            </div>
+            <div v-if="outline.tags" class="flex flex-wrap gap-1">
+              <span 
+                v-for="tag in outline.tags.split(',')" 
+                :key="tag"
+                class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs"
               >
-                <i class="fas fa-edit"></i>
-              </button>
-              <button 
-                @click.stop="confirmDelete(outline.id)"
-                class="text-red-600 hover:text-red-700"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
+                {{ tag }}
+              </span>
             </div>
           </div>
-          <div v-if="outline.subjectCategory" class="mb-2">
-            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-              {{ outline.subjectCategory }}
-            </span>
-          </div>
-          <div v-if="outline.tags" class="flex flex-wrap gap-2">
-            <span 
-              v-for="tag in outline.tags.split(',')" 
-              :key="tag"
-              class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs"
-            >
-              {{ tag }}
-            </span>
-          </div>
-        </div>
 
-        <!-- 空状态 -->
-        <div v-if="outlineList.length === 0" class="bg-white rounded-xl p-12 text-center">
-          <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
-          <p class="text-gray-600">暂无学科数据</p>
+          <!-- 空状态 -->
+          <div v-if="outlineList.length === 0" class="bg-white rounded-xl p-12 text-center">
+            <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600">暂无学科数据</p>
+          </div>
         </div>
       </div>
 
       <!-- 右侧知识树编辑器 -->
-      <div class="col-span-8">
-        <div v-if="selectedOutline" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">{{ selectedOutline.subjectName }}</h2>
+      <div class="col-span-8 overflow-y-auto" style="max-height: calc(100vh - 240px);">
+        <div v-if="selectedOutline" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 h-full">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-900">{{ selectedOutline.subjectName }}</h2>
             <button 
               @click="saveKnowledgeTree"
-              class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
+              class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
             >
               <i class="fas fa-save mr-2"></i>
               保存
@@ -123,10 +125,10 @@
           </div>
 
           <!-- 树形编辑器 -->
-          <div class="border border-gray-200 rounded-lg p-4 min-h-[500px]">
+          <div class="border border-gray-200 rounded-lg p-4 overflow-y-auto" style="max-height: calc(100vh - 360px);">
             <button 
               @click="addRootNode"
-              class="mb-4 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+              class="mb-3 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors text-sm"
             >
               <i class="fas fa-plus mr-2"></i>
               添加一级分支
@@ -148,7 +150,7 @@
         </div>
 
         <!-- 未选择状态 -->
-        <div v-else class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+        <div v-else class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center h-full flex flex-col items-center justify-center">
           <i class="fas fa-hand-pointer text-5xl text-gray-300 mb-4"></i>
           <p class="text-gray-600">请从左侧选择一个学科来编辑知识体系</p>
         </div>
@@ -221,18 +223,159 @@
       </div>
     </Transition>
 
-    <!-- 学科分类管理弹窗（待实现） -->
+    <!-- 学科分类管理弹窗 -->
     <Transition name="modal-fade">
       <div v-if="showCategoryManage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-gray-900">管理学科分类</h3>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col" style="max-height: 80vh;">
+          <!-- 标题 -->
+          <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">管理学科分类</h3>
+              <p class="text-sm text-gray-500 mt-1">配置类型：guidance > subjectCategory</p>
+            </div>
             <button @click="showCategoryManage = false" class="text-gray-500 hover:text-gray-700">
               <i class="fas fa-times text-xl"></i>
             </button>
           </div>
-          <p class="text-gray-600 mb-4">通过笔记配置管理来管理学科分类</p>
-          <p class="text-sm text-gray-500">配置类型：guidance > subjectCategory</p>
+
+          <!-- 内容区域 -->
+          <div class="flex-1 overflow-y-auto p-6">
+            <!-- 添加新分类 -->
+            <div class="mb-6 flex gap-2">
+              <input 
+                v-model="newCategoryName"
+                type="text" 
+                placeholder="输入新分类名称..."
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                @keyup.enter="addCategory"
+              >
+              <button 
+                @click="addCategory"
+                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors whitespace-nowrap"
+              >
+                <i class="fas fa-plus mr-2"></i>
+                添加分类
+              </button>
+            </div>
+
+            <!-- 分类列表 - 折叠式 -->
+            <div class="space-y-2">
+              <div 
+                v-for="(category, index) in categoryList" 
+                :key="category.id"
+                class="border border-gray-200 rounded-lg overflow-hidden"
+              >
+                <!-- 分类头部 -->
+                <div 
+                  @click="toggleCategory(category.id)"
+                  class="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                >
+                  <div class="flex items-center space-x-3">
+                    <i 
+                      class="fas transition-transform duration-200"
+                      :class="expandedCategories.includes(category.id) ? 'fa-chevron-down' : 'fa-chevron-right'"
+                    ></i>
+                    <span class="font-medium text-gray-900">{{ category.configName }}</span>
+                    <span class="text-xs text-gray-500">ID: {{ category.id }}</span>
+                  </div>
+                  <div class="flex items-center space-x-2" @click.stop>
+                    <button 
+                      @click="editCategory(category)"
+                      class="px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    >
+                      <i class="fas fa-edit mr-1"></i>
+                      编辑
+                    </button>
+                    <button 
+                      @click="deleteCategory(category.id)"
+                      class="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <i class="fas fa-trash mr-1"></i>
+                      删除
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 分类详细信息（展开时显示） -->
+                <transition name="expand">
+                  <div v-if="expandedCategories.includes(category.id)" class="p-4 bg-white border-t border-gray-200">
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span class="text-gray-600">笔记类型：</span>
+                        <span class="font-medium">{{ category.noteType }}</span>
+                      </div>
+                      <div>
+                        <span class="text-gray-600">配置类型：</span>
+                        <span class="font-medium">{{ category.configType }}</span>
+                      </div>
+                      <div>
+                        <span class="text-gray-600">创建人：</span>
+                        <span class="font-medium">{{ category.recCreator || '-' }}</span>
+                      </div>
+                      <div>
+                        <span class="text-gray-600">创建时间：</span>
+                        <span class="font-medium">{{ formatDate(category.recCreateTime) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+
+            <!-- 空状态 -->
+            <div v-if="categoryList.length === 0" class="text-center py-12">
+              <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
+              <p class="text-gray-600">暂无学科分类</p>
+            </div>
+          </div>
+
+          <!-- 底部按钮 -->
+          <div class="p-6 border-t border-gray-200 flex justify-end flex-shrink-0">
+            <button 
+              @click="showCategoryManage = false"
+              class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+            >
+              关闭
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- 编辑分类弹窗 -->
+    <Transition name="modal-fade">
+      <div v-if="showEditCategory" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-gray-900">编辑分类</h3>
+            <button @click="showEditCategory = false" class="text-gray-500 hover:text-gray-700">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
+            <input 
+              v-model="editingCategory.configName"
+              type="text" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+          </div>
+
+          <div class="flex gap-4">
+            <button 
+              @click="updateCategory"
+              class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors"
+            >
+              保存
+            </button>
+            <button 
+              @click="showEditCategory = false"
+              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+            >
+              取消
+            </button>
+          </div>
         </div>
       </div>
     </Transition>
@@ -250,7 +393,7 @@ import {
   deleteGuidanceOutline,
   type GuidanceOutline 
 } from '@/api/guidanceOutline'
-import { getNoteConfigByType } from '@/api/noteConfig'
+import { getNoteConfigByType, getConfigsByNoteType, createConfig, updateConfig, deleteConfig } from '@/api/noteConfig'
 import TreeNode from '@/components/TreeNode.vue'
 
 // 数据定义
@@ -262,6 +405,7 @@ const searchKeyword = ref('')
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
 const showCategoryManage = ref(false)
+const showEditCategory = ref(false)
 
 // 表单数据
 const formData = ref({
@@ -270,6 +414,15 @@ const formData = ref({
   subjectCategory: '',
   tags: '',
   knowledgeTree: ''
+})
+
+// 学科分类管理相关
+const categoryList = ref<any[]>([])
+const expandedCategories = ref<number[]>([])
+const newCategoryName = ref('')
+const editingCategory = ref<any>({
+  id: undefined,
+  configName: ''
 })
 
 // 知识树结构
@@ -492,6 +645,134 @@ const deleteNode = (nodeId: string) => {
   }
 }
 
+// 学科分类管理相关函数
+// 打开分类管理弹窗
+const openCategoryManage = async () => {
+  showCategoryManage.value = true
+  await loadCategoryList()
+}
+
+// 加载分类列表
+const loadCategoryList = async () => {
+  try {
+    const response = await getConfigsByNoteType('guidance')
+    if (response.code === 200) {
+      categoryList.value = (response.data || []).filter((item: any) => item.configType === 'subjectCategory')
+    }
+  } catch (error) {
+    console.error('加载分类列表失败:', error)
+  }
+}
+
+// 切换折叠状态
+const toggleCategory = (categoryId: number) => {
+  const index = expandedCategories.value.indexOf(categoryId)
+  if (index > -1) {
+    expandedCategories.value.splice(index, 1)
+  } else {
+    expandedCategories.value.push(categoryId)
+  }
+}
+
+// 添加分类
+const addCategory = async () => {
+  if (!newCategoryName.value.trim()) {
+    alert('请输入分类名称')
+    return
+  }
+
+  try {
+    const response = await createConfig({
+      noteType: 'guidance',
+      configType: 'subjectCategory',
+      configName: newCategoryName.value.trim()
+    })
+    
+    if (response.code === 200) {
+      alert('添加成功')
+      newCategoryName.value = ''
+      await loadCategoryList()
+      await loadCategories() // 刷新主页面的分类下拉列表
+    } else {
+      alert(response.msg || '添加失败')
+    }
+  } catch (error) {
+    console.error('添加分类失败:', error)
+    alert('添加失败')
+  }
+}
+
+// 编辑分类
+const editCategory = (category: any) => {
+  editingCategory.value = {
+    id: category.id,
+    configName: category.configName
+  }
+  showEditCategory.value = true
+}
+
+// 更新分类
+const updateCategory = async () => {
+  if (!editingCategory.value.configName.trim()) {
+    alert('请输入分类名称')
+    return
+  }
+
+  try {
+    const response = await updateConfig({
+      id: editingCategory.value.id,
+      configName: editingCategory.value.configName.trim()
+    })
+    
+    if (response.code === 200) {
+      alert('更新成功')
+      showEditCategory.value = false
+      await loadCategoryList()
+      await loadCategories()
+    } else {
+      alert(response.msg || '更新失败')
+    }
+  } catch (error) {
+    console.error('更新分类失败:', error)
+    alert('更新失败')
+  }
+}
+
+// 删除分类
+const deleteCategory = async (categoryId: number) => {
+  if (!confirm('确定要删除这个分类吗？')) {
+    return
+  }
+
+  try {
+    const response = await deleteConfig(categoryId)
+    
+    if (response.code === 200) {
+      alert('删除成功')
+      await loadCategoryList()
+      await loadCategories()
+    } else {
+      alert(response.msg || '删除失败')
+    }
+  } catch (error) {
+    console.error('删除分类失败:', error)
+    alert('删除失败')
+  }
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 // 页面加载
 onMounted(() => {
   loadOutlines()
@@ -507,6 +788,19 @@ onMounted(() => {
 
 .modal-fade-enter-from,
 .modal-fade-leave-to {
+  opacity: 0;
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
   opacity: 0;
 }
 </style>
