@@ -622,8 +622,8 @@ const addChildNode = (parentNode: TreeNodeType) => {
   parentNode.children.push(newNode)
 }
 
-const editNode = (node: TreeNodeType, newName: string) => {
-  node.name = newName
+const editNode = (payload: { node: TreeNodeType; name: string }) => {
+  payload.node.name = payload.name
 }
 
 const deleteNode = (nodeId: string) => {
@@ -694,7 +694,7 @@ const addCategory = async () => {
       await loadCategoryList()
       await loadCategories() // 刷新主页面的分类下拉列表
     } else {
-      alert(response.msg || '添加失败')
+      alert(response.message || '添加失败')
     }
   } catch (error) {
     console.error('添加分类失败:', error)
@@ -721,6 +721,8 @@ const updateCategory = async () => {
   try {
     const response = await updateConfig({
       id: editingCategory.value.id,
+      noteType: 'guidance',
+      configType: 'subjectCategory',
       configName: editingCategory.value.configName.trim()
     })
     
@@ -730,7 +732,7 @@ const updateCategory = async () => {
       await loadCategoryList()
       await loadCategories()
     } else {
-      alert(response.msg || '更新失败')
+      alert(response.message || '更新失败')
     }
   } catch (error) {
     console.error('更新分类失败:', error)
@@ -752,7 +754,7 @@ const deleteCategory = async (categoryId: number) => {
       await loadCategoryList()
       await loadCategories()
     } else {
-      alert(response.msg || '删除失败')
+      alert(response.message || '删除失败')
     }
   } catch (error) {
     console.error('删除分类失败:', error)

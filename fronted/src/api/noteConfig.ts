@@ -2,7 +2,7 @@ import request from './request'
 
 export interface NoteConfig {
   id?: number
-  noteType: 'fragment' | 'study' | 'memorization' | 'exercise' | 'practical' | 'framework'
+  noteType: 'fragment' | 'study' | 'memorization' | 'exercise' | 'practical' | 'framework' | 'skill' | 'guidance' | 'expansion'
   configType: string  // category, theme, subject 等
   configName: string
   sortOrder?: number
@@ -58,6 +58,6 @@ export const deleteConfig = (id: number) => {
  * 根据笔记类型和配置类型获取配置（简化版）
  */
 export const getNoteConfigByType = (noteType: string, configType: string) => {
-  return request.get(`/note-config/note-type/${noteType}/config-type/${configType}`)
+  return request.get<NoteConfig[]>(`/note-config/note-type/${noteType}/config-type/${configType}`)
 }
 

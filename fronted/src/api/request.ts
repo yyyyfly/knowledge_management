@@ -1,14 +1,27 @@
 /**
  * 统一请求封装
  */
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import type { ApiResponse } from '@/types/api'
 
 // API基础路径
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
+// 创建自定义请求实例类型
+interface CustomAxiosInstance extends AxiosInstance {
+  <T = any>(config: any): Promise<ApiResponse<T>>
+  <T = any>(url: string, config?: any): Promise<ApiResponse<T>>
+  get<T = any>(url: string, config?: any): Promise<ApiResponse<T>>
+  delete<T = any>(url: string, config?: any): Promise<ApiResponse<T>>
+  head<T = any>(url: string, config?: any): Promise<ApiResponse<T>>
+  options<T = any>(url: string, config?: any): Promise<ApiResponse<T>>
+  post<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>>
+  put<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>>
+  patch<T = any>(url: string, data?: any, config?: any): Promise<ApiResponse<T>>
+}
+
 // 创建axios实例
-const request: AxiosInstance = axios.create({
+const service = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: {
@@ -17,11 +30,11 @@ const request: AxiosInstance = axios.create({
 })
 
 // 请求拦截器
-request.interceptors.request.use(
-  (config: any) => {
+service.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
     // 添加Token到请求头
     const token = localStorage.getItem('token')
-    if (token) {
+    if (token && config.headers) {
       config.headers['Authorization'] = 'Bearer ' + token
     }
     return config
@@ -33,13 +46,13 @@ request.interceptors.request.use(
 )
 
 // 响应拦截器
-request.interceptors.response.use(
-  (response: AxiosResponse) => {
+service.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => {
     const res = response.data
     
     // 根据后端返回的code判断
     if (res.code === 200) {
-      return res
+      return res as any
     } else {
       console.error('请求失败:', res.message)
       return Promise.reject(new Error(res.message || '请求失败'))
@@ -58,6 +71,8 @@ request.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+const request = service as CustomAxiosInstance
 
 export default request
 
