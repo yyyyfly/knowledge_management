@@ -43,6 +43,14 @@
               </div>
               <span class="ml-3">时光轨迹</span>
             </router-link>
+            
+            <!-- 指导大纲 -->
+            <router-link to="/overview/guidance-outline" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-sitemap"></i>
+              </div>
+              <span class="ml-3">指导大纲</span>
+            </router-link>
           </div>
         </div>
 
@@ -258,7 +266,7 @@ import { ref, computed } from 'vue'
 // ======= 素材组唯一权威顺序配置，严禁其他地方定义或引用 =======
 const materialsConfig = [
   { name: '碎片笔记', path: '/fragment-notes', icon: 'fa-solid fa-puzzle-piece' },
-  { name: '框架笔记', path: '/framework-notes', icon: 'fa-solid fa-sitemap' },
+  { name: '技能笔记', path: '/skill-notes', icon: 'fa-solid fa-tools' },
   { name: '求学笔记', path: '/study-notes', icon: 'fa-solid fa-graduation-cap' },
   { name: '拓展笔记', path: '/expansion-notes', icon: 'fa-solid fa-book-open' },
   { name: '刷题笔记', path: '/exercise-notes', icon: 'fa-regular fa-pen-to-square' },

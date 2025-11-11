@@ -28,9 +28,12 @@ export interface Note {
   originalText?: string
   explanation?: string
   cue?: string
-  // 框架笔记字段
-  subject?: string[]
-  subjectType?: string[]
+  // 技能笔记字段
+  skillType?: string
+  skillPoint?: string
+  expectedDescription?: string
+  thinkingSummary?: string
+  finalEffect?: string
   // 求学笔记字段
   course?: string[]
   studySubject?: string[]
@@ -80,11 +83,9 @@ const normalizeNoteArrayFields = (notes: any[]): any[] => {
     }
     
     // 处理所有可能的数组字段
-    if (normalized.subject) normalized.subject = toArray(normalized.subject)
     if (normalized.course) normalized.course = toArray(normalized.course)
     if (normalized.studySubject) normalized.studySubject = toArray(normalized.studySubject)
     if (normalized.bookSubject) normalized.bookSubject = toArray(normalized.bookSubject)
-    if (normalized.subjectType) normalized.subjectType = toArray(normalized.subjectType)
     if (normalized.knowledgePoint) normalized.knowledgePoint = toArray(normalized.knowledgePoint)
     if (normalized.techTags) normalized.techTags = toArray(normalized.techTags)
     if (normalized.techStack) normalized.techStack = toArray(normalized.techStack)

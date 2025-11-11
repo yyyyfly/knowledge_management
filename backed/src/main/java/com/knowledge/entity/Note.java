@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 public class Note extends BaseEntity {
     
     /**
-     * 笔记类型:framework-框架笔记,study-求学笔记,memorization-背诵笔记,expansion-拓展笔记,exercise-刷题笔记,practical-实战笔记,fragment-碎片笔记
+     * 笔记类型:framework-技能笔记,study-求学笔记,memorization-背诵笔记,expansion-拓展笔记,exercise-刷题笔记,practical-实战笔记,fragment-碎片笔记
      */
     private String type;
     
@@ -39,16 +39,31 @@ public class Note extends BaseEntity {
      */
     private String tags;
     
-    // ===== 框架笔记字段 =====
+    // ===== 技能笔记字段 =====
     /**
-     * 学科类型（逗号分隔）
+     * 技能类型（逗号分隔）
      */
-    private String subjectType;
+    private String skillType;
     
     /**
-     * 知识点（逗号分隔）
+     * 技能点（逗号分隔）
      */
-    private String knowledgePoint;
+    private String skillPoint;
+    
+    /**
+     * 预期描述（富文本）
+     */
+    private String expectedDescription;
+    
+    /**
+     * 思考总结（富文本）
+     */
+    private String thinkingSummary;
+    
+    /**
+     * 最终效果（富文本）
+     */
+    private String finalEffect;
     
     // ===== 求学笔记字段 =====
     /**

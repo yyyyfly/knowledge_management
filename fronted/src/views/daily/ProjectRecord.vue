@@ -1027,7 +1027,7 @@
                 >
                   <option value="">全部类型</option>
                   <option value="fragment">碎片笔记</option>
-                  <option value="framework">框架笔记</option>
+                  <option value="skill">技能笔记</option>
                   <option value="study">求学笔记</option>
                   <option value="memorization">背诵笔记</option>
                   <option value="exercise">刷题笔记</option>
@@ -3501,7 +3501,7 @@ const closeMaterialDetail = () => {
 // 获取笔记类型样式类
 const getNoteTypeClass = (type: Note['type']) => {
   const classes = {
-    framework: 'bg-purple-100 text-purple-600',
+    skill: 'bg-purple-100 text-purple-600',
     study: 'bg-blue-100 text-blue-600',
     memorization: 'bg-green-100 text-green-600',
     exercise: 'bg-orange-100 text-orange-600',
@@ -3514,7 +3514,7 @@ const getNoteTypeClass = (type: Note['type']) => {
 // 获取笔记类型边框样式类
 const getNoteTypeBorderClass = (type: Note['type']) => {
   const classes = {
-    framework: 'border-purple-200 hover:border-purple-400',
+    skill: 'border-purple-200 hover:border-purple-400',
     study: 'border-blue-200 hover:border-blue-400',
     memorization: 'border-green-200 hover:border-green-400',
     exercise: 'border-orange-200 hover:border-orange-400',
@@ -3527,7 +3527,7 @@ const getNoteTypeBorderClass = (type: Note['type']) => {
 // 获取笔记类型文本
 const getNoteTypeText = (type: Note['type']) => {
   const texts = {
-    framework: '框架笔记',
+    skill: '技能笔记',
     study: '求学笔记',
     memorization: '背诵笔记',
     exercise: '刷题笔记',
@@ -3540,7 +3540,7 @@ const getNoteTypeText = (type: Note['type']) => {
 // 获取笔记类型图标
 const getNoteTypeIcon = (type: Note['type']) => {
   const icons = {
-    framework: 'fas fa-sitemap',
+    skill: 'fas fa-sitemap',
     study: 'fas fa-graduation-cap',
     memorization: 'fas fa-lightbulb',
     exercise: 'fa-regular fa-pen-to-square',
@@ -3553,7 +3553,7 @@ const getNoteTypeIcon = (type: Note['type']) => {
 // 获取笔记类型图标样式类
 const getNoteTypeIconClass = (type: Note['type']) => {
   const classes = {
-    framework: 'bg-purple-100 text-purple-600',
+    skill: 'bg-purple-100 text-purple-600',
     study: 'bg-blue-100 text-blue-600',
     memorization: 'bg-green-100 text-green-600',
     exercise: 'bg-orange-100 text-orange-600',

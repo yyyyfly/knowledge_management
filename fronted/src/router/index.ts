@@ -43,6 +43,13 @@ const router = createRouter({
       component: () => import('@/views/overview/TimelineReview.vue'),
       meta: { requiresAuth: true }
     },
+    // 主仪表盘 > 驾驶舱 > 指导大纲
+    {
+      path: '/overview/guidance-outline',
+      name: 'guidance-outline',
+      component: () => import('@/views/overview/GuidanceOutline.vue'),
+      meta: { requiresAuth: true }
+    },
     // 日常行动
     {
       path: '/daily/material-record',
@@ -70,9 +77,9 @@ const router = createRouter({
     },
     // 素材组 - 笔记页面
     {
-      path: '/framework-notes',
-      name: 'framework-notes',
-      component: () => import('@/views/materials/FrameworkNotes.vue'),
+      path: '/skill-notes',
+      name: 'skill-notes',
+      component: () => import('@/views/materials/SkillNotes.vue'),
       meta: { requiresAuth: true }
     },
     {

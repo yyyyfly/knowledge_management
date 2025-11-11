@@ -9,9 +9,12 @@
         <result column="summary" property="summary"/>
         <result column="content" property="content"/>
         <result column="tags" property="tags"/>
-        <!-- 框架笔记字段 -->
-        <result column="subject_type" property="subjectType"/>
-        <result column="knowledge_point" property="knowledgePoint"/>
+        <!-- 技能笔记字段 -->
+        <result column="skill_type" property="skillType"/>
+        <result column="skill_point" property="skillPoint"/>
+        <result column="expected_description" property="expectedDescription"/>
+        <result column="thinking_summary" property="thinkingSummary"/>
+        <result column="final_effect" property="finalEffect"/>
         <!-- 求学笔记字段 -->
         <result column="study_subject" property="studySubject"/>
         <result column="core_concept" property="coreConcept"/>
@@ -57,7 +60,7 @@
     
     <sql id="Base_Column_List">
         id, type, title, summary, content, tags,
-        subject_type, knowledge_point, 
+        skill_type, skill_point, expected_description, thinking_summary, final_effect,
         study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
         project, original_text, explanation, cue, understanding,
         exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
@@ -110,7 +113,7 @@
     <insert id="insert" parameterType="com.knowledge.entity.Note" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO km_note (
             type, title, summary, content, tags,
-            subject_type, knowledge_point, 
+            skill_type, skill_point, expected_description, thinking_summary, final_effect,
             study_subject, core_concept, mechanism, application_case, extension, common_mistake, reflection,
             project, original_text, explanation, cue, understanding,
             exercise_source, exercise_subject, exercise_knowledge, exercise_difficulty,
@@ -120,7 +123,7 @@
             rec_creator, rec_create_time, arch_flag
         ) VALUES (
             #{type}, #{title}, #{summary}, #{content}, #{tags},
-            #{subjectType}, #{knowledgePoint}, 
+            #{skillType}, #{skillPoint}, #{expectedDescription}, #{thinkingSummary}, #{finalEffect},
             #{studySubject}, #{coreConcept}, #{mechanism}, #{applicationCase}, #{extension}, #{commonMistake}, #{reflection},
             #{project}, #{originalText}, #{explanation}, #{cue}, #{understanding},
             #{exerciseSource}, #{exerciseSubject}, #{exerciseKnowledge}, #{exerciseDifficulty},
@@ -139,9 +142,12 @@
             <if test="summary != null and summary != ''">summary = #{summary},</if>
             <if test="content != null and content != ''">content = #{content},</if>
             <if test="tags != null and tags != ''">tags = #{tags},</if>
-            <!-- 框架笔记字段 -->
-            <if test="subjectType != null and subjectType != ''">subject_type = #{subjectType},</if>
-            <if test="knowledgePoint != null and knowledgePoint != ''">knowledge_point = #{knowledgePoint},</if>
+            <!-- 技能笔记字段 -->
+            <if test="skillType != null and skillType != ''">skill_type = #{skillType},</if>
+            <if test="skillPoint != null and skillPoint != ''">skill_point = #{skillPoint},</if>
+            <if test="expectedDescription != null and expectedDescription != ''">expected_description = #{expectedDescription},</if>
+            <if test="thinkingSummary != null and thinkingSummary != ''">thinking_summary = #{thinkingSummary},</if>
+            <if test="finalEffect != null and finalEffect != ''">final_effect = #{finalEffect},</if>
             <!-- 求学笔记字段 -->
             <if test="studySubject != null and studySubject != ''">study_subject = #{studySubject},</if>
             <if test="coreConcept != null and coreConcept != ''">core_concept = #{coreConcept},</if>

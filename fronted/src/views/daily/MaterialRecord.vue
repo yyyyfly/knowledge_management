@@ -391,7 +391,7 @@
             >
               <option value="">全部类型</option>
               <option value="fragment">碎片笔记</option>
-              <option value="framework">框架笔记</option>
+              <option value="skill">技能笔记</option>
               <option value="study">求学笔记</option>
               <option value="memorization">背诵笔记</option>
               <option value="exercise">刷题笔记</option>
@@ -493,7 +493,7 @@
               <option value="exercise">刷题笔记</option>
               <option value="practical">实战笔记</option>
               <option value="fragment">碎片笔记</option>
-              <option value="framework">框架笔记</option>
+              <option value="skill">技能笔记</option>
               <option value="memorization">背诵笔记</option>
             </select>
           </div>
@@ -576,11 +576,11 @@
                     <i class="fas fa-code text-indigo-500"></i>
                     <span>{{ record.exerciseSource }}</span>
                   </div>
-                  <div v-if="record.subjectType && record.subjectType.length > 0" class="flex items-center space-x-2 text-sm text-gray-600">
+                  <div v-if="record.skillType && record.skillType.length > 0" class="flex items-center space-x-2 text-sm text-gray-600">
                     <i class="fas fa-book text-blue-500"></i>
                     <span>学科类型：</span>
                     <div class="flex flex-wrap gap-1">
-                      <span v-for="type in record.subjectType" :key="type" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
+                      <span v-for="type in record.skillType" :key="type" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
                         {{ type }}
                       </span>
                     </div>
@@ -735,7 +735,7 @@
                   <select v-model="recordForm.type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 form-input">
                     <option value="">请选择类型</option>
                     <option value="fragment">碎片笔记</option>
-                    <option value="framework">框架笔记</option>
+                    <option value="skill">技能笔记</option>
                     <option value="study">求学笔记</option>
                     <option value="expansion">拓展笔记</option>
                     <option value="exercise">刷题笔记</option>
@@ -760,9 +760,9 @@
                       <div class="text-gray-600 text-xs">记录灵感思考</div>
                     </div>
                     <div class="bg-white bg-opacity-60 rounded-lg p-3 border border-blue-100">
-                      <i class="fas fa-sitemap text-blue-500 mb-1"></i>
-                      <div class="font-medium text-blue-700">框架笔记</div>
-                      <div class="text-gray-600 text-xs">知识体系构建</div>
+                      <i class="fas fa-tools text-blue-500 mb-1"></i>
+                      <div class="font-medium text-blue-700">技能笔记</div>
+                      <div class="text-gray-600 text-xs">技能点积累</div>
                     </div>
                     <div class="bg-white bg-opacity-60 rounded-lg p-3 border border-blue-100">
                       <i class="fas fa-graduation-cap text-green-500 mb-1"></i>
@@ -936,125 +936,159 @@
                   </div>
                 </div>
 
-                <!-- 框架笔记 -->
-                <div v-if="recordForm.type === 'framework'" class="space-y-3 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-6 border border-blue-200 shadow-sm">
+                <!-- 技能笔记 -->
+                <div v-if="recordForm.type === 'skill'" class="space-y-3 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200 shadow-sm">
                   <div class="flex items-center mb-4">
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-sky-500 rounded-lg flex items-center justify-center mr-3">
-                      <i class="fas fa-sitemap text-white text-sm"></i>
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                      <i class="fas fa-tools text-white text-sm"></i>
                     </div>
-                    <h4 class="text-lg font-semibold text-blue-900">框架笔记配置</h4>
+                    <h4 class="text-lg font-semibold text-purple-900">技能笔记配置</h4>
                   </div>
-                  <!-- 学科类型 -->
+                  <!-- 技能类型 -->
                   <div>
                     <div class="flex items-center justify-between mb-2">
-                      <label class="block text-sm font-medium text-gray-700">学科类型</label>
+                      <label class="block text-sm font-medium text-gray-700">技能类型</label>
                       <button 
                         type="button"
-                        @click="openConfigManager('framework', 'subjectType')"
-                        class="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                        @click="openConfigManager('skill', 'skillType')"
+                        class="text-sm text-purple-600 hover:text-purple-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
                         <span>管理</span>
                       </button>
                     </div>
                     
-                    <!-- 搜索/添加学科类型 -->
+                    <!-- 搜索/添加技能类型 -->
                     <TagSearchInput
-                      v-model:selected="recordForm.subjectType"
-                      :all-options="frameworkSubjects"
-                      placeholder="搜索或新建学科类型..."
-                      color="blue"
-                      @add="handleFrameworkSubjectAdd"
+                      v-model:selected="recordForm.skillType"
+                      :all-options="skillTypes"
+                      placeholder="搜索或新建技能类型..."
+                      color="purple"
+                      @add="handleSkillTypeAdd"
                     />
                     <TagDisplay
-                      v-if="recordForm.subjectType.length > 0"
-                      :tags="recordForm.subjectType"
-                      color="blue"
-                      @remove="removeFrameworkSubject"
+                      v-if="recordForm.skillType.length > 0"
+                      :tags="recordForm.skillType"
+                      color="purple"
+                      @remove="removeSkillType"
                     />
                   </div>
 
-                  <!-- 知识点类型 -->
+                  <!-- 技能点 -->
                   <div>
                     <div class="flex items-center justify-between mb-2">
-                      <label class="block text-sm font-medium text-gray-700">知识点类型</label>
+                      <label class="block text-sm font-medium text-gray-700">技能点</label>
                       <button 
                         type="button"
-                        @click="openConfigManager('framework', 'knowledgePoint')"
-                        class="text-sm text-green-600 hover:text-green-800 flex items-center space-x-1"
+                        @click="openConfigManager('skill', 'skillPoint')"
+                        class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
                       >
                         <i class="fas fa-cog"></i>
                         <span>管理</span>
                       </button>
                     </div>
                     
-                    <!-- 搜索/添加知识点 -->
+                    <!-- 搜索/添加技能点 -->
                     <TagSearchInput
-                      v-model:selected="recordForm.knowledgePoint"
-                      :all-options="frameworkKnowledge"
-                      placeholder="搜索或新建知识点..."
-                      color="green"
-                      @add="handleFrameworkKnowledgeAdd"
+                      v-model:selected="recordForm.skillPoint"
+                      :all-options="skillPoints"
+                      placeholder="搜索或新建技能点..."
+                      color="indigo"
+                      @add="handleSkillPointAdd"
                     />
                     <TagDisplay
-                      v-if="recordForm.knowledgePoint.length > 0"
-                      :tags="recordForm.knowledgePoint"
-                      color="green"
-                      @remove="removeFrameworkKnowledge"
+                      v-if="recordForm.skillPoint.length > 0"
+                      :tags="recordForm.skillPoint"
+                      color="indigo"
+                      @remove="removeSkillPoint"
                     />
                   </div>
                   
-                  <!-- 框架笔记内容编辑 -->
-                  <div class="pt-4 border-t border-blue-200 mt-4">
+                  <!-- 技能笔记内容编辑 -->
+                  <div class="pt-4 border-t border-purple-200 mt-4">
                     <div class="flex items-center mb-4">
-                      <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-sky-500 rounded-lg flex items-center justify-center mr-2">
+                      <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-2">
                         <i class="fas fa-edit text-white text-xs"></i>
                       </div>
-                      <h5 class="text-md font-semibold text-blue-800">框架内容编辑</h5>
+                      <h5 class="text-md font-semibold text-purple-800">技能学习记录</h5>
                     </div>
 
                     <!-- 标题 -->
                     <div class="mb-4">
-                      <label class="block text-sm font-medium text-blue-800 mb-2">
-                        <i class="fas fa-heading text-blue-600 mr-1"></i>
+                      <label class="block text-sm font-medium text-purple-800 mb-2">
+                        <i class="fas fa-heading text-purple-600 mr-1"></i>
                         标题
                       </label>
                       <input 
                         v-model="recordForm.title" 
                         type="text" 
                         placeholder="请输入标题"
-                        class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm form-input"
+                        class="w-full px-4 py-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm form-input"
                       >
                     </div>
 
                     <!-- 摘要 -->
                     <div class="mb-4">
-                      <label class="block text-sm font-medium text-blue-800 mb-2">
-                        <i class="fas fa-align-left text-blue-600 mr-1"></i>
+                      <label class="block text-sm font-medium text-purple-800 mb-2">
+                        <i class="fas fa-align-left text-purple-600 mr-1"></i>
                         摘要
                       </label>
                       <textarea 
                         v-model="recordForm.summary" 
                         rows="3" 
                         placeholder="请输入摘要..."
-                        class="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm form-input"
+                        class="w-full px-4 py-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm form-input"
                       ></textarea>
                     </div>
                     
-                    <!-- 内容编辑器 -->
-                    <div>
-                      <label class="block text-sm font-medium text-blue-800 mb-2">
-                        <i class="fas fa-file-alt text-blue-600 mr-1"></i>
-                        内容
+                    <!-- 预期描述 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-purple-800 mb-2">
+                        <i class="fas fa-bullseye text-purple-600 mr-1"></i>
+                        预期描述
                       </label>
                       <RichTextEditor 
-                        :editor="editor"
-                        border-color="blue"
+                        :editor="editorExpectedDescription"
+                        border-color="purple"
                         @insert-table="insertTable"
                         @insert-image="insertImage"
                         @upload-image="uploadImage"
                         @set-link="setLink"
-                        @import-markdown="importMarkdown(editor)"
+                        @import-markdown="importMarkdown(editorExpectedDescription)"
+                      />
+                    </div>
+                    
+                    <!-- 思考总结 -->
+                    <div class="mb-4">
+                      <label class="block text-sm font-medium text-purple-800 mb-2">
+                        <i class="fas fa-brain text-purple-600 mr-1"></i>
+                        思考总结
+                      </label>
+                      <RichTextEditor 
+                        :editor="editorThinkingSummary"
+                        border-color="purple"
+                        @insert-table="insertTable"
+                        @insert-image="insertImage"
+                        @upload-image="uploadImage"
+                        @set-link="setLink"
+                        @import-markdown="importMarkdown(editorThinkingSummary)"
+                      />
+                    </div>
+                    
+                    <!-- 最终效果 -->
+                    <div>
+                      <label class="block text-sm font-medium text-purple-800 mb-2">
+                        <i class="fas fa-trophy text-purple-600 mr-1"></i>
+                        最终效果
+                      </label>
+                      <RichTextEditor 
+                        :editor="editorFinalEffect"
+                        border-color="purple"
+                        @insert-table="insertTable"
+                        @insert-image="insertImage"
+                        @upload-image="uploadImage"
+                        @set-link="setLink"
+                        @import-markdown="importMarkdown(editorFinalEffect)"
                       />
                     </div>
                   </div>
@@ -1115,15 +1149,15 @@
                     
                     <!-- 搜索/添加知识点 -->
                     <TagSearchInput
-                      v-model:selected="recordForm.knowledgePoint"
+                      v-model:selected="recordForm.skillPoint"
                       :all-options="studyKnowledge"
                       placeholder="搜索或新建知识点..."
                       color="green"
                       @add="handleStudyKnowledgeAdd"
                     />
                     <TagDisplay
-                      v-if="recordForm.knowledgePoint.length > 0"
-                      :tags="recordForm.knowledgePoint"
+                      v-if="recordForm.skillPoint.length > 0"
+                      :tags="recordForm.skillPoint"
                       color="green"
                       @remove="removeKnowledgePoint"
                     />
@@ -1982,16 +2016,16 @@
     </div>
   </div>
 
-  <!-- 框架笔记学科类型管理弹窗 -->
-  <div v-if="showFrameworkSubjectManager" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <!-- 技能笔记技能类型管理弹窗 -->
+  <div v-if="showSkillTypeManager" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
-      <h3 class="text-lg font-semibold mb-4">管理学科类型</h3>
+      <h3 class="text-lg font-semibold mb-4">管理技能类型</h3>
       <div class="flex-1 overflow-hidden flex flex-col">
         <div class="flex-1 overflow-y-auto space-y-2 pr-2">
-          <div v-for="subject in availableFrameworkSubjects" :key="subject" class="flex items-center justify-between p-2 border rounded">
+          <div v-for="subject in availableSkillTypes" :key="subject" class="flex items-center justify-between p-2 border rounded">
             <span>{{ subject }}</span>
                     <button 
-              @click="deleteFrameworkSubject(subject)"
+              @click="deleteSkillType(subject)"
               class="text-red-600 hover:text-red-800 px-2 py-1 rounded"
             >
               删除
@@ -2001,15 +2035,15 @@
         <div class="flex-shrink-0 mt-4 pt-4 border-t">
           <div class="flex space-x-2">
             <input 
-              v-model="newFrameworkSubject"
+              v-model="newSkillType"
               type="text" 
-              placeholder="添加新学科类型"
-              @keyup.enter="addFrameworkSubject"
+              placeholder="添加新技能类型"
+              @keyup.enter="addSkillType"
               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
             >
             <button 
-              @click="addFrameworkSubject"
-              :disabled="!newFrameworkSubject.trim()"
+              @click="addSkillType"
+              :disabled="!newSkillType.trim()"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               添加
@@ -2019,7 +2053,7 @@
       </div>
       <div class="flex justify-end space-x-2 mt-4">
         <button 
-          @click="showFrameworkSubjectManager = false"
+          @click="showSkillTypeManager = false"
           class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
         >
           关闭
@@ -2028,16 +2062,16 @@
     </div>
           </div>
           
-  <!-- 框架笔记知识点管理弹窗 -->
-  <div v-if="showFrameworkKnowledgeManager" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <!-- 技能笔记技能点管理弹窗 -->
+  <div v-if="showSkillPointManager" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
-      <h3 class="text-lg font-semibold mb-4">管理知识点类型</h3>
+      <h3 class="text-lg font-semibold mb-4">管理技能点</h3>
       <div class="flex-1 overflow-hidden flex flex-col">
         <div class="flex-1 overflow-y-auto space-y-2 pr-2">
-          <div v-for="knowledge in availableFrameworkKnowledge" :key="knowledge" class="flex items-center justify-between p-2 border rounded">
+          <div v-for="knowledge in availableSkillPoints" :key="knowledge" class="flex items-center justify-between p-2 border rounded">
             <span>{{ knowledge }}</span>
             <button 
-              @click="deleteFrameworkKnowledge(knowledge)"
+              @click="deleteSkillPoint(knowledge)"
               class="text-red-600 hover:text-red-800 px-2 py-1 rounded"
             >
               删除
@@ -2047,15 +2081,15 @@
         <div class="flex-shrink-0 mt-4 pt-4 border-t">
           <div class="flex space-x-2">
             <input 
-              v-model="newFrameworkKnowledge"
+              v-model="newSkillPoint"
               type="text" 
-              placeholder="添加新知识点"
-              @keyup.enter="addFrameworkKnowledge"
+              placeholder="添加新技能点"
+              @keyup.enter="addSkillPoint"
               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
             >
             <button 
-              @click="addFrameworkKnowledge"
-              :disabled="!newFrameworkKnowledge.trim()"
+              @click="addSkillPoint"
+              :disabled="!newSkillPoint.trim()"
               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               添加
@@ -2065,7 +2099,7 @@
       </div>
       <div class="flex justify-end space-x-2 mt-4">
         <button 
-          @click="showFrameworkKnowledgeManager = false"
+          @click="showSkillPointManager = false"
           class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
         >
           关闭
@@ -2308,7 +2342,7 @@
           >
             <option value="">全部类型</option>
             <option value="fragment">碎片笔记</option>
-            <option value="framework">框架笔记</option>
+            <option value="skill">技能笔记</option>
             <option value="study">求学笔记</option>
             <option value="memorization">背诵笔记</option>
             <option value="exercise">刷题笔记</option>
@@ -2551,7 +2585,7 @@ const noteTypes = [
   { value: 'expansion', label: '拓展笔记', icon: 'fas fa-book-open' },
   { value: 'exercise', label: '刷题笔记', icon: 'fas fa-code' },
   { value: 'practical', label: '实战笔记', icon: 'fas fa-tools' },
-  { value: 'framework', label: '框架笔记', icon: 'fas fa-sitemap' }
+  { value: 'skill', label: '技能笔记', icon: 'fas fa-tools' }
 ]
 
 // 配置类型映射
@@ -2561,7 +2595,7 @@ const configTypeMap: Record<string, { type1: { key: string, label: string }, typ
   expansion: { type1: { key: 'project', label: '学科项目' }, type2: { key: 'knowledgePoint', label: '知识点' } },
   exercise: { type1: { key: 'source', label: '题目来源' }, type2: { key: 'subject', label: '学科类型' } },
   practical: { type1: { key: 'domain', label: '领域' }, type2: { key: 'techStack', label: '技术栈' } },
-  framework: { type1: { key: 'subjectType', label: '学科类型' }, type2: { key: 'knowledgePoint', label: '知识点类型' } }
+  skill: { type1: { key: 'skillType', label: '技能类型' }, type2: { key: 'skillPoint', label: '技能点' } }
 }
 
 // 加载笔记数据
@@ -2582,7 +2616,7 @@ const loadNotes = async () => {
 // 加载所有配置
 const loadAllConfigs = async () => {
   try {
-    const types = ['fragment', 'study', 'expansion', 'exercise', 'practical', 'framework']
+    const types = ['fragment', 'study', 'expansion', 'exercise', 'practical', 'skill']
     const promises = types.map(type => getConfigsByNoteType(type))
     const results = await Promise.all(promises)
     
@@ -2769,7 +2803,7 @@ const getConfigManagerTitle = (noteType: string, configType: string): string => 
     memorization: { subject: '管理科目', knowledgePoint: '管理知识点' },
     exercise: { source: '管理题目来源', subject: '管理学科类型' },
     practical: { domain: '管理领域', techStack: '管理技术栈' },
-    framework: { subjectType: '管理学科类型', knowledgePoint: '管理知识点类型' }
+    skill: { skillType: '管理技能类型', skillPoint: '管理技能点' }
   }
   return titles[noteType]?.[configType] || '管理配置'
 }
@@ -2857,8 +2891,8 @@ import {
   defaultFragmentCategories,
   defaultFragmentThemes,
   defaultStudySubjects,
-  defaultFrameworkSubjects,
-  defaultFrameworkKnowledge,
+  defaultSkillTypes,
+  defaultSkillPoints,
   defaultSubjectTypeOptions,
   defaultProjectTypeOptions,
   defaultExerciseSources,
@@ -2874,11 +2908,13 @@ const recordForm = reactive({
   title: '',
   summary: '',
   content: '',
-  // 框架笔记字段
-  subjectType: [] as string[],
-  knowledgePoint: [] as string[],
+  // 技能笔记字段
+  skillType: [] as string[],
+  skillPoint: [] as string[],
+  expectedDescription: '',    // 预期描述（富文本）
+  thinkingSummary: '',        // 思考总结（富文本）
+  finalEffect: '',            // 最终效果（富文本）
   subject: [] as string[],
-  frameworkType: [] as string[],
   // 求学笔记字段
   course: [] as string[],
   studySubject: [] as string[],
@@ -2896,6 +2932,7 @@ const recordForm = reactive({
   explanation: '',
   cue: '',
   // 拓展笔记字段
+  knowledgePoint: [] as string[],  // 知识点（多标签）
   understanding: '',        // 理解记录（富文本）
   // 刷题笔记字段
   exerciseSource: '',                  // 题目来源 - 单标签
@@ -2923,8 +2960,8 @@ const recordForm = reactive({
 
 
 // 新增字段相关
-const newFrameworkSubject = ref('')
-const newFrameworkKnowledge = ref('')
+const newSkillType = ref('')
+const newSkillPoint = ref('')
 const newSubject = ref('')
 const newCourse = ref('')
 const newFragmentCategory = ref('')
@@ -2954,13 +2991,13 @@ const showExerciseSourceManager = ref(false)
 const showExerciseSubjectManager = ref(false)
 const showExerciseKnowledgeManager = ref(false)
 
-// 框架笔记管理弹窗
-const showFrameworkSubjectManager = ref(false)
-const showFrameworkKnowledgeManager = ref(false)
+// 技能笔记管理弹窗
+const showSkillTypeManager = ref(false)
+const showSkillPointManager = ref(false)
 
-// 框架笔记存储的学科类型和知识点（可以被删除）
-const storedFrameworkSubjects = ref<string[]>([])
-const storedFrameworkKnowledge = ref<string[]>([])
+// 技能笔记存储的技能类型和技能点（可以被删除）
+const storedSkillTypes = ref<string[]>([])
+const storedSkillPoints = ref<string[]>([])
 
 // 所有题目来源、学科类型和知识点存储（包括预设和自定义）
 const allExerciseSources = ref<string[]>([])
@@ -3106,17 +3143,17 @@ const availableStudyKnowledge = computed(() => {
   return configs.map(c => c.configName).sort()
 })
 
-// 框架笔记可用学科类型
-const availableFrameworkSubjects = computed(() => {
+// 技能笔记可用技能类型
+const availableSkillTypes = computed(() => {
   // 从API配置中获取
-  const configs = allConfigs.value.filter(c => c.noteType === 'framework' && c.configType === 'subjectType')
+  const configs = allConfigs.value.filter(c => c.noteType === 'skill' && c.configType === 'skillType')
   return configs.map(c => c.configName).sort()
 })
 
-// 框架笔记可用知识点
-const availableFrameworkKnowledge = computed(() => {
+// 技能笔记可用技能点
+const availableSkillPoints = computed(() => {
   // 从API配置中获取
-  const configs = allConfigs.value.filter(c => c.noteType === 'framework' && c.configType === 'knowledgePoint')
+  const configs = allConfigs.value.filter(c => c.noteType === 'skill' && c.configType === 'skillPoint')
   return configs.map(c => c.configName).sort()
 })
 
@@ -3180,8 +3217,8 @@ const availablePracticalTechStacks = computed(() => {
 // ===== TagSearchInput组件使用的别名 =====
 const fragmentCategories = availableFragmentCategories
 const fragmentThemes = availableFragmentThemes
-const frameworkSubjects = availableFrameworkSubjects
-const frameworkKnowledge = availableFrameworkKnowledge
+const skillTypes = availableSkillTypes
+const skillPoints = availableSkillPoints
 const studySubjects = availableStudySubjects
 const studyKnowledge = availableStudyKnowledge
 const memorizationKnowledge = availableMemorizationKnowledge
@@ -3206,21 +3243,21 @@ const handleFragmentThemeAdd = async (tagName: string) => {
   }
 }
 
-const handleFrameworkSubjectAdd = async (tagName: string) => {
+const handleSkillTypeAdd = async (tagName: string) => {
   try {
-    await createConfig({ noteType: 'framework', configType: 'subjectType', configName: tagName })
+    await createConfig({ noteType: 'skill', configType: 'skillType', configName: tagName })
     await loadAllConfigs()
   } catch (error) {
-    console.error('添加学科类型失败:', error)
+    console.error('添加技能类型失败:', error)
   }
 }
 
-const handleFrameworkKnowledgeAdd = async (tagName: string) => {
+const handleSkillPointAdd = async (tagName: string) => {
   try {
-    await createConfig({ noteType: 'framework', configType: 'knowledgePoint', configName: tagName })
+    await createConfig({ noteType: 'skill', configType: 'skillPoint', configName: tagName })
     await loadAllConfigs()
   } catch (error) {
-    console.error('添加知识点失败:', error)
+    console.error('添加技能点失败:', error)
   }
 }
 
@@ -3322,7 +3359,7 @@ function normalizeRecordArrays() {
     if (record.course) record.course = toArray(record.course)
     if (record.studySubject) record.studySubject = toArray(record.studySubject)
     if (record.bookSubject) record.bookSubject = toArray(record.bookSubject)
-    if (record.subjectType) record.subjectType = toArray(record.subjectType)
+    if (record.skillType) record.skillType = toArray(record.skillType)
     if (record.knowledgePoint) record.knowledgePoint = toArray(record.knowledgePoint)
     if (record.techTags) record.techTags = toArray(record.techTags)
     if (record.fragmentCategory) record.fragmentCategory = toArray(record.fragmentCategory)
@@ -3451,7 +3488,7 @@ const existingFragmentCategories = computed(() => {
 const existingSubjectTypes = computed(() => {
   const types = new Set<string>()
   todayRecords.value.forEach(record => {
-    Array.isArray(record.subjectType) && record.subjectType.forEach(type => types.add(type))
+    Array.isArray(record.skillType) && record.skillType.forEach(type => types.add(type))
   })
   storedSubjectTypes.value.forEach(type => {
     types.add(type)
@@ -3499,7 +3536,7 @@ const existingFragmentThemes = computed(() => {
 const getTypeSpecificTitle = () => {
   const titles = {
     fragment: '碎片笔记 - 分类标签管理',
-    framework: '框架笔记 - 结构框架管理',
+    skill: '技能笔记 - 技能点管理',
     study: '求学笔记 - 学习课程管理',
     expansion: '拓展笔记 - 学科项目管理',
     memorization: '背诵笔记 - 记忆要点管理',
@@ -3509,20 +3546,20 @@ const getTypeSpecificTitle = () => {
   return titles[recordForm.type as keyof typeof titles] || ''
 }
 
-// 添加学科（框架笔记用）
+// 添加学科（技能笔记用）
 const addSubject = () => {
   const subject = newSubject.value.trim()
   if (subject) {
-    recordForm.subjectType.push(subject)
+    recordForm.skillType.push(subject)
     saveTypeToStorage('subjectType', subject)
     newSubject.value = ''
   }
 }
 
-// 选择学科（框架笔记用）
+// 选择学科（技能笔记用）
 const selectSubject = (subject: string) => {
-  if (!recordForm.subjectType.includes(subject)) {
-    recordForm.subjectType.push(subject)
+  if (!recordForm.skillType.includes(subject)) {
+    recordForm.skillType.push(subject)
   }
 }
 
@@ -3692,7 +3729,7 @@ const toggleTechTag = (tag: string) => {
 const addSubjectType = () => {
   const type = newSubjectType.value.trim()
   if (type) {
-    recordForm.subjectType.push(type)
+    recordForm.skillType.push(type)
     saveTypeToStorage('subjectType', type)
     newSubjectType.value = ''
   }
@@ -3700,8 +3737,8 @@ const addSubjectType = () => {
 
 // 选择学科类型
 const selectSubjectType = (type: string) => {
-  if (!recordForm.subjectType.includes(type)) {
-    recordForm.subjectType.push(type)
+  if (!recordForm.skillType.includes(type)) {
+    recordForm.skillType.push(type)
   }
 }
 
@@ -3709,7 +3746,7 @@ const selectSubjectType = (type: string) => {
 const addKnowledgePoint = () => {
   const point = newKnowledgePoint.value.trim()
   if (point) {
-    recordForm.knowledgePoint.push(point)
+    recordForm.skillPoint.push(point)
     saveTypeToStorage('knowledgePoint', point)
     newKnowledgePoint.value = ''
   }
@@ -3717,8 +3754,8 @@ const addKnowledgePoint = () => {
 
 // 选择知识点
 const selectKnowledgePoint = (point: string) => {
-  if (!recordForm.knowledgePoint.includes(point)) {
-    recordForm.knowledgePoint.push(point)
+  if (!recordForm.skillPoint.includes(point)) {
+    recordForm.skillPoint.push(point)
   }
 }
 
@@ -3832,13 +3869,27 @@ const editRecord = (record: Note) => {
   
   // 填充类型特定字段
   const recordData = record as any
-  if (record.type === 'framework') {
-    recordForm.subjectType = recordData.subjectType ? [...recordData.subjectType] : []
-    recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
-    recordForm.content = record.content || ''
+  if (record.type === 'skill') {
+    // 技能笔记：填充技能类型、技能点和三个富文本字段
+    recordForm.skillType = recordData.skillType ? [...recordData.skillType] : []
+    recordForm.skillPoint = recordData.skillPoint ? [...recordData.skillPoint] : []
+    recordForm.expectedDescription = recordData.expectedDescription || ''
+    recordForm.thinkingSummary = recordData.thinkingSummary || ''
+    recordForm.finalEffect = recordData.finalEffect || ''
+    
+    // 设置编辑器内容（处理图片占位符）
+    if (editorExpectedDescription.value) {
+      editorExpectedDescription.value.commands.setContent(replaceImagesWithPlaceholders(recordData.expectedDescription || ''))
+    }
+    if (editorThinkingSummary.value) {
+      editorThinkingSummary.value.commands.setContent(replaceImagesWithPlaceholders(recordData.thinkingSummary || ''))
+    }
+    if (editorFinalEffect.value) {
+      editorFinalEffect.value.commands.setContent(replaceImagesWithPlaceholders(recordData.finalEffect || ''))
+    }
   } else if (record.type === 'study') {
     recordForm.studySubject = recordData.studySubject ? [...recordData.studySubject] : []
-    recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
+    recordForm.skillPoint = recordData.skillPoint ? [...recordData.skillPoint] : []
     recordForm.content = record.content || ''
     recordForm.coreConcept = recordData.coreConcept || ''
     recordForm.mechanism = recordData.mechanism || ''
@@ -3854,7 +3905,7 @@ const editRecord = (record: Note) => {
     recordForm.content = record.content || ''
   } else if (record.type === 'memorization') {
     recordForm.project = recordData.project || ''
-    recordForm.knowledgePoint = recordData.knowledgePoint ? [...recordData.knowledgePoint] : []
+    recordForm.skillPoint = recordData.skillPoint ? [...recordData.skillPoint] : []
     recordForm.originalText = recordData.originalText || record.content || ''
     recordForm.explanation = recordData.explanation || ''
     recordForm.cue = recordData.cue || ''
@@ -4003,7 +4054,7 @@ const editRecord = (record: Note) => {
           console.log('✓ 参考设计已加载，内容长度:', contentWithPlaceholders.length)
         }
       } else {
-        // 碎片笔记、框架笔记：使用主编辑器
+        // 碎片笔记、技能笔记：使用主编辑器
         console.log('加载主编辑器内容，长度:', recordForm.content?.length || 0)
         console.log('内容是否包含图片:', recordForm.content?.includes('<img') || false)
         console.log('内容预览（前200字符）:', recordForm.content?.substring(0, 200))
@@ -4302,6 +4353,55 @@ const memorizationEditorExtensions = [
     TextStyle,
     FontFamily,
 ]
+
+// 技能笔记专用编辑器
+const editorExpectedDescription = useEditor({
+  content: '',
+  extensions: [
+    ...memorizationEditorExtensions,
+    Placeholder.configure({ placeholder: '描述对这个技能的预期目标和期望达到的效果...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[150px] p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.expectedDescription = editor.getHTML()
+  },
+})
+
+const editorThinkingSummary = useEditor({
+  content: '',
+  extensions: [
+    ...memorizationEditorExtensions,
+    Placeholder.configure({ placeholder: '记录学习过程中的思考、感悟和总结...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[150px] p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.thinkingSummary = editor.getHTML()
+  },
+})
+
+const editorFinalEffect = useEditor({
+  content: '',
+  extensions: [
+    ...memorizationEditorExtensions,
+    Placeholder.configure({ placeholder: '描述最终掌握的效果和实际应用情况...' }),
+  ],
+  editorProps: {
+    attributes: {
+      class: 'prose prose-sm focus:outline-none min-h-[150px] p-3',
+    },
+  },
+  onUpdate: ({ editor }) => {
+    recordForm.finalEffect = editor.getHTML()
+  },
+})
 
 // 背诵笔记专用编辑器
 const originalTextEditor = useEditor({
@@ -5234,8 +5334,21 @@ const submitRecord = async () => {
     hasContent = hasCoreConcept || hasMechanism || hasApplication || hasExtension || hasMistake || hasReflection
     contentFieldName = '学习内容（核心概念/机制原理/应用案例/延伸对比/常见误区/思考理解至少填一项）'
     console.log('求学笔记内容检查:', { hasCoreConcept, hasMechanism, hasApplication, hasExtension, hasMistake, hasReflection, hasContent })
+  } else if (recordForm.type === 'skill') {
+    // 技能笔记：检查三个专用编辑器的内容
+    const expectedDescContent = editorExpectedDescription.value?.getHTML() || ''
+    const thinkingSummaryContent = editorThinkingSummary.value?.getHTML() || ''
+    const finalEffectContent = editorFinalEffect.value?.getHTML() || ''
+    
+    const hasExpectedDesc = expectedDescContent && expectedDescContent.trim() !== '' && expectedDescContent !== '<p></p>' && expectedDescContent !== '<p><br></p>'
+    const hasThinkingSummary = thinkingSummaryContent && thinkingSummaryContent.trim() !== '' && thinkingSummaryContent !== '<p></p>' && thinkingSummaryContent !== '<p><br></p>'
+    const hasFinalEffect = finalEffectContent && finalEffectContent.trim() !== '' && finalEffectContent !== '<p></p>' && finalEffectContent !== '<p><br></p>'
+    
+    hasContent = hasExpectedDesc || hasThinkingSummary || hasFinalEffect
+    contentFieldName = '技能内容（预期描述/思考总结/最终效果至少填一项）'
+    console.log('技能笔记内容检查:', { hasExpectedDesc, hasThinkingSummary, hasFinalEffect, hasContent })
   } else {
-    // 框架笔记、碎片笔记：检查通用编辑器
+    // 碎片笔记：检查通用编辑器
     hasContent = editorContent && editorContent.trim() !== '' && editorContent !== '<p></p>' && editorContent !== '<p><br></p>'
     contentFieldName = '内容'
   }
@@ -5261,11 +5374,11 @@ const submitRecord = async () => {
   // 对于有专用富文本编辑器的笔记类型，content字段设置为空字符串
   let finalContent = ''
   if (recordForm.type === 'expansion' || recordForm.type === 'memorization' || 
-      recordForm.type === 'exercise' || recordForm.type === 'practical' || recordForm.type === 'study') {
+      recordForm.type === 'exercise' || recordForm.type === 'practical' || recordForm.type === 'study' || recordForm.type === 'skill') {
     // 这些类型有专用编辑器，content字段可以为空
     finalContent = ''
   } else {
-    // 框架笔记、碎片笔记使用通用编辑器
+    // 碎片笔记使用通用编辑器
     finalContent = editorContent
     
     // 将占位符还原为原始图片
@@ -5284,13 +5397,23 @@ const submitRecord = async () => {
       }
       
   // 添加类型特定字段
-      if (recordForm.type === 'framework') {
-    noteData.subjectType = recordForm.subjectType.join(',')
-    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+      if (recordForm.type === 'skill') {
+    // 技能笔记：使用三个富文本字段代替content
+    noteData.skillType = recordForm.skillType.join(',')
+    noteData.skillPoint = recordForm.skillPoint.join(',')
+    noteData.expectedDescription = restorePlaceholdersToImages(editorExpectedDescription.value?.getHTML() || '')
+    noteData.thinkingSummary = restorePlaceholdersToImages(editorThinkingSummary.value?.getHTML() || '')
+    noteData.finalEffect = restorePlaceholdersToImages(editorFinalEffect.value?.getHTML() || '')
+    
+    console.log('技能笔记保存数据（图片已还原）:', {
+      expectedDescription: noteData.expectedDescription.substring(0, 100),
+      thinkingSummary: noteData.thinkingSummary.substring(0, 100),
+      finalEffect: noteData.finalEffect.substring(0, 100)
+    })
       } else if (recordForm.type === 'study') {
     // 求学笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.studySubject = recordForm.studySubject.join(',')
-    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+    noteData.skillPoint = recordForm.skillPoint.join(',')
     
     // 获取内容并还原图片占位符
     noteData.coreConcept = restorePlaceholdersToImages(coreConceptEditor.value?.getHTML() || '')
@@ -5321,7 +5444,7 @@ const submitRecord = async () => {
   } else if (recordForm.type === 'memorization') {
     // 背诵笔记：从编辑器实时获取HTML内容（包含图片）
     noteData.project = recordForm.project
-    noteData.knowledgePoint = recordForm.knowledgePoint.join(',')
+    noteData.skillPoint = recordForm.skillPoint.join(',')
     
     // 获取内容并还原图片占位符
     noteData.originalText = restorePlaceholdersToImages(originalTextEditor.value?.getHTML() || '')
@@ -5447,11 +5570,15 @@ const resetForm = () => {
   
   // 重置类型特定字段
   recordForm.subject = []
-  recordForm.frameworkType = ''
   recordForm.course = []
-  recordForm.subjectType = []
+  recordForm.skillType = []
   recordForm.project = ''
-  recordForm.knowledgePoint = []
+  recordForm.skillPoint = []
+  
+  // 技能笔记字段
+  recordForm.expectedDescription = ''
+  recordForm.thinkingSummary = ''
+  recordForm.finalEffect = ''
   
   // 背诵笔记字段
   recordForm.originalText = ''
@@ -5504,7 +5631,7 @@ const resetForm = () => {
   // 重置编辑器内容
   console.log('开始重置所有编辑器...')
   
-  // 主编辑器（碎片笔记、框架笔记）
+  // 主编辑器（碎片笔记、技能笔记）
   if (editor.value) {
     editor.value.commands.setContent('')
     console.log('✓ 主编辑器已重置')
@@ -5595,7 +5722,7 @@ const getTypeClass = (type: string) => {
     exercise: 'bg-orange-100 text-orange-600',
     practical: 'bg-red-100 text-red-600',
     fragment: 'bg-indigo-100 text-indigo-600',
-    framework: 'bg-teal-100 text-teal-600',
+    skill: 'bg-teal-100 text-teal-600',
     memorization: 'bg-pink-100 text-pink-600'
   }
   return classes[type as keyof typeof classes] || 'bg-gray-100 text-gray-600'
@@ -5609,7 +5736,7 @@ const getTypeText = (type: string) => {
     exercise: '刷题笔记',
     practical: '实战笔记',
     fragment: '碎片笔记',
-    framework: '框架笔记',
+    skill: '技能笔记',
     memorization: '背诵笔记'
   }
   return texts[type as keyof typeof texts] || '未知'
@@ -5680,9 +5807,9 @@ const loadStoredTypes = () => {
     storedProjectTypes.value = JSON.parse(localStorage.getItem('noteProjectTypes') || '[]')
     storedFragmentThemes.value = JSON.parse(localStorage.getItem('noteFragmentThemes') || '[]')
     
-    // 加载框架笔记数据
-    storedFrameworkSubjects.value = JSON.parse(localStorage.getItem('storedFrameworkSubjects') || JSON.stringify(defaultFrameworkSubjects))
-    storedFrameworkKnowledge.value = JSON.parse(localStorage.getItem('storedFrameworkKnowledge') || JSON.stringify(defaultFrameworkKnowledge))
+    // 加载技能笔记数据
+    storedSkillTypes.value = JSON.parse(localStorage.getItem('storedSkillTypes') || JSON.stringify(defaultSkillTypes))
+    storedSkillPoints.value = JSON.parse(localStorage.getItem('storedSkillPoints') || JSON.stringify(defaultSkillPoints))
     
     // 加载自定义选项
     customProjectOptions.value = JSON.parse(localStorage.getItem('customProjectOptions') || '[]')
@@ -5949,112 +6076,112 @@ const removeStudySubject = (subject: string) => {
   recordForm.studySubject = recordForm.studySubject.filter(s => s !== subject)
 }
 
-// === 框架笔记处理函数 ===
-// 移除框架笔记学科类型
-const removeFrameworkSubject = (subject: string) => {
-  recordForm.subjectType = recordForm.subjectType.filter(s => s !== subject)
+// === 技能笔记处理函数 ===
+// 移除技能类型
+const removeSkillType = (subject: string) => {
+  recordForm.skillType = recordForm.skillType.filter(s => s !== subject)
 }
 
-// 移除框架笔记知识点
-const removeFrameworkKnowledge = (knowledge: string) => {
-  recordForm.knowledgePoint = recordForm.knowledgePoint.filter(k => k !== knowledge)
+// 移除技能点
+const removeSkillPoint = (knowledge: string) => {
+  recordForm.skillPoint = recordForm.skillPoint.filter(k => k !== knowledge)
 }
 
-// 添加框架笔记学科类型
-const addFrameworkSubject = () => {
-  const subject = newFrameworkSubject.value.trim()
+// 添加技能类型
+const addSkillType = () => {
+  const subject = newSkillType.value.trim()
   if (subject) {
     // 添加到表单
-    if (!recordForm.subjectType.includes(subject)) {
-      recordForm.subjectType.push(subject)
+    if (!recordForm.skillType.includes(subject)) {
+      recordForm.skillType.push(subject)
     }
     // 添加到存储数组
-    if (!storedFrameworkSubjects.value.includes(subject)) {
-      storedFrameworkSubjects.value.push(subject)
-      localStorage.setItem('storedFrameworkSubjects', JSON.stringify(storedFrameworkSubjects.value))
+    if (!storedSkillTypes.value.includes(subject)) {
+      storedSkillTypes.value.push(subject)
+      localStorage.setItem('storedSkillTypes', JSON.stringify(storedSkillTypes.value))
     }
-    newFrameworkSubject.value = ''
+    newSkillType.value = ''
   }
 }
 
-// 添加框架笔记知识点
-const addFrameworkKnowledge = () => {
-  const knowledge = newFrameworkKnowledge.value.trim()
+// 添加技能点
+const addSkillPoint = () => {
+  const knowledge = newSkillPoint.value.trim()
   if (knowledge) {
     // 添加到表单
-    if (!recordForm.knowledgePoint.includes(knowledge)) {
-      recordForm.knowledgePoint.push(knowledge)
+    if (!recordForm.skillPoint.includes(knowledge)) {
+      recordForm.skillPoint.push(knowledge)
     }
     // 添加到存储数组
-    if (!storedFrameworkKnowledge.value.includes(knowledge)) {
-      storedFrameworkKnowledge.value.push(knowledge)
-      localStorage.setItem('storedFrameworkKnowledge', JSON.stringify(storedFrameworkKnowledge.value))
+    if (!storedSkillPoints.value.includes(knowledge)) {
+      storedSkillPoints.value.push(knowledge)
+      localStorage.setItem('storedSkillPoints', JSON.stringify(storedSkillPoints.value))
     }
-    newFrameworkKnowledge.value = ''
+    newSkillPoint.value = ''
   }
 }
 
-// 选择框架笔记学科类型
-const selectFrameworkSubject = (subject: string) => {
-  if (!recordForm.subjectType.includes(subject)) {
-    recordForm.subjectType.push(subject)
+// 选择技能类型
+const selectSkillType = (subject: string) => {
+  if (!recordForm.skillType.includes(subject)) {
+    recordForm.skillType.push(subject)
   }
 }
 
-// 选择框架笔记知识点
-const selectFrameworkKnowledge = (knowledge: string) => {
-  if (!recordForm.knowledgePoint.includes(knowledge)) {
-    recordForm.knowledgePoint.push(knowledge)
+// 选择技能点
+const selectSkillPoint = (knowledge: string) => {
+  if (!recordForm.skillPoint.includes(knowledge)) {
+    recordForm.skillPoint.push(knowledge)
   }
 }
 
-// 删除框架笔记学科类型（检查是否有笔记在使用）
-const deleteFrameworkSubject = (subject: string) => {
-  // 检查是否有框架笔记在使用这个学科类型
+// 删除技能类型（检查是否有笔记在使用）
+const deleteSkillType = (subject: string) => {
+  // 检查是否有技能笔记在使用这个技能类型
   const isInUse = todayRecords.value.some(record => 
-    record.type === 'framework' && 
-    record.subjectType && 
-    Array.isArray(record.subjectType) && 
-    record.subjectType.includes(subject)
+    record.type === 'skill' && 
+    record.skillType && 
+    Array.isArray(record.skillType) && 
+    record.skillType.includes(subject)
   )
   
   if (isInUse) {
-    alert(`无法删除"${subject}"，因为有笔记正在使用此学科类型`)
+    alert(`无法删除"${subject}"，因为有笔记正在使用此技能类型`)
     return
   }
   
   // 从存储数组中删除
-  const index = storedFrameworkSubjects.value.indexOf(subject)
+  const index = storedSkillTypes.value.indexOf(subject)
   if (index > -1) {
-    storedFrameworkSubjects.value.splice(index, 1)
+    storedSkillTypes.value.splice(index, 1)
     // 保存到localStorage
-    localStorage.setItem('storedFrameworkSubjects', JSON.stringify(storedFrameworkSubjects.value))
-    console.log(`学科类型"${subject}"已从列表中删除`)
+    localStorage.setItem('storedSkillTypes', JSON.stringify(storedSkillTypes.value))
+    console.log(`技能类型"${subject}"已从列表中删除`)
   }
 }
 
-// 删除框架笔记知识点（检查是否有笔记在使用）
-const deleteFrameworkKnowledge = (knowledge: string) => {
-  // 检查是否有框架笔记在使用这个知识点
+// 删除技能点（检查是否有笔记在使用）
+const deleteSkillPoint = (knowledge: string) => {
+  // 检查是否有技能笔记在使用这个技能点
   const isInUse = todayRecords.value.some(record => 
-    record.type === 'framework' && 
-    record.knowledgePoint && 
-    Array.isArray(record.knowledgePoint) && 
-    record.knowledgePoint.includes(knowledge)
+    record.type === 'skill' && 
+    record.skillPoint && 
+    Array.isArray(record.skillPoint) && 
+    record.skillPoint.includes(knowledge)
   )
   
   if (isInUse) {
-    alert(`无法删除"${knowledge}"，因为有笔记正在使用此知识点`)
+    alert(`无法删除"${knowledge}"，因为有笔记正在使用此技能点`)
     return
   }
   
   // 从存储数组中删除
-  const index = storedFrameworkKnowledge.value.indexOf(knowledge)
+  const index = storedSkillPoints.value.indexOf(knowledge)
   if (index > -1) {
-    storedFrameworkKnowledge.value.splice(index, 1)
+    storedSkillPoints.value.splice(index, 1)
     // 保存到localStorage
-    localStorage.setItem('storedFrameworkKnowledge', JSON.stringify(storedFrameworkKnowledge.value))
-    console.log(`知识点"${knowledge}"已从列表中删除`)
+    localStorage.setItem('storedSkillPoints', JSON.stringify(storedSkillPoints.value))
+    console.log(`技能点"${knowledge}"已从列表中删除`)
   }
 }
 
@@ -6204,36 +6331,36 @@ const removeFragmentCategory = (category: string) => {
 
 // 切换学科类型
 const toggleSubjectType = (type: string) => {
-  if (recordForm.subjectType.includes(type)) {
-    recordForm.subjectType = recordForm.subjectType.filter(t => t !== type)
+  if (recordForm.skillType.includes(type)) {
+    recordForm.skillType = recordForm.skillType.filter(t => t !== type)
   } else {
-    recordForm.subjectType.push(type)
+    recordForm.skillType.push(type)
   }
 }
 
 // 移除学科类型
 const removeSubjectType = (type: string) => {
-  recordForm.subjectType = recordForm.subjectType.filter(t => t !== type)
+  recordForm.skillType = recordForm.skillType.filter(t => t !== type)
 }
 
 // 切换知识点
 const toggleKnowledgePoint = (point: string) => {
-  if (recordForm.knowledgePoint.includes(point)) {
-    recordForm.knowledgePoint = recordForm.knowledgePoint.filter(p => p !== point)
+  if (recordForm.skillPoint.includes(point)) {
+    recordForm.skillPoint = recordForm.skillPoint.filter(p => p !== point)
   } else {
-    recordForm.knowledgePoint.push(point)
+    recordForm.skillPoint.push(point)
   }
 }
 
 // 移除知识点
 const removeKnowledgePoint = (point: string) => {
-  recordForm.knowledgePoint = recordForm.knowledgePoint.filter(p => p !== point)
+  recordForm.skillPoint = recordForm.skillPoint.filter(p => p !== point)
 }
 
 // 选择背诵笔记知识点
 const selectMemorizationKnowledge = (point: string) => {
-  if (!recordForm.knowledgePoint.includes(point)) {
-    recordForm.knowledgePoint.push(point)
+  if (!recordForm.skillPoint.includes(point)) {
+    recordForm.skillPoint.push(point)
   }
 }
 
@@ -6298,8 +6425,8 @@ const handleCustomProject = () => {
 // 处理学科类型选择
 const handleSubjectTypeSelect = () => {
   if (selectedSubjectType.value && selectedSubjectType.value !== 'other') {
-    if (!recordForm.subjectType.includes(selectedSubjectType.value)) {
-      recordForm.subjectType.push(selectedSubjectType.value)
+    if (!recordForm.skillType.includes(selectedSubjectType.value)) {
+      recordForm.skillType.push(selectedSubjectType.value)
     }
     selectedSubjectType.value = ''
   }
@@ -6323,8 +6450,8 @@ const addCustomSubjectType = () => {
     const newType = newSubjectType.value.trim()
     
     // 添加到表单
-    if (!recordForm.subjectType.includes(newType)) {
-      recordForm.subjectType.push(newType)
+    if (!recordForm.skillType.includes(newType)) {
+      recordForm.skillType.push(newType)
     }
     
     // 添加到自定义选项中
@@ -6454,7 +6581,7 @@ const getNoteTypeLabel = (type: string) => {
     memorization: '背诵笔记',
     exercise: '刷题笔记',
     practical: '实战笔记',
-    framework: '框架笔记'
+    skill: '技能笔记'
   }
   return typeMap[type] || type
 }

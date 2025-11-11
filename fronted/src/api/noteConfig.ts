@@ -54,3 +54,10 @@ export const deleteConfig = (id: number) => {
   return request.delete<string>(`/note-config/${id}`)
 }
 
+/**
+ * 根据笔记类型和配置类型获取配置（简化版）
+ */
+export const getNoteConfigByType = (noteType: string, configType: string) => {
+  return request.get(`/note-config/note-type/${noteType}/config-type/${configType}`)
+}
+

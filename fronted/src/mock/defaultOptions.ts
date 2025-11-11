@@ -29,16 +29,18 @@ export const defaultStudySubjects = [
   '英语', '日语', '法学', '哲学', '历史学', '文学'
 ]
 
-// 框架笔记学科类型选项
-export const defaultFrameworkSubjects = [
-  '计算机科学', '数学', '物理学', '化学', '生物学', '经济学', '管理学', '法学', '文学', '历史学'
+// 技能笔记技能类型选项
+export const defaultSkillTypes = [
+  '前端开发', '后端开发', '移动开发', '数据库', '算法', '系统设计', '测试', '运维', '项目管理', '软技能'
 ]
 
-// 框架笔记知识点选项
-export const defaultFrameworkKnowledge = [
-  '数据结构', '算法设计', '系统架构', '编程语言', '软件工程',
-  '数据库设计', '网络协议', '机器学习', '人工智能', '前端开发',
-  '后端开发', '移动开发', '运维部署', '测试方法', '项目管理'
+// 技能笔记技能点选项
+export const defaultSkillPoints = [
+  'Vue.js', 'React', 'TypeScript', 'JavaScript', 'CSS/Sass',
+  'Spring Boot', 'Node.js', 'Python', 'Java', 'Go',
+  'MySQL', 'Redis', 'MongoDB', 'PostgreSQL',
+  '数据结构', '算法设计', '系统架构', '设计模式',
+  'Git', 'Docker', 'CI/CD', 'Linux', 'Nginx'
 ]
 
 // 学科类型选项

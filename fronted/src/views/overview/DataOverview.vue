@@ -298,17 +298,17 @@
           </div>
         </div>
 
-        <!-- 框架笔记仪表盘 -->
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-5 hover:shadow-lg transition-shadow cursor-pointer border border-purple-200" @click="$router.push('/framework-notes')">
+        <!-- 技能笔记仪表盘 -->
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-5 hover:shadow-lg transition-shadow cursor-pointer border border-purple-200" @click="$router.push('/skill-notes')">
           <div class="flex items-center justify-between mb-3">
-            <h4 class="text-lg font-semibold text-gray-900">框架笔记</h4>
-            <span class="bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">框架</span>
+            <h4 class="text-lg font-semibold text-gray-900">技能笔记</h4>
+            <span class="bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">技能</span>
           </div>
           <p class="text-gray-600 mb-3 text-sm">知识框架、体系结构、思维导图</p>
           <div class="flex justify-between items-center mb-3">
             <div>
               <p class="text-gray-500 text-sm">素材数量</p>
-              <p class="text-xl font-bold text-gray-900">{{ noteStats.framework }} 条</p>
+              <p class="text-xl font-bold text-gray-900">{{ noteStats.skill }} 条</p>
             </div>
             <div class="text-purple-500">
               <i class="fas fa-sitemap text-2xl"></i>
@@ -316,7 +316,7 @@
           </div>
           <div class="flex items-center text-sm text-gray-500">
             <i class="fas fa-clock mr-1"></i>
-            <span>最近更新: {{ getLatestUpdate('framework') }}</span>
+            <span>最近更新: {{ getLatestUpdate('skill') }}</span>
           </div>
         </div>
 
@@ -944,7 +944,7 @@ dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
 
 // 响应式数据容器
-const noteStats = ref<any>({ framework: 0, study: 0, memorization: 0, exercise: 0, practical: 0, fragment: 0 })
+const noteStats = ref<any>({ skill: 0, study: 0, expansion: 0, exercise: 0, practical: 0, fragment: 0 })
 const allHonors = ref<any[]>([])
 const allNotes = ref<any[]>([])
 const allTasks = ref<any[]>([])
@@ -1236,7 +1236,7 @@ const loadData = async () => {
     if (noteRes.code === 200) {
       allNotes.value = noteRes.data || []
       // 计算笔记统计
-      const stats: any = { framework: 0, study: 0, memorization: 0, exercise: 0, practical: 0, fragment: 0 }
+      const stats: any = { skill: 0, study: 0, expansion: 0, exercise: 0, practical: 0, fragment: 0 }
       allNotes.value.forEach((note: any) => {
         if (stats.hasOwnProperty(note.type)) {
           stats[note.type]++
@@ -1569,7 +1569,7 @@ const getEventEmoji = (days: number) => {
 }
 
 // 动态获取各类笔记最近更新时间（改为异步）
-const getLatestUpdate = (type: 'framework' | 'study' | 'memorization' | 'exercise' | 'practical' | 'fragment') => {
+const getLatestUpdate = (type: 'skill' | 'study' | 'expansion' | 'exercise' | 'practical' | 'fragment') => {
   // 依赖currentTime.value以实现自动更新
   currentTime.value // 触发响应式更新
   

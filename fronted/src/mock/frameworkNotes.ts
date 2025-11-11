@@ -29,10 +29,10 @@ const generateRandomTime = (start: Date, end: Date): string => {
 // 获取时间范围
 const timeRange = generateTimeRange();
 
-// 框架笔记类型定义
-export interface FrameworkNote {
+// 技能笔记类型定义
+export interface SkillNote {
   id: number
-  type: 'framework'
+  type: 'skill'
   title: string
   summary: string
   content: string
@@ -42,10 +42,10 @@ export interface FrameworkNote {
   knowledgePoint: string[]   // 知识点类型
 }
 
-export const frameworkNotes: FrameworkNote[] = [
+export const skillNotes: SkillNote[] = [
   {
     id: 1,
-    type: 'framework',
+    type: 'skill',
     title: 'Vue.js 组件化开发框架',
     summary: 'Vue.js前端框架的组件化思想、状态管理和路由系统的完整梳理',
     content: '<h2>Vue.js 组件化开发框架</h2><p>Vue.js是一个渐进式的JavaScript框架，以组件化开发为核心理念。</p><h3>核心概念</h3><ul><li>响应式数据绑定原理</li><li>组件生命周期管理</li><li>虚拟DOM和diff算法</li><li>指令系统和模板语法</li></ul><h3>状态管理</h3><ul><li>Vuex状态管理模式</li><li>模块化状态管理</li><li>状态持久化方案</li><li>异步状态处理</li></ul><h3>路由系统</h3><ul><li>Vue Router配置</li><li>路由守卫机制</li><li>动态路由匹配</li><li>嵌套路由设计</li></ul>',
@@ -56,7 +56,7 @@ export const frameworkNotes: FrameworkNote[] = [
   },
   {
     id: 2,
-    type: 'framework',
+    type: 'skill',
     title: '数据库设计规范化框架',
     summary: '关系型数据库设计的规范化理论、索引优化和性能调优体系',
     content: '<h2>数据库设计规范化框架</h2><p>数据库设计是系统架构的重要组成部分，需要遵循科学的设计原则。</p><h3>规范化理论</h3><ul><li>第一范式到第三范式</li><li>BCNF和第四范式</li><li>函数依赖分析</li><li>数据冗余控制</li></ul><h3>索引策略</h3><ul><li>B+树索引原理</li><li>联合索引设计</li><li>覆盖索引优化</li><li>索引失效场景</li></ul><h3>性能优化</h3><ul><li>SQL查询优化</li><li>执行计划分析</li><li>分库分表策略</li><li>读写分离方案</li></ul>',
@@ -177,26 +177,26 @@ export const frameworkNotes: FrameworkNote[] = [
   }
 ]
 
-// 获取所有框架笔记
-export const getAllFrameworkNotes = () => {
-  return frameworkNotes
+// 获取所有技能笔记
+export const getAllSkillNotes = () => {
+  return skillNotes
 }
 
-// 根据ID获取单个框架笔记
-export const getFrameworkNoteById = (id: number) => {
-  return frameworkNotes.find(note => note.id === id)
+// 根据ID获取单个技能笔记
+export const getSkillNoteById = (id: number) => {
+  return skillNotes.find(note => note.id === id)
 }
 
-// 根据学科类型获取框架笔记
-export const getFrameworkNotesBySubjectType = (subjectType: string) => {
-  return frameworkNotes.filter(note => 
-    note.subjectType.includes(subjectType)
+// 根据技能类型获取技能笔记
+export const getSkillNotesByType = (skillType: string) => {
+  return skillNotes.filter(note => 
+    note.subjectType.includes(skillType)
   )
 }
 
-// 根据知识点获取框架笔记
-export const getFrameworkNotesByKnowledgePoint = (knowledgePoint: string) => {
-  return frameworkNotes.filter(note => 
-    note.knowledgePoint.includes(knowledgePoint)
+// 根据技能点获取技能笔记
+export const getSkillNotesByPoint = (skillPoint: string) => {
+  return skillNotes.filter(note => 
+    note.knowledgePoint.includes(skillPoint)
   )
 } 

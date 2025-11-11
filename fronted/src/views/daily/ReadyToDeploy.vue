@@ -133,34 +133,34 @@
             </div>
 
             <!-- 操作按钮 -->
-            <div class="ml-6 flex flex-col space-y-3">
+            <div class="ml-6 grid grid-cols-2 gap-3">
               <button 
                 @click="viewProjectNotes(project)"
-                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
+                class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
               >
-                <i class="fas fa-book-open mr-2"></i>
-                回顾笔记
+                <i class="fas fa-book-open mr-1.5"></i>
+                调用资源
               </button>
               <button 
                 @click="addSprintNote(project)"
-                class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
+                class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
               >
-                <i class="fas fa-plus mr-2"></i>
-                新增记忆
+                <i class="fas fa-plus mr-1.5"></i>
+                新增战法
               </button>
               <button 
                 @click="manageSprintNotes(project)"
-                class="px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-orange-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
+                class="px-5 py-2.5 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-orange-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
               >
-                <i class="fas fa-edit mr-2"></i>
-                管理记忆
+                <i class="fas fa-edit mr-1.5"></i>
+                调整战法
               </button>
               <button 
                 @click="reviewSprintNotes(project)"
-                class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
+                class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap"
               >
-                <i class="fas fa-book-reader mr-2"></i>
-                回顾记忆
+                <i class="fas fa-book-reader mr-1.5"></i>
+                熟练战法
               </button>
             </div>
           </div>
@@ -174,7 +174,7 @@
         <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
         <div class="text-sm text-gray-700">
           <p class="font-semibold mb-1">功能说明</p>
-          <p>此页面展示所有进行中的战争行动与外交行动项目。出征前在此页面反复回顾项目的<strong>关联笔记</strong>和<strong>冲刺记忆</strong>，确保准备充分，做好最后的冲刺准备。</p>
+          <p>此页面展示所有进行中的战争行动与外交行动项目。出征前在此页面反复回顾项目的<strong>关联笔记</strong>和<strong>冲刺要点</strong>，确保准备充分，做好最后的冲刺准备。</p>
             </div>
           </div>
         </div>
@@ -312,8 +312,8 @@
 
           <!-- 笔记详细内容（根据类型和Tab显示） -->
           <div class="note-content bg-gray-50 p-4 rounded-lg min-h-[200px]">
-            <!-- 碎片笔记/框架笔记：只有一个 content 字段 -->
-            <div v-if="selectedNoteDetail?.type === 'fragment' || selectedNoteDetail?.type === 'framework'" 
+            <!-- 碎片笔记/技能笔记：只有一个 content 字段 -->
+            <div v-if="selectedNoteDetail?.type === 'fragment' || selectedNoteDetail?.type === 'skill'" 
                  v-html="selectedNoteDetail?.content || '暂无内容'">
             </div>
 
@@ -421,10 +421,10 @@
               </span>
             </div>
 
-            <!-- 框架笔记 - 显示学科 -->
-            <div v-if="selectedNoteDetail?.type === 'framework' && selectedNoteDetail?.subjectType" 
+            <!-- 技能笔记 - 显示学科 -->
+            <div v-if="selectedNoteDetail?.type === 'skill' && selectedNoteDetail?.skillType" 
                  class="flex items-center space-x-2">
-              <span class="text-sm font-medium text-gray-700">学科：</span>
+              <span class="text-sm font-medium text-gray-700">技能类型：</span>
               <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
                 {{ selectedNoteDetail.subjectType }}
               </span>
@@ -466,7 +466,7 @@
           </div>
         </div>
 
-    <!-- 添加/编辑冲刺记忆表单弹窗 -->
+    <!-- 添加/编辑冲刺要点表单弹窗 -->
     <div 
       v-if="showAddSprintNoteDialog" 
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]"
@@ -475,7 +475,7 @@
       <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <!-- 表单头部 -->
         <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 sticky top-0">
-          <h3 class="text-2xl font-bold">{{ isEditingSprintNote ? '编辑冲刺记忆' : '新增冲刺记忆' }}</h3>
+          <h3 class="text-2xl font-bold">{{ isEditingSprintNote ? '编辑冲刺要点' : '新增冲刺要点' }}</h3>
           <p class="text-green-100 mt-1">{{ selectedProject?.name }}</p>
         </div>
 
@@ -538,13 +538,13 @@
               ></textarea>
             </div>
 
-            <!-- 记忆提示词 -->
+            <!-- 提示线索 -->
             <div class="mb-4">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">记忆提示词</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">提示线索</label>
               <textarea 
                 v-model="sprintNoteForm.cue" 
                 rows="3" 
-                placeholder="请输入记忆提示词或口诀"
+                placeholder="请输入提示线索或口诀"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
               ></textarea>
             </div>
@@ -571,7 +571,7 @@
       </div>
     </div>
 
-    <!-- 管理冲刺记忆弹窗 -->
+    <!-- 管理冲刺要点弹窗 -->
     <div 
       v-if="showManageSprintNotesDialog" 
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
@@ -580,7 +580,7 @@
       <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
         <!-- 弹窗头部 -->
         <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-6">
-          <h3 class="text-2xl font-bold">管理冲刺记忆</h3>
+          <h3 class="text-2xl font-bold">管理冲刺要点</h3>
           <p class="text-yellow-100 mt-1">{{ selectedProject?.name }}</p>
         </div>
 
@@ -588,7 +588,7 @@
         <div class="p-6 overflow-y-auto" style="max-height: calc(80vh - 200px)">
           <div v-if="projectSprintNotes.length === 0" class="text-center py-12">
             <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-            <p class="text-gray-500">暂无冲刺记忆</p>
+            <p class="text-gray-500">暂无冲刺要点</p>
           </div>
 
           <div v-else class="space-y-3">
@@ -637,7 +637,7 @@
       </div>
     </div>
 
-    <!-- 回顾冲刺记忆弹窗 -->
+    <!-- 回顾冲刺要点弹窗 -->
     <div 
       v-if="showReviewSprintNotesDialog" 
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
@@ -646,8 +646,8 @@
       <div class="bg-white rounded-xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <!-- 弹窗头部 -->
         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6">
-          <h3 class="text-2xl font-bold">回顾冲刺记忆</h3>
-          <p class="text-purple-100 mt-1">{{ selectedProject?.name }} - {{ filteredSprintNotes.length }} 条记忆</p>
+          <h3 class="text-2xl font-bold">回顾冲刺要点</h3>
+          <p class="text-purple-100 mt-1">{{ selectedProject?.name }} - {{ filteredSprintNotes.length }} 条要点</p>
         </div>
 
         <!-- 搜索框 -->
@@ -667,7 +667,7 @@
         <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 300px)">
           <div v-if="filteredSprintNotes.length === 0" class="text-center py-12">
             <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-            <p class="text-gray-500">未找到匹配的记忆</p>
+            <p class="text-gray-500">未找到匹配的要点</p>
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -700,7 +700,7 @@
       </div>
     </div>
 
-    <!-- 冲刺记忆详情弹窗 -->
+    <!-- 冲刺要点详情弹窗 -->
     <div 
       v-if="showSprintNoteDetailDialog" 
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]"
@@ -830,7 +830,7 @@ const noteDetailTabs = computed(() => {
     'memorization': [
       { label: '原文', value: 'original' },
       { label: '解释', value: 'explanation' },
-      { label: '记忆线索', value: 'cue' }
+      { label: '提示线索', value: 'cue' }
     ],
     'exercise': [
       { label: '题目描述', value: 'question' },
@@ -842,9 +842,9 @@ const noteDetailTabs = computed(() => {
       { label: '设计思路', value: 'design' },
       { label: '参考设计', value: 'reference' }
     ],
-    // 碎片笔记和框架笔记没有 Tab，直接显示 content
+    // 碎片笔记和技能笔记没有 Tab，直接显示 content
     'fragment': [],
-    'framework': []
+    'skill': []
   }
   
   return tabConfigs[type] || []
@@ -1100,7 +1100,7 @@ const editSprintNote = (note: any) => {
 
 // 删除冲刺记忆
 const deleteSprintNote = async (note: any) => {
-  if (!confirm('确定删除这条冲刺记忆吗？')) return
+  if (!confirm('确定删除这条冲刺要点吗？')) return
   
   try {
     const response = await request.delete(`/project/sprint-notes/${note.id}`)
@@ -1199,7 +1199,7 @@ const closeNoteDetailDialog = () => {
 const getNoteTypeText = (type: string) => {
   const typeMap: Record<string, string> = {
     'fragment': '碎片笔记',
-    'framework': '框架笔记',
+    'skill': '技能笔记',
     'study': '求学笔记',
     'expansion': '拓展笔记',
     'memorization': '背诵笔记',
@@ -1244,7 +1244,7 @@ const parseTagsArray = (tags: any): string[] => {
 const getNoteTypeTagClass = (type: string) => {
   const classMap: Record<string, string> = {
     'fragment': 'bg-purple-100 text-purple-700',
-    'framework': 'bg-blue-100 text-blue-700',
+    'skill': 'bg-blue-100 text-blue-700',
     'study': 'bg-green-100 text-green-700',
     'expansion': 'bg-blue-100 text-blue-700',
     'memorization': 'bg-amber-100 text-amber-700',
@@ -1258,7 +1258,7 @@ const getNoteTypeTagClass = (type: string) => {
 const getNoteTypeIconClass = (type: string) => {
   const iconMap: Record<string, string> = {
     'fragment': 'fas fa-puzzle-piece',
-    'framework': 'fas fa-sitemap',
+    'skill': 'fas fa-sitemap',
     'study': 'fas fa-graduation-cap',
     'expansion': 'fas fa-book-open',
     'memorization': 'fas fa-bookmark',
@@ -1272,7 +1272,7 @@ const getNoteTypeIconClass = (type: string) => {
 const getNoteCardBorderClass = (type: string) => {
   const classMap: Record<string, string> = {
     'fragment': 'border-purple-200 hover:border-purple-400',
-    'framework': 'border-blue-200 hover:border-blue-400',
+    'skill': 'border-blue-200 hover:border-blue-400',
     'study': 'border-green-200 hover:border-green-400',
     'expansion': 'border-blue-200 hover:border-blue-400',
     'memorization': 'border-amber-200 hover:border-amber-400',

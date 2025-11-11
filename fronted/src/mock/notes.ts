@@ -3,7 +3,7 @@
 // 统一笔记类型定义
 export interface Note {
   id: number
-  type: 'framework' | 'study' | 'memorization' | 'exercise' | 'practical' | 'fragment'
+  type: 'skill' | 'study' | 'memorization' | 'exercise' | 'practical' | 'fragment'
   title: string
   summary: string
   content: string
@@ -39,7 +39,7 @@ export interface Note {
 }
 
 // 导入各类型笔记数据
-import { getAllFrameworkNotes } from './frameworkNotes'
+import { getAllSkillNotes } from './frameworkNotes'
 import { getAllStudyNotes } from './studyNotes'
 import { getAllExerciseNotes } from './exerciseNotes'
 import { getAllPracticalNotes } from './practicalNotes'
@@ -48,7 +48,7 @@ import { getAllMemorizationNotes } from './memorizationNotes'
 
 // 获取所有笔记
 export const getAllNotes = (): Note[] => {
-  const frameworkNotes = getAllFrameworkNotes()
+  const skillNotes = getAllSkillNotes()
   const studyNotes = getAllStudyNotes()
   const exerciseNotes = getAllExerciseNotes()
   const practicalNotes = getAllPracticalNotes()
@@ -56,7 +56,7 @@ export const getAllNotes = (): Note[] => {
   const memorizationNotes = getAllMemorizationNotes()
   
   return [
-    ...frameworkNotes,
+    ...skillNotes,
     ...studyNotes,
     ...exerciseNotes,
     ...practicalNotes,
@@ -68,8 +68,8 @@ export const getAllNotes = (): Note[] => {
 // 根据类型获取笔记
 export const getNotesByType = (type: Note['type']): Note[] => {
   switch (type) {
-    case 'framework':
-      return getAllFrameworkNotes()
+    case 'skill':
+      return getAllSkillNotes()
     case 'study':
       return getAllStudyNotes()
     case 'exercise':
@@ -114,7 +114,7 @@ export const getNotesStats = () => {
   const stats = {
     total: allNotes.length,
     byType: {
-      framework: allNotes.filter(n => n.type === 'framework').length,
+      skill: allNotes.filter(n => n.type === 'skill').length,
       study: allNotes.filter(n => n.type === 'study').length,
       memorization: allNotes.filter(n => n.type === 'memorization').length,
       exercise: allNotes.filter(n => n.type === 'exercise').length,

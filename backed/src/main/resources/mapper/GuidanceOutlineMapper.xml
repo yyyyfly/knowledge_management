@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.knowledge.mapper.GuidanceOutlineMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.GuidanceOutline">
+        <id column="id" property="id"/>
+        <result column="subject_name" property="subjectName"/>
+        <result column="subject_category" property="subjectCategory"/>
+        <result column="knowledge_tree" property="knowledgeTree"/>
+        <result column="tags" property="tags"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_guidance_outline
+        WHERE id = #{id}
+        AND rec_creator = #{recCreator}
+        AND arch_flag = 0
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_guidance_outline
+        WHERE rec_creator = #{recCreator}
+        AND arch_flag = 0
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 根据分类查询 -->
+    <select id="selectByCategory" resultMap="BaseResultMap">
+        SELECT * FROM km_guidance_outline
+        WHERE rec_creator = #{recCreator}
+        AND arch_flag = 0
+        <if test="subjectCategory != null and subjectCategory != ''">
+            AND subject_category = #{subjectCategory}
+        </if>
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 搜索 -->
+    <select id="search" resultMap="BaseResultMap">
+        SELECT * FROM km_guidance_outline
+        WHERE rec_creator = #{recCreator}
+        AND arch_flag = 0
+        <if test="keyword != null and keyword != ''">
+            AND (subject_name LIKE CONCAT('%', #{keyword}, '%')
+            OR tags LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY rec_create_time DESC
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.knowledge.entity.GuidanceOutline" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_guidance_outline (
+            subject_name,
+            subject_category,
+            knowledge_tree,
+            tags,
+            rec_creator,
+            rec_create_time,
+            arch_flag
+        ) VALUES (
+            #{subjectName},
+            #{subjectCategory},
+            #{knowledgeTree},
+            #{tags},
+            #{recCreator},
+            NOW(),
+            0
+        )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="com.knowledge.entity.GuidanceOutline">
+        UPDATE km_guidance_outline
+        SET subject_name = #{subjectName},
+            subject_category = #{subjectCategory},
+            knowledge_tree = #{knowledgeTree},
+            tags = #{tags},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除（逻辑删除） -->
+    <update id="delete">
+        UPDATE km_guidance_outline
+        SET arch_flag = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 物理删除 -->
+    <delete id="deletePhysically">
+        DELETE FROM km_guidance_outline
+        WHERE id = #{id}
+    </delete>
+
+</mapper>
+
