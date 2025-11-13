@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.DatabaseManagementMapper">
+
+    <!-- ========== 表结构操作（DDL） ========== -->
+    
+    <!-- 获取数据库所有表名 - 兼容MySQL 5.7和8.0 -->
+    <select id="getAllTables" resultType="String">
+        SELECT TABLE_NAME 
+        FROM information_schema.TABLES 
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_TYPE = 'BASE TABLE'
+        ORDER BY TABLE_NAME
+    </select>
+    
+    <!-- 获取表结构信息 - 兼容MySQL 5.7和8.0 -->
+    <select id="getTableStructure" resultType="Map">
+        SELECT 
+            COLUMN_NAME as columnName,
+            COLUMN_TYPE as columnType,
+            DATA_TYPE as dataType,
+            CHARACTER_MAXIMUM_LENGTH as maxLength,
+            IS_NULLABLE as isNullable,
+            COLUMN_DEFAULT as defaultValue,
+            COLUMN_KEY as columnKey,
+            EXTRA as extra,
+            COLUMN_COMMENT as comment
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = #{tableName}
+        ORDER BY ORDINAL_POSITION
+    </select>
+    
+    <!-- 获取建表语句 - 兼容MySQL 5.7和8.0 -->
+    <select id="getCreateTableSQL" resultType="Map">
+        SHOW CREATE TABLE `${tableName}`
+    </select>
+    
+    <!-- 执行DDL语句 -->
+    <update id="executeSQL">
+        ${sql}
+    </update>
+    
+    <!-- 获取表的详细信息 - 兼容MySQL 5.7和8.0 -->
+    <select id="getTableInfo" resultType="Map">
+        SELECT 
+            TABLE_NAME as tableName,
+            ENGINE as engine,
+            TABLE_COLLATION as collation,
+            TABLE_COMMENT as comment,
+            TABLE_ROWS as tableRows,
+            CREATE_TIME as createTime,
+            UPDATE_TIME as updateTime
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = #{tableName}
+    </select>
+    
+    <!-- ========== 数据操作（DML） ========== -->
+    
+    <!-- 分页查询表数据 - 兼容MySQL 5.7和8.0 -->
+    <select id="queryTableData" resultType="Map">
+        SELECT * FROM `${tableName}`
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 统计表总记录数 - 兼容MySQL 5.7和8.0 -->
+    <select id="countTableData" resultType="Integer">
+        SELECT COUNT(*) FROM `${tableName}`
+    </select>
+    
+    <!-- 获取主键列名 - 兼容MySQL 5.7和8.0 -->
+    <select id="getPrimaryKeyColumn" resultType="String">
+        SELECT COLUMN_NAME
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = #{tableName}
+        AND COLUMN_KEY = 'PRI'
+        LIMIT 1
+    </select>
+    
+    <!-- 动态插入记录 -->
+    <insert id="insertRecord">
+        ${insertSQL}
+    </insert>
+    
+    <!-- 动态更新记录 -->
+    <update id="updateRecord">
+        ${updateSQL}
+    </update>
+    
+    <!-- 删除记录 - 兼容MySQL 5.7和8.0 -->
+    <delete id="deleteRecord">
+        DELETE FROM `${tableName}`
+        WHERE `${pkColumn}` = #{pkValue}
+    </delete>
+
+</mapper>
+

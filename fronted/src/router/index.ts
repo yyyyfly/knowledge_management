@@ -165,6 +165,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
+      path: '/data-management',
+      name: 'data-management',
+      component: () => import('@/views/system/DataManagement.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
       path: '/account-settings',
       name: 'account-settings',
       component: () => import('@/views/AccountSettings.vue'),
