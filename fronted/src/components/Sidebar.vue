@@ -247,6 +247,13 @@
               </div>
               <span class="ml-3">用户管理</span>
             </router-link>
+            <!-- 数据管理（仅管理员可见） -->
+            <router-link v-if="isAdmin" to="/data-management" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
+              <div class="w-6 flex justify-center">
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <span class="ml-3">数据管理</span>
+            </router-link>
             <router-link to="/account-settings" class="flex items-center p-3 rounded-lg text-dark-200 hover:bg-dark-600/30 transition-colors">
               <div class="w-6 flex justify-center">
                 <i class="fa-solid fa-user-cog"></i>
