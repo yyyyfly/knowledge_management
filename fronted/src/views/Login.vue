@@ -6,7 +6,7 @@
         <!-- Logo和标题 -->
         <div class="text-center">
           <div class="inline-block p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg mb-4">
-            <i class="fas fa-brain text-white text-4xl"></i>
+            <i class="fas fa-project-diagram text-white text-4xl"></i>
           </div>
           <h2 class="text-3xl font-bold text-gray-900 mb-2">个人知识管理系统</h2>
           <p class="text-gray-600">请登录您的账户</p>

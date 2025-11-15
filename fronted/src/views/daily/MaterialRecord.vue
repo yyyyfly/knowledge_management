@@ -1061,7 +1061,7 @@
                     <!-- 思考总结 -->
                     <div class="mb-4">
                       <label class="block text-sm font-medium text-purple-800 mb-2">
-                        <i class="fas fa-brain text-purple-600 mr-1"></i>
+                        <i class="fas fa-project-diagram text-purple-600 mr-1"></i>
                         思考总结
                       </label>
                       <RichTextEditor 
@@ -1288,7 +1288,7 @@
                     <!-- 思考理解 -->
                     <div class="mb-4">
                       <label class="block text-sm font-medium text-emerald-800 mb-2">
-                        <i class="fas fa-brain text-emerald-600 mr-1"></i>
+                        <i class="fas fa-project-diagram text-emerald-600 mr-1"></i>
                         思考理解
                       </label>
                       <RichTextEditor 
@@ -1368,7 +1368,7 @@
                   <div class="pt-4 border-t border-blue-200 mt-4">
                     <div class="flex items-center mb-4">
                       <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-2">
-                        <i class="fas fa-brain text-white text-xs"></i>
+                        <i class="fas fa-project-diagram text-white text-xs"></i>
                       </div>
                       <h5 class="text-md font-semibold text-blue-800">拓展内容编辑</h5>
                     </div>
@@ -1422,7 +1422,7 @@
                     <!-- 理解记录编辑器 -->
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-brain text-blue-600 mr-1"></i>
+                        <i class="fas fa-project-diagram text-blue-600 mr-1"></i>
                         理解记录
                       </label>
                       <RichTextEditor 

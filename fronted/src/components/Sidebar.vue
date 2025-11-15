@@ -3,7 +3,7 @@
     <div class="flex flex-col h-full">
       <div class="flex items-center justify-between p-4 border-b border-dark-600">
         <h1 class="text-xl font-bold text-primary flex items-center space-x-2">
-          <i class="fa-solid fa-brain"></i>
+          <i class="fa-solid fa-project-diagram"></i>
           <span>知识管理系统</span>
         </h1>
         <button class="lg:hidden text-dark-400 hover:text-dark-100" @click="toggleSidebar">
