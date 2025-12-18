@@ -104,3 +104,11 @@ export const deleteRecord = (tableName: string, pkColumn: string, pkValue: strin
 
 
 
+
+
+
+
+
+
+
+

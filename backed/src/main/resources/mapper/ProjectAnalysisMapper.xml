@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.ProjectAnalysisMapper">
+
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.ProjectAnalysis">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="logic_description" property="logicDescription"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+
+    <!-- 插入项目分析 -->
+    <insert id="insert" parameterType="com.knowledge.entity.ProjectAnalysis" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_project_analysis (
+            project_id, logic_description,
+            rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+        ) VALUES (
+            #{projectId}, #{logicDescription},
+            #{recCreator}, NOW(), #{recRevisor}, NOW(), 1
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM km_project_analysis
+        WHERE id = #{id} AND arch_flag = 1
+    </select>
+
+    <!-- 根据项目ID查询 -->
+    <select id="selectByProjectId" resultMap="BaseResultMap">
+        SELECT * FROM km_project_analysis
+        WHERE project_id = #{projectId}
+          AND rec_creator = #{username}
+          AND arch_flag = 1
+    </select>
+
+    <!-- 查询所有项目分析 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM km_project_analysis
+        WHERE rec_creator = #{username} AND arch_flag = 1
+        ORDER BY rec_revise_time DESC
+    </select>
+
+    <!-- 更新项目分析 -->
+    <update id="update" parameterType="com.knowledge.entity.ProjectAnalysis">
+        UPDATE km_project_analysis
+        SET
+            project_id = #{projectId},
+            logic_description = #{logicDescription},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id} AND arch_flag = 1
+    </update>
+
+    <!-- 根据项目ID更新 -->
+    <update id="updateByProjectId" parameterType="com.knowledge.entity.ProjectAnalysis">
+        UPDATE km_project_analysis
+        SET
+            logic_description = #{logicDescription},
+            rec_revisor = #{recRevisor},
+            rec_revise_time = NOW()
+        WHERE project_id = #{projectId} 
+          AND rec_creator = #{recCreator}
+          AND arch_flag = 1
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="delete">
+        UPDATE km_project_analysis
+        SET arch_flag = 0,
+            rec_revisor = #{revisor},
+            rec_revise_time = NOW()
+        WHERE id = #{id} AND arch_flag = 1
+    </update>
+
+    <!-- 检查项目分析是否存在 -->
+    <select id="existsByProjectId" resultType="int">
+        SELECT COUNT(1) FROM km_project_analysis
+        WHERE project_id = #{projectId}
+          AND rec_creator = #{username}
+          AND arch_flag = 1
+    </select>
+
+</mapper>
+

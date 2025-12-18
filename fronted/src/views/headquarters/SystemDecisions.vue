@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
-        <h1 class="text-3xl font-bold text-gray-900">系统决策</h1>
+        <h1 class="text-3xl font-bold text-gray-900">日常决策</h1>
         <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">战略管理</span>
       </div>
       <p class="text-gray-600">管理项目结构、任务分配和问题处理，为项目执行提供决策支持</p>
@@ -1284,7 +1284,7 @@ import {
   type CheckinItem 
 } from '@/api/checkin'
 
-// 系统决策仪表板 - 专注于项目管理和决策制定
+// 日常决策仪表板 - 专注于项目管理和决策制定
 
 // 响应式数据
 const projects = ref<any[]>([])

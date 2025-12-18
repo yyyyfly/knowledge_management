@@ -12,7 +12,7 @@
     <!-- 操作选项 -->
     <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">选择操作</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- 任务执行 -->
         <div 
           @click="openOperation('taskExecution')"
@@ -23,7 +23,7 @@
               <i class="fas fa-play-circle text-2xl text-green-600"></i>
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">任务执行</h4>
-            <p class="text-gray-600">查看和执行系统决策中创建的任务，记录执行进度</p>
+            <p class="text-gray-600">查看和执行日常决策中创建的任务，记录执行进度</p>
           </div>
         </div>
 
@@ -41,20 +41,6 @@
           </div>
         </div>
 
-        <!-- 项目心得 -->
-        <div 
-          @click="openOperation('projectRecord')"
-          class="p-6 border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all duration-200"
-        >
-          <div class="text-center">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-lightbulb text-2xl text-blue-600"></i>
-            </div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">项目心得</h4>
-            <p class="text-gray-600">记录项目执行过程中的心得体会、技术收获和执行总结</p>
-          </div>
-        </div>
-
         <!-- 打卡操作 -->
         <div 
           @click="openOperation('checkinOperation')"
@@ -66,20 +52,6 @@
             </div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">打卡操作</h4>
             <p class="text-gray-600">每日打卡、习惯养成和目标追踪</p>
-          </div>
-        </div>
-
-        <!-- 笔记调用 -->
-        <div 
-          @click="openOperation('noteReference')"
-          class="p-6 border-2 border-dashed border-indigo-300 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 cursor-pointer transition-all duration-200"
-        >
-          <div class="text-center">
-            <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-book-open text-2xl text-indigo-600"></i>
-            </div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">笔记调用</h4>
-            <p class="text-gray-600">关联项目笔记，快速调用相关知识和资料</p>
           </div>
         </div>
       </div>
@@ -526,104 +498,6 @@
           </div>
         </div>
       </template>
-      <template v-else-if="currentOperation === 'projectRecord'">
-        <div class="bg-white rounded-xl shadow-soft p-6 mb-8 max-h-[80vh] flex flex-col">
-          <div class="flex items-center justify-between mb-6 flex-shrink-0">
-            <h3 class="text-xl font-semibold text-gray-900">项目心得</h3>
-            <div class="flex space-x-2">
-              <button 
-                @click="showCreateRecord = true"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-              >
-                <i class="fas fa-plus"></i>
-                <span>新建心得</span>
-              </button>
-              <button 
-                @click="closeOperation()"
-                class="text-gray-500 hover:text-gray-700"
-              >
-                <i class="fas fa-times text-xl"></i>
-              </button>
-            </div>
-          </div>
-          
-          <!-- 搜索和筛选 -->
-          <div class="mb-6 flex-shrink-0">
-            <div class="flex flex-col md:flex-row gap-4">
-              <div class="flex-1">
-                <input 
-                  v-model="projectRecordSearchQuery"
-                  type="text" 
-                  placeholder="搜索心得标题、内容或技术关键词..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-              </div>
-              <div>
-                <select v-model="projectRecordFilterProject" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                  <option value="">全部项目</option>
-                  <option v-for="project in projects" :key="project.id" :value="project.id">
-                    {{ project.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 项目心得列表 -->
-          <div class="space-y-4 flex-1 overflow-y-auto">
-            <div v-for="record in filteredProjectRecords" :key="record.id" class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center space-x-3 mb-2">
-                    <h4 class="text-lg font-medium text-gray-900">{{ record.title }}</h4>
-                    <span class="text-sm text-gray-500">项目：{{ getProjectName(record.projectId) }}</span>
-                  </div>
-                  <div class="bg-gray-50 p-3 rounded-lg mb-3">
-                    <p class="text-sm font-medium text-gray-700 mb-1">心得摘要：</p>
-                    <p class="text-sm text-gray-600">{{ record.summary }}</p>
-                  </div>
-                  
-                  <!-- 详细描述 -->
-                  <div v-if="record.content" class="mb-3">
-                    <p class="text-sm font-medium text-gray-700 mb-1">详细内容：</p>
-                    <div class="text-sm text-gray-600 prose prose-sm max-w-none" v-html="record.content"></div>
-                  </div>
-                  
-                  <div class="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>{{ record.updateTime }}</span>
-                    <div class="flex space-x-1">
-                      <span v-for="tag in record.tags" :key="tag" class="bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        {{ tag }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex space-x-2">
-                  <button @click="editProjectRecord(record)" class="text-blue-600 hover:text-blue-800">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button @click="deleteProjectRecord(record.id)" class="text-red-600 hover:text-red-800">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <!-- 搜索空状态 -->
-            <div v-if="filteredProjectRecords.length === 0" class="text-center py-12 text-gray-500">
-              <i class="fas fa-search text-4xl mb-4"></i>
-              <p class="text-lg font-medium mb-2">未找到匹配的项目心得</p>
-              <p class="text-sm">请尝试调整搜索条件或创建新心得</p>
-              <button 
-                @click="showCreateRecord = true"
-                class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                创建新心得
-              </button>
-            </div>
-          </div>
-        </div>
-      </template>
 
       <!-- 问题管理 -->
       <template v-else-if="currentOperation === 'issueManagement'">
@@ -798,7 +672,7 @@
           <div v-if="activeCheckinItems.length === 0" class="text-center py-12 text-gray-500 flex-1">
             <i class="fas fa-check-circle text-6xl mb-4"></i>
             <p class="text-lg font-medium mb-2">暂无打卡项目</p>
-            <p class="text-sm">请先在"系统决策"中创建打卡项目</p>
+            <p class="text-sm">请先在"日常决策"中创建打卡项目</p>
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 overflow-y-auto">

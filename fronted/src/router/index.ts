@@ -50,6 +50,13 @@ const router = createRouter({
       component: () => import('@/views/overview/GuidanceOutline.vue'),
       meta: { requiresAuth: true }
     },
+    // 主仪表盘 > 需求草案
+    {
+      path: '/overview/requirement-draft',
+      name: 'requirement-draft',
+      component: () => import('@/views/overview/RequirementDraft.vue'),
+      meta: { requiresAuth: true }
+    },
     // 日常行动
     {
       path: '/daily/material-record',
@@ -73,6 +80,20 @@ const router = createRouter({
       path: '/ready-to-deploy',
       name: 'ready-to-deploy',
       component: () => import('@/views/daily/ReadyToDeploy.vue'),
+      meta: { requiresAuth: true }
+    },
+    // 项目分析
+    {
+      path: '/daily/project-analysis',
+      name: 'project-analysis',
+      component: () => import('@/views/daily/ProjectAnalysis.vue'),
+      meta: { requiresAuth: true }
+    },
+    // 项目心得
+    {
+      path: '/daily/project-insight',
+      name: 'project-insight',
+      component: () => import('@/views/daily/ProjectInsight.vue'),
       meta: { requiresAuth: true }
     },
     // 素材组 - 笔记页面
@@ -110,6 +131,12 @@ const router = createRouter({
       path: '/fragment-notes',
       name: 'fragment-notes',
       component: () => import('@/views/materials/FragmentNotes.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/training-center',
+      name: 'training-center',
+      component: () => import('@/views/materials/TrainingCenter.vue'),
       meta: { requiresAuth: true }
     },
     // 行动组仪表盘

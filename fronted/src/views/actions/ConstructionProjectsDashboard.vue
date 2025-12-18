@@ -3,7 +3,7 @@
     <!-- 页面头部 -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
-        <h1 class="text-3xl font-bold text-gray-900">建设行动</h1>
+        <h1 class="text-3xl font-bold text-gray-900">工程建设</h1>
         <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">能力提升</span>
       </div>
       <p class="text-gray-600">知识学习、技能打磨、个人成长的系统规划中心，致力于打造全面能力体系、提升核心竞争力</p>
@@ -308,7 +308,7 @@
 import { ref, computed, onMounted, onActivated } from 'vue'
 import request from '@/api/request'
 
-// 建设行动仪表板 - 专注于能力提升和学习成长
+// 工程建设仪表板 - 专注于能力提升和学习成长
 
 // 响应式数据
 const projects = ref<any[]>([])
@@ -332,10 +332,10 @@ const loadProjectInsights = async () => {
           ...item,
           tags: item.tags ? item.tags.split(',').filter((t: string) => t.trim()) : []
         }))
-      console.log('【建设行动】加载项目心得数据:', projectRecords.value.length, '个')
+      console.log('【工程建设】加载项目心得数据:', projectRecords.value.length, '个')
     }
   } catch (error) {
-    console.error('【建设行动】加载项目心得失败:', error)
+    console.error('【工程建设】加载项目心得失败:', error)
   }
 }
 
@@ -347,22 +347,22 @@ const loadIssues = async () => {
       const allIssues = response.data || []
       const projectIds = projects.value.map(p => p.id)
       issues.value = allIssues.filter((i: any) => projectIds.includes(i.projectId))
-      console.log('【建设行动】加载问题记录数据:', issues.value.length, '个')
+      console.log('【工程建设】加载问题记录数据:', issues.value.length, '个')
     }
   } catch (error) {
-    console.error('【建设行动】加载问题记录失败:', error)
+    console.error('【工程建设】加载问题记录失败:', error)
   }
 }
 
 // 加载数据
 const loadData = async () => {
   try {
-    console.log('【建设行动】开始加载数据...')
-    // 加载建设行动类别的项目
+    console.log('【工程建设】开始加载数据...')
+    // 加载工程建设类别的项目
     const projectRes = await request.get('/project/category/construction')
     if (projectRes.code === 200) {
       projects.value = projectRes.data || []
-      console.log('【建设行动】加载项目数据:', projects.value.length, '个')
+      console.log('【工程建设】加载项目数据:', projects.value.length, '个')
     }
     
     // 加载所有任务（后续根据项目ID过滤）
@@ -371,14 +371,14 @@ const loadData = async () => {
       const allTasks = taskRes.data || []
       const projectIds = projects.value.map(p => p.id)
       tasks.value = allTasks.filter((t: any) => projectIds.includes(t.projectId))
-      console.log('【建设行动】加载任务数据:', tasks.value.length, '个')
+      console.log('【工程建设】加载任务数据:', tasks.value.length, '个')
     }
     
     // 加载项目心得和问题记录
     await loadProjectInsights()
     await loadIssues()
   } catch (error) {
-    console.error('【建设行动】加载数据失败:', error)
+    console.error('【工程建设】加载数据失败:', error)
   }
 }
 
@@ -618,7 +618,7 @@ onMounted(() => {
 
 // 组件激活时重新加载数据（当从其他页面切换回来时）
 onActivated(() => {
-  console.log('【建设行动】页面被激活，刷新数据...')
+  console.log('【工程建设】页面被激活，刷新数据...')
   loadData()
 })
 </script>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.CustomPracticeMapper">
+    
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.CustomPractice">
+        <id column="id" property="id"/>
+        <result column="practice_name" property="practiceName"/>
+        <result column="scenario_type" property="scenarioType"/>
+        <result column="scenario_detail" property="scenarioDetail"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="background" property="background"/>
+        <result column="description" property="description"/>
+        <result column="target_skills" property="targetSkills"/>
+        <result column="tech_stack" property="techStack"/>
+        <result column="constraints" property="constraints"/>
+        <result column="practice_content" property="practiceContent"/>
+        <result column="evaluation_criteria" property="evaluationCriteria"/>
+        <result column="reference_materials" property="referenceMaterials"/>
+        <result column="time_limit" property="timeLimit"/>
+        <result column="compatibility_notes" property="compatibilityNotes"/>
+        <result column="tags" property="tags"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, practice_name, scenario_type, scenario_detail, difficulty, background, description, 
+        target_skills, tech_stack, constraints, practice_content, evaluation_criteria, 
+        reference_materials, time_limit, compatibility_notes, tags,
+        rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+    </sql>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_custom_practice
+        WHERE id = #{id} AND arch_flag = 0 AND rec_creator = #{recCreator}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_custom_practice
+        WHERE arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY rec_create_time DESC
+    </select>
+    
+    <select id="selectByScenarioType" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM km_custom_practice
+        WHERE scenario_type = #{scenarioType} AND arch_flag = 0 AND rec_creator = #{recCreator}
+        ORDER BY rec_create_time DESC
+    </select>
+    
+    <insert id="insert" parameterType="com.knowledge.entity.CustomPractice" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_custom_practice (
+            practice_name, scenario_type, scenario_detail, difficulty, background, description, 
+            target_skills, tech_stack, constraints, practice_content, evaluation_criteria, 
+            reference_materials, time_limit, compatibility_notes, tags,
+            rec_creator, rec_create_time, arch_flag
+        ) VALUES (
+            #{practiceName}, #{scenarioType}, #{scenarioDetail}, #{difficulty}, #{background}, #{description},
+            #{targetSkills}, #{techStack}, #{constraints}, #{practiceContent}, #{evaluationCriteria},
+            #{referenceMaterials}, #{timeLimit}, #{compatibilityNotes}, #{tags},
+            #{recCreator}, NOW(), 0
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.knowledge.entity.CustomPractice">
+        UPDATE km_custom_practice
+        <set>
+            <if test="practiceName != null">practice_name = #{practiceName},</if>
+            <if test="scenarioType != null">scenario_type = #{scenarioType},</if>
+            <if test="scenarioDetail != null">scenario_detail = #{scenarioDetail},</if>
+            <if test="difficulty != null">difficulty = #{difficulty},</if>
+            <if test="background != null">background = #{background},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="targetSkills != null">target_skills = #{targetSkills},</if>
+            <if test="techStack != null">tech_stack = #{techStack},</if>
+            <if test="constraints != null">constraints = #{constraints},</if>
+            <if test="practiceContent != null">practice_content = #{practiceContent},</if>
+            <if test="evaluationCriteria != null">evaluation_criteria = #{evaluationCriteria},</if>
+            <if test="referenceMaterials != null">reference_materials = #{referenceMaterials},</if>
+            <if test="timeLimit != null">time_limit = #{timeLimit},</if>
+            <if test="compatibilityNotes != null">compatibility_notes = #{compatibilityNotes},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="recRevisor != null">rec_revisor = #{recRevisor},</if>
+            rec_revise_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        UPDATE km_custom_practice
+        SET arch_flag = 1, rec_revise_time = NOW()
+        WHERE id = #{id}
+    </delete>
+    
+</mapper>
+

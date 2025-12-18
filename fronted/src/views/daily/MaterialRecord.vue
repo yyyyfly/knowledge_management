@@ -3,10 +3,10 @@
     <!-- 页面头部 -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
-        <h1 class="text-3xl font-bold text-gray-900">笔记记录</h1>
-        <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">日常记录</span>
+        <h1 class="text-3xl font-bold text-gray-900">素材笔记</h1>
+        <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">素材记录</span>
       </div>
-      <p class="text-gray-600">记录日常学习、阅读、思考的素材和笔记，为项目制作积累素材</p>
+      <p class="text-gray-600">记录日常学习、阅读、思考中的知识素材，为后续项目和复习提供参考</p>
     </div>
 
     <!-- 笔记配置管理 -->

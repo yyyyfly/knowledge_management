@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowledge.mapper.RequirementDraftMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.knowledge.entity.RequirementDraft">
+        <id column="id" property="id"/>
+        <result column="version" property="version"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="rec_creator" property="recCreator"/>
+        <result column="rec_create_time" property="recCreateTime"/>
+        <result column="rec_revisor" property="recRevisor"/>
+        <result column="rec_revise_time" property="recReviseTime"/>
+        <result column="arch_flag" property="archFlag"/>
+    </resultMap>
+    
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, version, title, description, status, sort_order, 
+        rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+    </sql>
+    
+    <!-- 查询所有需求草案（按version分组，组内按sort_order排序） -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM km_requirement_draft
+        WHERE arch_flag = 0
+        ORDER BY version DESC, sort_order ASC, rec_create_time DESC
+    </select>
+    
+    <!-- 根据ID查询需求草案 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM km_requirement_draft
+        WHERE id = #{id} AND arch_flag = 0
+    </select>
+    
+    <!-- 根据版本号查询需求草案 -->
+    <select id="selectByVersion" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM km_requirement_draft
+        WHERE version = #{version} AND arch_flag = 0
+        ORDER BY sort_order ASC, rec_create_time DESC
+    </select>
+    
+    <!-- 查询所有版本号列表（去重） -->
+    <select id="selectVersionList" resultType="java.lang.String">
+        SELECT DISTINCT version
+        FROM km_requirement_draft
+        WHERE arch_flag = 0
+        ORDER BY version DESC
+    </select>
+    
+    <!-- 新增需求草案 -->
+    <insert id="insert" parameterType="com.knowledge.entity.RequirementDraft" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO km_requirement_draft (
+            version, title, description, status, sort_order,
+            rec_creator, rec_create_time, rec_revisor, rec_revise_time, arch_flag
+        ) VALUES (
+            #{version}, #{title}, #{description}, #{status}, #{sortOrder},
+            #{recCreator}, #{recCreateTime}, #{recRevisor}, #{recReviseTime}, #{archFlag}
+        )
+    </insert>
+    
+    <!-- 更新需求草案 -->
+    <update id="update" parameterType="com.knowledge.entity.RequirementDraft">
+        UPDATE km_requirement_draft
+        <set>
+            <if test="version != null">version = #{version},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="recRevisor != null">rec_revisor = #{recRevisor},</if>
+            <if test="recReviseTime != null">rec_revise_time = #{recReviseTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 根据ID删除需求草案（逻辑删除） -->
+    <update id="deleteById">
+        UPDATE km_requirement_draft
+        SET arch_flag = 1
+        WHERE id = #{id}
+    </update>
+    
+</mapper>
+
